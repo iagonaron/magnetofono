@@ -3699,5 +3699,22 @@ else boot();
   });
 })();
 </script>
+
+<script>
+(function(){
+  function coloca(){
+    var t=document.getElementById('cineTabs'), m=document.getElementById('maker');
+    if(!t) return;
+    var y=18;
+    if(m){ var r=m.getBoundingClientRect(); if(r.height) y=r.bottom+16; }
+    t.style.top=Math.round(y)+'px';
+  }
+  window.addEventListener('resize',coloca);
+  window.addEventListener('orientationchange',coloca);
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',coloca);
+  else coloca();
+  setTimeout(coloca,400); setTimeout(coloca,1500);
+})();
+</script>
 </body>
 </html>
