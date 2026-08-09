@@ -364,6 +364,31 @@
     #toast{max-width:60vw}
     #tDeckReels{display:none}
   }
+
+/* ══════════ portada con foto, pestañas de vídeo y visor ══════════ */
+#boot .portada{display:block;width:min(560px,60vw);max-height:34vh;object-fit:contain;
+  border-radius:8px;box-shadow:0 26px 60px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.07);margin:0 auto}
+#cineTabs{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:14;
+  display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.cineTab{cursor:pointer;font:inherit;font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;
+  padding:9px 15px;border-radius:4px;color:#FFF3DC;white-space:nowrap;
+  background:linear-gradient(176deg,#5C3C15,#A06D23 42%,#4B3010);
+  border:1px solid rgba(0,0,0,.65);
+  box-shadow:0 1px 0 rgba(255,228,175,.35) inset,0 5px 14px rgba(0,0,0,.55)}
+.cineTab:hover{filter:brightness(1.15)}
+@media (max-width:1180px){ #cineTabs{top:72px} .cineTab{font-size:11.5px;padding:7px 11px} }
+#cine{position:fixed;inset:0;z-index:60;background:rgba(3,5,7,.94);
+  display:none;align-items:center;justify-content:center;padding:3vh 3vw}
+#cine.open{display:flex}
+#cineBox{width:min(1180px,94vw);max-height:94vh;display:flex;flex-direction:column;gap:10px}
+#cineTop{display:flex;align-items:center;justify-content:space-between;gap:14px}
+#cineTitle{font-size:clamp(14px,2vw,22px);letter-spacing:.04em;color:#EAF1F4;margin:0}
+#cineVid{width:100%;max-height:80vh;background:#000;border-radius:6px;
+  box-shadow:0 24px 70px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.08);display:block}
+#cineFoot{font-size:13px;color:#8C99A2;line-height:1.5;margin:0}
+#cineX{cursor:pointer;border:1px solid rgba(190,210,225,.35);background:rgba(255,255,255,.07);
+  color:#DCE6EC;border-radius:4px;padding:8px 16px;font:inherit;font-size:14px;letter-spacing:.06em}
+#cineX:hover{background:rgba(255,255,255,.14)}
 </style>
 </head>
 <body>
@@ -456,6 +481,7 @@
     <button class="btn plate sm" id="fNew" style="flex:1">Borrar cinta</button>
   </div>
   <button class="btn plate sm" id="fTaller" style="background:linear-gradient(176deg,#2E5B45,#4E9B72 40%,#254937);color:#EAFFF3;text-shadow:0 1px 0 rgba(0,0,0,.4)">Taller de música concreta</button>
+  <button class="btn plate sm" style="background:linear-gradient(176deg,#5C3C15,#A06D23 40%,#4B3010);color:#FFF3DC;text-shadow:0 1px 0 rgba(0,0,0,.45)" data-cine="magne">▶ Vídeo magnetófono</button>
   <button class="btn ghost" id="fPre">Volver a cargar la muestra de piano</button>
   <button class="btn ghost" id="fTour">Ver el despiece otra vez</button>
 </div>
@@ -669,6 +695,7 @@
       <button class="key big" id="tPlay" title="Reproducir la cinta y todas las pistas a la vez">
         <span class="cap" id="tPlayIco">▶</span><span class="lbl">Todo junto</span></button>
       <button class="key" id="tStop" title="Parar"><span class="cap">■</span><span class="lbl">Parar</span></button>
+      <button class="key" data-cine="concreta" title="Ver el vídeo de música concreta"><span class="cap">▶</span><span class="lbl">Vídeo</span></button>
       <button class="key" id="tallerClose" title="Volver al magnetófono"><span class="cap">←</span><span class="lbl">Volver</span></button>
     </div>
   </div>
@@ -751,6 +778,7 @@
 </div>
 
 <div id="boot">
+  <img class="portada" src="portada.jpg" alt="Magnetófono de bobina abierta" onerror="if(this.dataset.n){this.style.display='none'}else{this.dataset.n=1;this.src='portada.png'}">
   <p class="sub">Estudio de música electrónica · A Coruña</p>
   <h1>El sonido en imanes</h1>
   <p class="lede">Vas a ir montando el magnetófono pieza a pieza sobre la mesa, con el microscopio abierto al lado para ver lo que pasa dentro del cabezal. Después grabas, escuchas, y al final entras en el taller: cortar, pegar y poner la cinta del revés, como en 1951.</p>
@@ -2572,7 +2600,7 @@ rec:{ name:'Grabar', steps:[
    alt:'O usar la muestra de piano',
    run:function(){ G.busy=true; micEnable().then(function(){ G.busy=false; }); },
    altRun:function(){ usarPrecarga(); },
-   ok:function(){ return S.micOn; }},
+   ok:function(){ return S.micOn||S.hasAudio; }},
 
   {tag:'Grabar', view:'microfono', micro:'grabar', meter:true,
    title:'Graba',
@@ -3278,7 +3306,7 @@ function bindUI(){
   $('gAlt').addEventListener('click',function(){
     if(G.busy||!G.flow) return;
     var st=FLOWS[G.flow].steps[G.i];
-    if(st.altRun) audioInit().then(function(){ st.altRun(); renderStep(); });
+    if(st.altRun) audioInit().then(function(){ G.pressed=true; st.altRun(); renderStep(); });
   });
   $('gBack').addEventListener('click',function(){ stepBack(); });
   $('gFold').addEventListener('click',function(){
@@ -3620,6 +3648,54 @@ $('bBoot').addEventListener('click',function(){
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
 else boot();
 
+})();
+</script>
+
+<div id="cineTabs">
+    <button class="cineTab" data-cine="magne">▶ Vídeo magnetófono</button>
+    <button class="cineTab" data-cine="concreta">▶ Vídeo música concreta</button>
+</div>
+
+<div id="cine" role="dialog" aria-modal="true" aria-label="Vídeo">
+  <div id="cineBox">
+    <div id="cineTop">
+      <p id="cineTitle"></p>
+      <button id="cineX" type="button">Cerrar ✕</button>
+    </div>
+    <video id="cineVid" controls playsinline preload="metadata"></video>
+    <p id="cineFoot"></p>
+  </div>
+</div>
+<script>
+(function(){
+  var VID = {
+    magne:{t:'Vídeo magnetófono',f:'video-magnetofono.mp4',
+      p:'Unidad 4 · la máquina de verdad, después de haberla montado tú pieza a pieza.'},
+    concreta:{t:'Vídeo música concreta',f:'video-musica-concreta.mp4',
+      p:'Unidad 4 · lo que se puede hacer cortando y pegando cinta, que es lo que haces en el taller.'}
+  };
+  var cine=document.getElementById('cine'), vid=document.getElementById('cineVid');
+  function abre(k){
+    var v=VID[k]; if(!v) return;
+    ['bStopAll','tStop'].forEach(function(id){
+      var b=document.getElementById(id);
+      if(b&&b.offsetParent!==null){ try{ b.click(); }catch(e){} }
+    });
+    document.getElementById('cineTitle').textContent=v.t;
+    document.getElementById('cineFoot').textContent=v.p||'';
+    if(vid.getAttribute('src')!==v.f){ vid.setAttribute('src',v.f); vid.load(); }
+    cine.classList.add('open');
+    setTimeout(function(){ try{ vid.play(); }catch(e){} },120);
+  }
+  function cierra(){ try{ vid.pause(); }catch(e){} cine.classList.remove('open'); }
+  document.getElementById('cineX').addEventListener('click',cierra);
+  cine.addEventListener('click',function(e){ if(e.target===cine) cierra(); });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'&&cine.classList.contains('open')){ e.stopPropagation(); cierra(); }
+  },true);
+  Array.prototype.forEach.call(document.querySelectorAll('[data-cine]'),function(b){
+    b.addEventListener('click',function(){ abre(b.getAttribute('data-cine')); });
+  });
 })();
 </script>
 </body>
