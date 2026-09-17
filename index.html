@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- Sentry (17-sep-2026): errores JS en produccion. Sin datos personales: solo el id anonimo de la cuenta como etiqueta. -->
+<script src="https://browser.sentry-cdn.com/10.70.0/bundle.min.js" crossorigin="anonymous"></script>
+<script>
+if(window.Sentry && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){
+  Sentry.init({ dsn:'https://c2f1bb8373171bd486ca2ec64d472b33@o4512064125861888.ingest.de.sentry.io/4512064142704720',
+    release:'magnetofono@2026-09-17', environment:'production', sendDefaultPii:false,
+    initialScope:{ tags:{ app:'magnetofono' } },
+    ignoreErrors:['ResizeObserver loop','Non-Error promise rejection','AbortError','Load failed','NetworkError','Failed to fetch'],
+    beforeSend:function(ev){
+      try{ var s=(JSON.parse(localStorage.getItem('lmeav_session')||localStorage.getItem('lmpro_session')||'null')||window.__LM_SES||null); if(s&&s.id){ ev.tags=ev.tags||{}; ev.tags.cuenta=String(s.id); } }catch(e){}
+      if(ev.user) delete ev.user;
+      return ev;
+    }
+  });
+}
+</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Magnetófono — cómo graba y reproduce, y taller de música concreta</title>
@@ -4276,6 +4293,49 @@ else boot();
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',coloca);
   else coloca();
   setTimeout(coloca,400); setTimeout(coloca,1500);
+})();
+</script>
+<!-- (17-sep-2026, Iago) PENTAGRAMAS QUE CABEN. VexFlow dibuja el pentagrama con un
+     ancho fijo metido en el propio SVG (style="width:920px"), que pisa al CSS. En iPad en
+     vertical la caja es mas estrecha y tiene el desplazamiento bloqueado, asi que las
+     ultimas notas quedaban cortadas y sin forma de llegar a ellas (lo que una alumna
+     describio como "no me deja avanzar a la derecha", 16-sep-2026). Aqui se le quita ese
+     ancho fijo y se deja que el viewBox escale el MISMO dibujo al ancho que haya.
+     Solo toca los SVG grandes: los iconos (24 px) no se tocan. -->
+<script>
+(function(){
+  function ajusta(sv){
+    try{
+      if(!sv || !sv.style) return;
+      var w=parseFloat(sv.getAttribute('width')||sv.style.width||0);
+      if(!w || w < 300) return;                       // iconos y cosas pequenas, fuera
+      if(!sv.getAttribute('viewBox')){
+        var h=parseFloat(sv.getAttribute('height')||sv.style.height||0);
+        if(!h) return;
+        sv.setAttribute('viewBox','0 0 '+w+' '+h);
+      }
+      sv.setAttribute('preserveAspectRatio','xMinYMin meet');
+      sv.removeAttribute('width'); sv.removeAttribute('height');
+      sv.style.width='100%'; sv.style.height='auto'; sv.style.maxWidth='100%';
+    }catch(e){}
+  }
+  function pasada(){ try{ document.querySelectorAll('svg').forEach(ajusta); }catch(e){} }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',pasada); else pasada();
+  addEventListener('load',pasada);
+  try{
+    new MutationObserver(function(ms){
+      for(var i=0;i<ms.length;i++){
+        var m=ms[i];
+        if(m.type==='attributes'){ if(m.target && String(m.target.tagName).toLowerCase()==='svg') ajusta(m.target); continue; }
+        var a=m.addedNodes;
+        for(var j=0;j<a.length;j++){
+          var n=a[j]; if(!n || n.nodeType!==1) continue;
+          if(String(n.tagName).toLowerCase()==='svg') ajusta(n);
+          else if(n.querySelectorAll) n.querySelectorAll('svg').forEach(ajusta);
+        }
+      }
+    }).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['width','height','style']});
+  }catch(e){}
 })();
 </script>
 </body>
