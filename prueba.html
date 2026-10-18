@@ -42,8 +42,9 @@
 </script>
 <!-- LM at home · SELECCIONADOR DE VOLUNTARIOS (como en los otros portales del medallero). Solo con la cuenta Protester: el
      medallero de gp.lmathome.es abre este portal con «#c=<cuenta>»; aquí se quita de la dirección, se guarda en este navegador
-     y se carga el seleccionador de https://gp.lmathome.es/voluntarios/ (tema «cinta»; botón arriba a la derecha, activo en la
-     hora de clase). A los alumnos no les hace nada. Quitarlo de este portal: borrar este bloque. -->
+     y se carga el seleccionador de https://gp.lmathome.es/voluntarios/ (tema «cinta»; desde la v3, 18-oct, sin botón: en la hora
+     de clase, al «Empezar la bobina N», el motor llama a LMVoluntarios.ofrece() y sale «Seleccionar voluntario» en el medio).
+     A los alumnos no les hace nada. Quitarlo de este portal: borrar este bloque. -->
 <script>
 window.LM_VOL_CONFIG = function () {
   return {
