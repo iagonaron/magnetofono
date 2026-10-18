@@ -34,25 +34,15 @@
     document.head.appendChild(st);
   }());
 
-  // ═══════════════════════════ 1 · b1_disco: un disco no se deja cortar ═══════════════════════════
-  /* La animática (b1v34.py, anim_problema / anim_nocorta): el disco en CX 640, CY 440 (R 400), el brazo con su pivote en
-     (1200, 140) y la aguja en el radio 380 (ángulo -0,62). Fondos dibujados con las mismas funciones (gen_disco.py):
-     b1_disco_fondo (el problema: aros encendidos y rótulos, SIN brazo: el brazo se arrastra), b1_disco_liso (el disco liso
-     con su brazo, como mientras corta el cúter) y b1_disco_roto (el disco partido, igual que el primer fotograma del tramo
-     siguiente, el del «¿Ves? Un disco no se puede cortar.»). */
-  const DISCO = {
-    cx: 640, cy: 440, rout: 400, rin: 150, piv: { x: 1200, y: 140 }, rr0: 380, ang: -0.62,
-    grieta: [[268.0, 290.0], [283.9, 299.0], [298.7, 310.0], [313.9, 320.2], [331.1, 326.6], [348.9, 332.0], [365.9, 338.9], [382.8, 346.0], [396.2, 359.6], [410.7, 371.1], [427.4, 378.6], [444.7, 384.9], [462.0, 391.1], [477.0, 401.8], [493.1, 410.4], [507.5, 422.2], [522.6, 432.5], [540.7, 437.4], [557.9, 443.9], [573.3, 453.7], [588.7, 463.6], [605.8, 470.2], [623.7, 475.4], [640.0, 483.6], [655.4, 493.6], [671.4, 502.1], [687.3, 511.1], [702.5, 521.5], [718.1, 530.9], [735.3, 537.5], [750.6, 547.5], [768.0, 553.6], [785.2, 560.0], [800.6, 570.0], [815.6, 580.6], [830.9, 590.7], [847.0, 599.1], [863.2, 607.6], [878.1, 618.4], [894.4, 626.5], [910.9, 634.3], [927.2, 642.5], [942.7, 652.2], [960.1, 658.3], [974.3, 670.5], [992.0, 676.0]]
-  };
-  function brazo(g, N) {
-    const P = DISCO.piv, E = { x: N.x + 40, y: N.y - 52 };
-    g.lineCap = 'round'; g.lineJoin = 'round';
-    g.strokeStyle = 'rgb(199,194,184)'; g.lineWidth = 9; g.beginPath(); g.moveTo(P.x, P.y); g.lineTo(E.x, E.y); g.stroke();
-    g.strokeStyle = 'rgb(179,173,163)'; g.lineWidth = 7; g.beginPath(); g.moveTo(E.x, E.y); g.lineTo(N.x, N.y); g.stroke();
-    g.fillStyle = 'rgb(107,102,97)'; g.beginPath(); g.arc(P.x, P.y, 34, 0, 7); g.fill();
-    g.strokeStyle = 'rgb(217,212,199)'; g.lineWidth = 2; g.beginPath(); g.arc(P.x, P.y, 34, 0, 7); g.stroke();
-    g.fillStyle = 'rgb(242,237,224)'; g.beginPath(); g.arc(N.x, N.y, 7, 0, 7); g.fill();
-  }
+  // ═══════════════════════════ 1 · b1_disco: recortar el disco en círculo… y se rompe ═══════════════════════════
+  /* (18-oct, bobina 1 v3.6, N10 de Iago) «Inténtalo tú: con el cúter de Odile, recorta en círculo el trozo sin grabar (entre el
+     amarillo y el azul)». Como en la animática (b1v36.py, anim_nocorta): el disco en (640, 440), la línea de corte en el radio
+     322 (la otra, en el 240); el corte empieza en el ángulo 0,20 y va en el sentido de las agujas del reloj; a media vuelta, el
+     disco se raja. El alumno arrastra el cúter por la línea de puntos (o pulsa → / Espacio / Intro): la raya brillante del corte
+     le sigue y, casi a la media vuelta (u = 0,968, el primer fotograma del tramo b1_02), sigue el vídeo: el último trocito del
+     corte y el disco que se rompe, con su ruido. Fondo: b1_disco_fondo (gen_disco36.py: el del vídeo justo antes del tajo, sin
+     el cúter, que lo pinta la página). */
+  const DISCO = { cx: 640, cy: 440, r: 322, a0: 0.20, uFin: 0.9682 };
   function cuter(g, P, d) {
     const im = IM('i/b1_disco_cuter.png'); if (!im) return;
     g.save(); g.translate(P.x, P.y); g.rotate(Math.atan2(d.y, d.x)); g.drawImage(im, -300, -60); g.restore();
@@ -63,144 +53,77 @@
     return D2(p, { x: a.x + t * (b.x - a.x), y: a.y + t * (b.y - a.y) });
   }
   MAG.registra('b1_disco', {
-    titulo: 'El disco que no se deja cortar',
+    titulo: 'Recorta el disco en círculo',
     fondo: 'i/b1_disco_fondo.jpg',
-    recursos: ['i/b1_disco_fondo.jpg', 'i/b1_disco_liso.jpg', 'i/b1_disco_roto.jpg', 'i/b1_disco_cuter.png', 'i/b1_disco_p_cuter.png',
-      'i/b1_disco_p_aguja.png', 'i/b1_disco_p_raya.png', 'a/b1_disco_crepita.mp3', 'a/b1_disco_frenazo.mp3', 'a/b1_disco_pitido.mp3',
-      'a/b1_disco_cuter.mp3', 'a/b1_disco_raja.mp3', 'a/b1_disco_raya.mp3'],
+    recursos: ['i/b1_disco_fondo.jpg', 'i/b1_disco_cuter.png', 'i/b1_disco_p_cuter.png', 'a/b1_disco_crepita.mp3', 'a/b1_disco_raspa.mp3'],
     async monta(ctx) {
       ctx.fondo('i/b1_disco_fondo.jpg');
       ctx.bucle('a/b1_disco_crepita.mp3', { db: -6, entra: 0.8 });
+      ctx.teclas([]);
       const W = 1300, H = 1080, cv = lienzo(ctx, 0, 0, W, H, 1), g = cv.getContext('2d');
       cv.style.touchAction = 'none';
-      const tagCuter = img(ctx, 'i/b1_disco_p_cuter.png', 592, 962), tagAguja = img(ctx, 'i/b1_disco_p_aguja.png', 1246, 112);
-      const raya = img(ctx, 'i/b1_disco_p_raya.png', 1110, 605); raya.style.display = 'none';
-      const oir = ctx.boton('', { clase: 'mbtn-sec', icono: MAG.ICO.play, titulo: 'Escuchar el disco' });
-      Object.assign(oir.style, { position: 'absolute', left: '1110px', top: '612px', zIndex: 3 });
-      const tj = ctx.tarjeta({ titulo: 'AHORA TÚ', texto: 'Junta el frenazo y el pitido.<br>Tienes el cúter de Odile… o&nbsp;la&nbsp;aguja.', x: 1110, y: 702, w: 740 });
-      tj.style.zIndex = 3; tj.querySelector('.tj-txt').style.font = '400 33px/45px var(--maq)';
-      const N0 = { x: DISCO.cx + DISCO.rr0 * Math.cos(DISCO.ang), y: DISCO.cy + DISCO.rr0 * Math.sin(DISCO.ang) };
-      const REPOSO = { p: { x: 568, y: 990 }, d: (function () { const v = { x: 1, y: -0.12 }, n = Math.hypot(v.x, v.y); return { x: v.x / n, y: v.y / n }; }()) };
-      const GR = DISCO.grieta, TA = { x: GR[0][0], y: GR[0][1] }, TB = { x: GR[GR.length - 1][0], y: GR[GR.length - 1][1] };
-      const LT = D2(TA, TB), DIR = { x: (TB.x - TA.x) / LT, y: (TB.y - TA.y) / LT };
-      let fase = 'problema', aguja = { x: N0.x, y: N0.y }, rayas = [], rayaLen = 0, nRaya = 0;
-      let arrastra = null, cut = { p: { x: REPOSO.p.x, y: REPOSO.p.y }, d: REPOSO.d }, u = 0, ultimo = null, sonando = false, esq = null, tEsq = 0, porTeclado = false;
+      const tagCuter = img(ctx, 'i/b1_disco_p_cuter.png', 1000, 540);
+      const tj = ctx.tarjeta({ titulo: 'AHORA TÚ', texto: 'Con el cúter de Odile, recorta en círculo el trozo sin grabar (entre el amarillo y el azul): arrastra el cúter por la línea de puntos.', x: 1110, y: 640, w: 740 });
+      tj.style.zIndex = 3; tj.querySelector('.tj-txt').style.font = '400 31px/43px var(--maq)';
+      const pol = (r, a) => ({ x: DISCO.cx + r * Math.cos(a), y: DISCO.cy + r * Math.sin(a) });
+      const angDe = p => Math.atan2(p.y - DISCO.cy, p.x - DISCO.cx);
+      const norm = a => { while (a > Math.PI) a -= 2 * Math.PI; while (a <= -Math.PI) a += 2 * Math.PI; return a; };
+      let u = 0, arrastra = false, ultAng = null, acabado = false, raspa = null, tMov = 0;
       let terminar; const fin = new Promise(r => { terminar = r; });
-
+      const angAhora = () => DISCO.a0 + Math.PI * u;
       function pinta(t) {
         g.clearRect(0, 0, W, H);
-        if ((fase === 'problema' && arrastra === 'cuter') || fase === 'corte') {            // por dónde corta el cúter (discreto)
-          const n = GR.length, k0 = fase === 'corte' ? Math.max(0, Math.round(n * u) - 1) : 0;
-          g.save(); g.setLineDash([10, 12]); g.strokeStyle = 'rgba(247,245,237,0.32)'; g.lineWidth = 2; g.beginPath();
-          for (let i = k0; i < n; i++) { const q = GR[i]; if (i === k0) g.moveTo(q[0], q[1]); else g.lineTo(q[0], q[1]); } g.stroke(); g.restore();
+        const ang = angAhora();
+        if (u > 0) {                                                          // la raya brillante del corte (la de la animática)
+          g.strokeStyle = 'rgba(252,250,242,0.95)'; g.lineWidth = 3; g.lineCap = 'round';
+          g.beginPath(); g.arc(DISCO.cx, DISCO.cy, DISCO.r, DISCO.a0, ang, false); g.stroke();
         }
-        if (fase === 'problema') {
-          g.lineCap = 'round';
-          rayas.forEach(r => {
-            if (r.length < 2) return;
-            g.strokeStyle = 'rgba(8,8,8,0.92)'; g.lineWidth = 5; g.beginPath(); r.forEach((p, i) => { if (i) g.lineTo(p.x, p.y); else g.moveTo(p.x, p.y); }); g.stroke();
-            g.strokeStyle = 'rgba(240,234,218,0.85)'; g.lineWidth = 2.2; g.beginPath(); r.forEach((p, i) => { if (i) g.lineTo(p.x + 1, p.y - 1); else g.moveTo(p.x + 1, p.y - 1); }); g.stroke();
-          });
-          brazo(g, aguja);
-          cuter(g, cut.p, cut.d);
-        } else if (fase === 'corte') {
-          const n = GR.length, k = Math.max(2, Math.round(n * u));
-          g.strokeStyle = 'rgba(247,245,237,0.95)'; g.lineWidth = 3; g.lineJoin = 'round'; g.lineCap = 'round';
-          g.beginPath(); for (let i = 0; i < k; i++) { const p = GR[i]; if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); } g.stroke();
-          if (arrastra === 'cuter' || porTeclado) {
-            const a = GR[Math.max(0, k - 3)], b = GR[Math.min(n - 1, k - 1)];
-            const d = { x: b[0] - a[0], y: b[1] - a[1] }, m = Math.hypot(d.x, d.y) || 1;
-            cuter(g, { x: b[0], y: b[1] }, m > 1 ? { x: d.x / m, y: d.y / m } : DIR);
-          } else cuter(g, REPOSO.p, REPOSO.d);
-        } else if (fase === 'roto' && esq) {
-          const dt = (t - tEsq) / 1000;
-          if (dt < 0.7) esq.forEach(e => {
-            const p = { x: e.p.x + e.v.x * dt * (1 - 0.5 * dt), y: e.p.y + e.v.y * dt * (1 - 0.5 * dt) }, s = e.s;
-            g.fillStyle = 'rgba(20,20,22,' + (1 - dt / 0.7).toFixed(3) + ')';
-            g.beginPath(); g.moveTo(p.x + s, p.y); g.lineTo(p.x - s * 0.6, p.y + s * 0.8); g.lineTo(p.x - s * 0.4, p.y - s); g.closePath(); g.fill();
-          });
+        if (u === 0 && !arrastra) {                                           // por dónde: una flechita que late, por delante del cúter
+          const k = 0.5 + 0.5 * Math.sin(t / 260), a1 = ang + 0.10, a2 = ang + 0.42;
+          g.strokeStyle = 'rgba(255,214,120,' + (0.55 + 0.4 * k).toFixed(3) + ')'; g.lineWidth = 6; g.lineCap = 'round';
+          g.beginPath(); g.arc(DISCO.cx, DISCO.cy, DISCO.r + 34, a1, a2, false); g.stroke();
+          const p = pol(DISCO.r + 34, a2), d = { x: -Math.sin(a2), y: Math.cos(a2) }, n = { x: -d.y, y: d.x };
+          g.beginPath(); g.moveTo(p.x + d.x * 16, p.y + d.y * 16); g.lineTo(p.x - d.x * 6 + n.x * 12, p.y - d.y * 6 + n.y * 12);
+          g.moveTo(p.x + d.x * 16, p.y + d.y * 16); g.lineTo(p.x - d.x * 6 - n.x * 12, p.y - d.y * 6 - n.y * 12); g.stroke();
         }
+        cuter(g, pol(DISCO.r, ang), { x: -Math.sin(ang), y: Math.cos(ang) });
       }
-      let sucio = true; const marca = () => { sucio = true; };
-      ctx.cada(t => { if (sucio || (fase === 'roto' && esq && t - tEsq < 800) || sonando) { pinta(t); sucio = false; } });
-
-      const enDisco = p => Math.hypot(p.x - DISCO.cx, p.y - DISCO.cy) < DISCO.rout + 10;
-      function empiezaCorte() {
-        fase = 'corte'; ctx.fondo('i/b1_disco_liso.jpg');
-        [tagCuter, tagAguja, raya, oir, tj].forEach(e => { e.style.display = 'none'; });
-        ctx.suena('a/b1_disco_cuter.mp3', { db: -1 });
-      }
-      function rompe() {
-        fase = 'roto'; arrastra = null; ctx.fondo('i/b1_disco_roto.jpg');
-        ctx.suena('a/b1_disco_raja.mp3', { db: 0 }); ctx.suena('a/b1_disco_raya.mp3', { db: -10 });
-        let x = 21; const rnd = () => { x = (x * 9301 + 49297) % 233280; return x / 233280; };
-        esq = Array.from({ length: 9 }, () => {
-          const q = GR[5 + Math.floor(rnd() * (GR.length - 10))]; const a = rnd() * 6.283, sp = 120 + rnd() * 140;
-          return { p: { x: q[0], y: q[1] }, v: { x: Math.cos(a) * sp, y: Math.sin(a) * sp }, s: 3 + rnd() * 4 };
-        });
-        tEsq = performance.now(); marca();
-        setTimeout(() => terminar(), 1200);
+      ctx.cada(t => { pinta(t); if (raspa && t - tMov > 140) raspa.volumen(-40, 0.12); });
+      function avanza(du) {
+        if (acabado || du <= 0) return;
+        if (!raspa) raspa = ctx.bucle('a/b1_disco_raspa.mp3', { db: -6, entra: 0.04 });
+        u = Math.min(DISCO.uFin, u + du); tMov = performance.now(); raspa.volumen(-6, 0.05);
+        if (tagCuter.style.display !== 'none') tagCuter.style.display = 'none';
+        if (u >= DISCO.uFin) {                                                // casi a media vuelta: el vídeo sigue (y el disco se rompe)
+          acabado = true; arrastra = false; if (raspa) raspa.volumen(-12, 0.02);
+          terminar();
+        }
       }
       function abajo(ev) {
-        if (fase === 'roto' || sonando) return;
-        const p = MAG.punto(ev);
-        if (fase === 'problema' && D2(p, aguja) < 46) { arrastra = 'aguja'; rayas.push([]); }
-        else if (cercaDeSegmento(p, cut.p, cut.d, 215) < 34 || (fase === 'corte' && enDisco(p))) arrastra = 'cuter';
-        else return;
-        ultimo = p; if (cv.setPointerCapture) { try { cv.setPointerCapture(ev.pointerId); } catch (e) {} } ev.preventDefault(); marca();
+        if (acabado) return;
+        const p = MAG.punto(ev), ang = angAhora(), P = pol(DISCO.r, ang), d = { x: -Math.sin(ang), y: Math.cos(ang) };
+        if (cercaDeSegmento(p, P, d, 215) > 46 && D2(p, P) > 70) return;     // se coge el cúter (o la raya, justo donde va)
+        arrastra = true; ultAng = angDe(p);
+        if (cv.setPointerCapture) { try { cv.setPointerCapture(ev.pointerId); } catch (e) {} } ev.preventDefault();
       }
       function mueve(ev) {
         const p = MAG.punto(ev);
-        if (!arrastra) { cv.style.cursor = (fase !== 'roto' && ((D2(p, aguja) < 46 && fase === 'problema') || cercaDeSegmento(p, REPOSO.p, REPOSO.d, 215) < 34)) ? 'grab' : 'default'; return; }
-        cv.style.cursor = 'grabbing';
-        if (arrastra === 'aguja') {
-          const r = Math.hypot(p.x - DISCO.cx, p.y - DISCO.cy), lim = DISCO.rout + 6;
-          const q = r > lim ? { x: DISCO.cx + (p.x - DISCO.cx) * lim / r, y: DISCO.cy + (p.y - DISCO.cy) * lim / r } : p;
-          const enSurcos = r > DISCO.rin + 24 && r < DISCO.rout;
-          if (enSurcos) {
-            const tr = rayas[rayas.length - 1]; if (tr.length) rayaLen += D2(tr[tr.length - 1], q); tr.push({ x: q.x, y: q.y });
-            if (rayaLen > 60 + nRaya * 150 && nRaya < 4) { ctx.suena('a/b1_disco_raya.mp3', { db: -3, rate: 0.9 + 0.2 * Math.random() }); nRaya++; }
-            if (rayaLen > 140 && raya.style.display === 'none') {
-              raya.style.display = ''; oir.style.display = 'none';
-              tj.querySelector('.tj-txt').innerHTML = 'La aguja raya el disco…<br>¿Y con el cúter?';
-            }
-          } else if (rayas[rayas.length - 1].length) rayas.push([]);
-          aguja = { x: q.x, y: q.y };
-        } else if (arrastra === 'cuter') {
-          if (fase === 'problema') { cut = { p, d: cut.d }; if (enDisco(p)) empiezaCorte(); }
-          if (fase === 'corte' && enDisco(p) && ultimo) {
-            const dx = p.x - ultimo.x, dy = p.y - ultimo.y;
-            u = Math.min(1, u + Math.abs(dx * DIR.x + dy * DIR.y) / LT * 1.3);
-            if (u >= 1) { rompe(); return; }
-          }
+        if (!arrastra) {
+          const ang = angAhora(), P = pol(DISCO.r, ang), d = { x: -Math.sin(ang), y: Math.cos(ang) };
+          cv.style.cursor = (!acabado && (cercaDeSegmento(p, P, d, 215) < 46 || D2(p, P) < 70)) ? 'grab' : 'default'; return;
         }
-        ultimo = p; marca();
+        cv.style.cursor = 'grabbing';
+        const r = D2(p, { x: DISCO.cx, y: DISCO.cy }); if (r < 120 || r > 520) return;    // lejos del centro y no muy fuera
+        const a = angDe(p), da = norm(a - ultAng); ultAng = a;
+        if (da > 0 && da < 0.6) avanza(da / Math.PI);                          // solo hacia delante (en el sentido del corte)
       }
-      function arriba() {
-        if (arrastra === 'cuter' && fase === 'problema') cut = { p: { x: REPOSO.p.x, y: REPOSO.p.y }, d: REPOSO.d };
-        arrastra = null; ultimo = null; marca();
-      }
+      function arriba() { arrastra = false; ultAng = null; }
       ctx.on(cv, 'pointerdown', abajo); ctx.on(window, 'pointermove', mueve); ctx.on(window, 'pointerup', arriba);
-      ctx.on(window, 'keydown', ev => {                         // con el teclado: → (o Espacio, o Intro) corta un trozo cada vez
-        if (fase === 'roto' || sonando || arrastra || ev.repeat) return;
+      ctx.on(window, 'keydown', ev => {                                       // con el teclado: → (o Espacio, o Intro) corta un trozo
+        if (acabado || ev.repeat) return;
         if (ev.key !== 'ArrowRight' && ev.key !== ' ' && ev.key !== 'Enter') return;
-        ev.preventDefault(); porTeclado = true;
-        if (fase === 'problema') empiezaCorte();
-        u = Math.min(1, u + 0.2); if (u >= 1) rompe(); else marca();
-      });
-      // escuchar el disco tal cual: frenazo (fuera)… mucho hueco… pitido (dentro), con la aguja que va hacia dentro
-      oir.addEventListener('click', () => {
-        if (sonando || fase !== 'problema') return;
-        sonando = true; oir.disabled = true; const t0 = performance.now(), DUR = 4300, a0 = { x: aguja.x, y: aguja.y };
-        const r0 = Math.hypot(a0.x - DISCO.cx, a0.y - DISCO.cy), an0 = Math.atan2(a0.y - DISCO.cy, a0.x - DISCO.cx);
-        ctx.suena('a/b1_disco_frenazo.mp3', { db: 0 });
-        setTimeout(() => { if (ctx.vivo()) ctx.suena('a/b1_disco_pitido.mp3', { db: 0 }); }, 3150);
-        const paso = () => {
-          if (!ctx.vivo()) return;
-          const k = Math.min(1, (performance.now() - t0) / DUR), r = r0 + (DISCO.rin + 62 - r0) * k, an = an0 + 0.05 * k;
-          aguja = { x: DISCO.cx + r * Math.cos(an), y: DISCO.cy + r * Math.sin(an) }; marca();
-          if (k < 1) requestAnimationFrame(paso); else { sonando = false; oir.disabled = false; aguja = { x: N0.x, y: N0.y }; marca(); }
-        };
+        ev.preventDefault();
+        let n = 0; const paso = () => { if (acabado || !ctx.vivo()) return; avanza(0.012); if (++n < 20) requestAnimationFrame(paso); };
         requestAnimationFrame(paso);
       });
       await fin;
@@ -570,25 +493,29 @@
   function alSalir(ctx, fn) { ctx.on({ addEventListener() {}, removeEventListener() { try { fn(); } catch (e) {} } }, 'b1-salir', () => {}); }
 
   // ── 4 · b1_grabar ──
+  /* (18-oct, N17 de Iago) Sin botón «Grabar» abajo ni 3, 2, 1: la ● de la botonera (señalada), y se graba MANTENIÉNDOLA (o la R
+     del teclado); al soltar, para (hasta 8 s: lo que cabe en la cinta de la lupa). El micrófono ya se pidió al empezar la bobina.
+     Sin micro: «Usar una frase de muestra». */
   MAG.registra('b1_grabar', {
     titulo: 'Grabar una frase',
+    micro: true,
     fondo: 'i/b1_grabar_fondo.jpg',
-    recursos: RECURSOS_LUPA.concat(['i/b1_grabar_fondo.jpg', 'i/b1_lupa_bob_grabar.png', 'i/b1_lupa_o13.png', 'a/b1_tic.mp3', 'a/b1_frase_muestra.mp3']),
+    recursos: RECURSOS_LUPA.concat(['i/b1_grabar_fondo.jpg', 'i/b1_lupa_bob_grabar.png', 'i/b1_lupa_o13.png', 'a/b1_frase_muestra.mp3']),
     async monta(ctx) {
       ctx.fondo('i/b1_grabar_fondo.jpg');
-      bucleLimpio(ctx, 'a/b1_lupa_amb.mp3', -6);
+      bucleLimpio(ctx, 'a/b1_lupa_amb.mp3', -20);                 // (18-oct, N18) el ruidito de la máquina, casi nada
       const C = laCinta(ctx, LU.XR), mic = onda(ctx, 945, 1144, 190, [936, 140, 216, 102]);
       const bob = img(ctx, 'i/b1_lupa_bob_grabar.png', LU.XR - 56, 326, { z: 2 }); bob.style.display = 'none';
       ctx.figura('i/b1_lupa_o13.png', { caja: [1385, 597, 498, 483] }).el.style.zIndex = 3;     // Odile escucha con los auriculares
       KESSLER_ESCUCHA(ctx);
-      const M = mesaLupa(ctx, 'Graba una frase con el micro y mira cómo se ordenan las partículas.');
-      const bRec = ctx.boton('Grabar', { clase: 'mbtn-prin', icono: MAG.ICO.rec, padre: M.fila }); bRec.querySelector('.mbtn-ic').style.color = 'var(--rojo)';
+      const TXT = 'Mantén pulsada la <b style="color:var(--rojo)">●</b> de arriba mientras dices una frase al micro… y mira cómo se ordenan las partículas.';
+      const M = mesaLupa(ctx, TXT);
       const bMuestra = ctx.boton('Usar una frase de muestra', { clase: 'mbtn-prin', icono: MAG.ICO.play, padre: M.fila }); bMuestra.style.display = 'none';
-      const bOtra = ctx.boton('', { clase: 'mbtn-sec', icono: MAG.ICO.otra, titulo: 'Grabar otra vez', padre: M.fila }); bOtra.style.display = 'none';
-      const cuenta = ctx.el('div', { class: 'b1-cuenta' });
-      Object.assign(cuenta.style, { position: 'absolute', left: '830px', top: '318px', width: '150px', textAlign: 'center', font: '900 150px/1 var(--tit)', color: 'var(--crema)', textShadow: '0 6px 24px rgba(0,0,0,.6)', zIndex: 6, display: 'none', pointerEvents: 'none' });
-      let estado = 'listo', g = null, t0 = 0, env = null, pk = 0.02, nivel = 0, fuenteMuestra = null, seguir = null, rec = null, tAnt = 0;
+      let estado = 'listo', g = null, t0 = 0, env = null, pk = 0.02, nivel = 0, fuenteMuestra = null, seguir = null, rec = null, tAnt = 0, soltado = false;
       const ahora = () => performance.now() / 1000;
+      ctx.teclas(['rec']);
+      const senal = () => { ctx.senala(estado === 'sinmicro' ? null : 'rec', ''); if (estado === 'grabando') M.txt('Grabando… <b>suelta la ●</b> cuando acabes la frase.'); };
+      senal();
       ctx.cada(tms => {
         const t = tms / 1000, dt = Math.min(0.05, t - (tAnt || t)); tAnt = t;
         C.paso(dt);
@@ -604,11 +531,10 @@
       });
       C.pinta(); mic.pinta(0);
       function empieza(conMuestra) {
-        estado = 'grabando'; bRec.querySelector('.mbtn-tx').textContent = 'Parar'; bRec.querySelector('.mbtn-ic').innerHTML = MAG.ICO.stop;
-        bRec.style.display = ''; bMuestra.style.display = 'none'; bOtra.style.display = 'none';
+        estado = 'grabando'; bMuestra.style.display = 'none';
         C.X = LU.XR; C.borrado = null; rec = grabador(C, LU.XR, 8.4); C.vObj = LU.V; bob.style.display = '';
         mic.t0 = ahora(); mic.n = 0; mic.viva = true; t0 = ahora();
-        MAG.botonera.enclava('rec'); MAG.botonera.rotulo('GRABANDO');
+        MAG.botonera.enclava('rec'); MAG.botonera.rotulo('GRABANDO'); senal();
         if (conMuestra) {
           const b = MAG.R['a/b1_frase_muestra.mp3'] && MAG.R['a/b1_frase_muestra.mp3'].buf;
           env = b ? envolvente(b) : (() => 0); B1M.buf = b; B1M.muestra = true;
@@ -618,51 +544,47 @@
       }
       async function para() {
         if (estado !== 'grabando') return;
+        const dura = ahora() - t0;
         estado = 'parando'; C.vObj = 0; C.campo = null; if (fuenteMuestra) { fuenteMuestra.parar(0.06); fuenteMuestra = null; } bob.style.display = 'none'; mic.viva = false; mic.pinta(0);
         MAG.botonera.enclava(null); MAG.botonera.rotulo(''); ctx.suena('a/b1_tecla.mp3', { db: -6 });
-        bRec.style.display = 'none';
         let buf = null;
         if (g) { try { buf = await g.para(); } catch (e) { buf = null; } g = null; }
+        if (!ctx.vivo()) return;
+        if (!env && dura < 0.5) {                                   // un toque sin querer: no cuenta
+          estado = B1M.rec ? 'hecho' : 'listo'; C.rec = B1M.rec || null; C.sucio = true;
+          M.txt(TXT + '<br><small>Mantenla pulsada mientras hablas.</small>'); senal(); return;
+        }
         if (buf) { B1M.buf = normaliza(buf); B1M.muestra = false; }
         else if (!B1M.buf) { B1M.buf = MAG.R['a/b1_frase_muestra.mp3'] && MAG.R['a/b1_frase_muestra.mp3'].buf; B1M.muestra = true; }
         B1M.rec = { v: rec.v.slice(0, rec.n), n: rec.n };
         MAG.datos.b1_frase = { dur: B1M.buf ? +B1M.buf.duration.toFixed(2) : 0, muestra: B1M.muestra, v: Array.from(B1M.rec.v, x => Math.round(x * 100) / 100) };
         try { MAG.guardaDatos(); } catch (e) {}
         if (B1M.buf && !B1M.muestra) MAG.idbPon('b1_frase', MAG.bufAObj(B1M.buf)).catch(() => {});
-        if (!ctx.vivo()) return;
-        estado = 'hecho'; bOtra.style.display = ''; M.txt('Graba una frase con el micro y mira cómo se ordenan las partículas.');
+        estado = 'hecho'; M.txt(TXT); senal();
         if (!seguir) { seguir = ctx.seguir(); seguir.then(() => terminar()); }
       }
       let terminar; const fin = new Promise(r => { terminar = r; });
-      async function pulsaRec(deBotonera) {
-        if (estado === 'grabando') { para(); return; }
-        if (estado !== 'listo' && estado !== 'hecho' && estado !== 'sinmicro') return;
-        if (!deBotonera) ctx.suena('a/b1_tecla.mp3', { db: -4 });
-        estado = 'abriendo'; bRec.disabled = true; bOtra.style.display = 'none';
-        const avisa = setTimeout(() => { if (estado === 'abriendo') { bMuestra.style.display = ''; } }, 5000);
-        const st = await MAG.mic.abre(); clearTimeout(avisa);
-        if (!ctx.vivo() || estado !== 'abriendo') return;
-        bRec.disabled = false;
-        if (!st) { estado = 'sinmicro'; M.txt('No encuentro el micrófono. Puedes grabar una frase de muestra.'); bRec.style.display = 'none'; bMuestra.style.display = ''; return; }
-        estado = 'cuenta'; bRec.style.display = 'none'; bMuestra.style.display = 'none';
-        C.X = LU.XR; C.rec = null; C.sucio = true;                // la cinta, en blanco otra vez
-        for (const n of ['3', '2', '1']) { cuenta.textContent = n; cuenta.style.display = ''; ctx.suena('a/b1_tic.mp3', { db: -4 }); await MAG.espera(800); if (!ctx.vivo()) return; }
-        cuenta.style.display = 'none';
+      async function abajo() {
+        if (estado !== 'listo' && estado !== 'hecho') return;
+        estado = 'abriendo'; soltado = false;
         g = await MAG.mic.graba({ max: 8.6, recorta: false, alNivel: r => { nivel = r; } });
         if (!ctx.vivo()) { if (g) g.para(); return; }
-        if (g.error) { g = null; estado = 'sinmicro'; M.txt('No encuentro el micrófono. Puedes grabar una frase de muestra.'); bMuestra.style.display = ''; return; }
-        ctx.suena('a/b1_tecla.mp3', { db: -6 }); empieza(false);
+        if (g.error) {
+          g = null; estado = 'sinmicro'; M.txt('No encuentro el micrófono (o no tiene permiso). Puedes grabar una frase de muestra.');
+          bMuestra.style.display = ''; senal(); return;
+        }
+        C.X = LU.XR; C.rec = null; C.sucio = true;                 // la cinta, en blanco otra vez
+        empieza(false);
+        if (soltado) para();                                          // se soltó mientras se abría el micro
       }
-      bRec.addEventListener('click', () => pulsaRec(false));
-      ctx.botonera('rec', () => pulsaRec(true));
-      bOtra.addEventListener('click', () => { if (estado === 'hecho') { C.rec = null; C.X = LU.XR; C.sucio = true; bRec.querySelector('.mbtn-tx').textContent = 'Grabar'; bRec.querySelector('.mbtn-ic').innerHTML = MAG.ICO.rec; bRec.style.display = ''; pulsaRec(false); } });
+      function arriba() { if (estado === 'grabando') para(); else if (estado === 'abriendo') soltado = true; }
+      ctx.mantener('rec', abajo, arriba);
       bMuestra.addEventListener('click', async () => {
-        if (estado === 'grabando' || estado === 'cuenta') return;
-        estado = 'cuenta'; bMuestra.style.display = 'none'; bRec.style.display = 'none'; ctx.suena('a/b1_tecla.mp3', { db: -4 });
+        if (estado === 'grabando') return;
+        estado = 'muestra'; bMuestra.style.display = 'none'; ctx.suena('a/b1_tecla.mp3', { db: -4 });
         C.X = LU.XR; C.rec = null; C.sucio = true;
         await MAG.espera(250); if (!ctx.vivo()) return; empieza(true);
       });
-      ctx.on(window, 'keydown', ev => { if ((ev.key === 'r' || ev.key === 'R') && !ev.repeat) { ev.preventDefault(); pulsaRec(false); } });
       alSalir(ctx, () => { if (g) { try { g.para(); } catch (e) {} g = null; } });
       await fin;
     }
@@ -683,14 +605,17 @@
   const OK_SVG = '<svg class="b1-ok" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
   // ── 5 · b1_reproducir ──
+  /* (18-oct, N18/N19 de Iago) Se reproduce con el ▶ de la botonera (señalado), sin botón «Escuchar»; fuera el «como en el
+     fonógrafo» (el fonógrafo lo tienen en la memoria; ya se comparará después): solo suena el magnetófono. El ruidito de la
+     máquina, casi nada (y aún menos mientras suena la frase): lo que se «vende» es que el magnetófono suena limpio. */
   MAG.registra('b1_reproducir', {
-    titulo: 'Reproducir y comparar',
+    titulo: 'Reproducir',
     fondo: 'i/b1_reproducir_fondo.jpg',
     recursos: RECURSOS_LUPA.concat(['i/b1_reproducir_fondo.jpg', 'i/b1_lupa_bob_escuchar.png', 'i/b1_lupa_r_play.png', 'i/b1_lupa_r_rebobina.png',
-      'a/b1_frase_muestra.mp3', 'a/b1_rebobina.mp3', 'a/b1_disco_crepita.mp3']),
+      'a/b1_frase_muestra.mp3', 'a/b1_rebobina.mp3']),
     async monta(ctx) {
       ctx.fondo('i/b1_reproducir_fondo.jpg');
-      bucleLimpio(ctx, 'a/b1_lupa_amb.mp3', -6);
+      const amb = bucleLimpio(ctx, 'a/b1_lupa_amb.mp3', -24);
       const F = await laFrase(); if (!ctx.vivo()) return;
       const X0 = LU.XP - 90, C = laCinta(ctx, X0); C.rec = F.rec;
       const alt = onda(ctx, 1596, 1746, 190, [1588, 128, 328, 140]);
@@ -698,16 +623,9 @@
       const rPlay = img(ctx, 'i/b1_lupa_r_play.png', 300, 544, { z: 2 }), rRew = img(ctx, 'i/b1_lupa_r_rebobina.png', 300, 544, { z: 2 });
       rPlay.style.display = rRew.style.display = 'none';
       KESSLER_ESCUCHA(ctx);
-      const M = mesaLupa(ctx, 'Reprodúcela y compárala con el fonógrafo.');
-      const conm = MAG.el('div', { class: 'b1-conm' }); conm.style.position = 'relative'; M.fila.appendChild(conm);
-      const modos = [['fono', 'Como en el fonógrafo'], ['cinta', 'En cinta']].map(([k, t]) => {
-        const b = MAG.el('button', { type: 'button', html: '<span>' + t + '</span>' + OK_SVG }); b.dataset.k = k; conm.appendChild(b); return b;
-      });
-      const bPlay = ctx.boton('Escuchar', { clase: 'mbtn-prin', icono: MAG.ICO.play, padre: M.fila });
-      let modo = 'cinta', estado = 'listo', oido = { fono: false, cinta: false }, sonido = null, crepita = null, filtro = null, tAnt = 0, seguir = null;
-      const pon = k => { modo = k; modos.forEach(b => b.classList.toggle('on', b.dataset.k === k)); };
-      pon('cinta');
-      modos.forEach(b => b.addEventListener('click', () => { if (estado === 'listo') { pon(b.dataset.k); ctx.suena('a/b1_tecla.mp3', { db: -10 }); } }));
+      const M = mesaLupa(ctx, 'Reprodúcela: dale al <b>▶</b> de arriba.');
+      ctx.teclas(['play']); ctx.senala('play', '');
+      let estado = 'listo', sonido = null, tAnt = 0, seguir = null, veces = 0;
       let terminar; const fin = new Promise(r => { terminar = r; });
       const ahora = () => performance.now() / 1000;
       ctx.cada(tms => {
@@ -725,25 +643,18 @@
       C.pinta(); alt.pinta(0, true);
       function arrancaSonido() {
         if (!F.buf) { setTimeout(acaba, 1500); return; }
-        if (modo === 'fono') {
-          filtro = MAG.filtro('fonografo'); filtro.salida.connect(MAG.master);
-          sonido = ctx.suena(F.buf, { db: -1, destino: filtro.entrada });
-          crepita = ctx.suena('a/b1_disco_crepita.mp3', { db: -9, bucle: true, entra: 0.05 });
-        } else sonido = ctx.suena(F.buf, { db: 0 });
+        sonido = ctx.suena(F.buf, { db: 0 });
         sonido.fin.then(() => { if (ctx.vivo() && estado === 'suena') acaba(); });
       }
-      function play(deBotonera) {
+      function play() {
         if (estado !== 'listo') return;
-        if (deBotonera !== true) ctx.suena('a/b1_tecla.mp3', { db: -4 });
         estado = 'arranca'; C.vObj = LU.V; alt.t0 = ahora(); alt.n = 0; alt.viva = true;
-        bPlay.disabled = true; modos.forEach(b => { b.disabled = true; });
-        rPlay.style.display = ''; MAG.botonera.enclava('play'); MAG.botonera.rotulo('PLAY');
+        if (amb) amb.volumen(-40, 0.3);
+        rPlay.style.display = ''; MAG.botonera.enclava('play'); MAG.botonera.rotulo('PLAY'); ctx.senala(null);
       }
       function acaba() {
         if (estado !== 'suena') return;
-        oido[modo] = true; modos.forEach(b => b.classList.toggle('oido', oido[b.dataset.k]));
-        if (crepita) { crepita.parar(0.2); crepita = null; }
-        if (filtro) { const f_ = filtro; filtro = null; setTimeout(() => { try { f_.salida.disconnect(); } catch (e) {} }, 400); }
+        veces++;
         estado = 'frena'; C.vObj = 0; bob.style.display = 'none'; alt.viva = false; alt.pinta(0, true);
         rPlay.style.display = 'none'; MAG.botonera.enclava(null); MAG.botonera.rotulo('');
         setTimeout(() => {
@@ -754,17 +665,19 @@
       }
       function listo() {
         estado = 'listo'; rRew.style.display = 'none'; MAG.botonera.enclava(null); MAG.botonera.rotulo('');
-        bPlay.disabled = false; modos.forEach(b => { b.disabled = false; });
-        if (!oido.fono) pon('fono'); else if (!oido.cinta) pon('cinta');
-        if (oido.fono && oido.cinta && !seguir) { seguir = ctx.seguir(); seguir.then(() => terminar()); }
+        if (amb) amb.volumen(-24, 0.6);
+        ctx.senala('play', '');
+        if (veces && !seguir) { seguir = ctx.seguir(); seguir.then(() => terminar()); }
       }
-      bPlay.addEventListener('click', () => play(false));
-      ctx.botonera('play', () => play(true));
+      ctx.botonera('play', () => play());
       await fin;
     }
   });
 
   // ── 6 · b1_borrar ──
+  /* (18-oct, N17/N18/N20) Sin botones: se BORRA manteniendo la ● (la cinta pasa por el cabezal de borrar mientras se mantiene; al
+     soltar, para) y se escucha con el ▶ (señalados, uno y luego el otro). Antes del cabezal, las partículas ORDENADAS (la frase
+     grabada): se ve cómo el borrador las desordena. */
   MAG.registra('b1_borrar', {
     titulo: 'Borrar la cinta',
     fondo: 'i/b1_borrar_fondo.jpg',
@@ -772,7 +685,7 @@
       'a/b1_frase_muestra.mp3', 'a/b1_soplido.mp3']),
     async monta(ctx) {
       ctx.fondo('i/b1_borrar_fondo.jpg');
-      bucleLimpio(ctx, 'a/b1_lupa_amb.mp3', -6);
+      bucleLimpio(ctx, 'a/b1_lupa_amb.mp3', -20);
       const F = await laFrase(); if (!ctx.vivo()) return;
       const X0 = LU.XE - 60, C = laCinta(ctx, X0); C.rec = F.rec;
       const L = (F.rec ? F.rec.n : 100) * LU.PX;                 // lo que ocupa la frase en la cinta
@@ -781,29 +694,28 @@
       const rBlanco = img(ctx, 'i/b1_lupa_r_blanco.png', 280, 544, { z: 2 }), rPlay = img(ctx, 'i/b1_lupa_r_play.png', 300, 544, { z: 2 });
       rBlanco.style.display = rPlay.style.display = 'none';
       KESSLER_ESCUCHA(ctx);
-      const M = mesaLupa(ctx, 'Bórrala: pasa la cinta por el cabezal de borrar… y luego escúchala.', 620);
-      const bBorra = ctx.boton('Borrar', { clase: 'mbtn-prin', padre: M.fila });
-      const bPlay = ctx.boton('Escuchar', { clase: 'mbtn-prin', icono: MAG.ICO.play, padre: M.fila }); bPlay.style.display = 'none';
+      const M = mesaLupa(ctx, 'Bórrala: mantén pulsada la <b style="color:var(--rojo)">●</b> de arriba y la cinta pasa por el cabezal de borrar… Luego, escúchala con el <b>▶</b>.', 620);
+      ctx.teclas(['rec', 'play']); ctx.senala('rec', '');
       let estado = 'listo', tAnt = 0, sopl = null, xFin = 0, seguir = null;
       let terminar; const fin = new Promise(r => { terminar = r; });
       const ahora = () => performance.now() / 1000;
       ctx.cada(tms => {
         const t = tms / 1000, dt = Math.min(0.05, t - (tAnt || t)); tAnt = t;
         C.paso(dt);
-        if (estado === 'borra') {
+        if (estado === 'borra' || estado === 'pausaBorra') {
           const uE = LU.XE - C.X; C.borrado = [uE, LU.XE - X0 + 1];
-          C.campo = { x: LU.XE, v: Math.sin(2 * Math.PI * 5.5 * t) };   // un campo que cambia de sentido muy deprisa
+          C.campo = estado === 'borra' ? { x: LU.XE, v: Math.sin(2 * Math.PI * 5.5 * t) } : null;   // un campo que cambia de sentido muy deprisa
           if (uE < -L - 30) {
             estado = 'frena'; C.vObj = 0; C.campo = null; bob.style.display = 'none'; MAG.botonera.enclava(null); MAG.botonera.rotulo('');
             if (sopl) { sopl.parar(0.3); sopl = null; }
-            setTimeout(() => { if (!ctx.vivo()) return; estado = 'borrada'; rBlanco.style.display = ''; bBorra.style.display = 'none'; bPlay.style.display = ''; }, 500);
+            setTimeout(() => { if (!ctx.vivo()) return; estado = 'borrada'; rBlanco.style.display = ''; ctx.senala('play', ''); }, 500);
           }
           C.sucio = true;
         }
         if (estado === 'suena') {
           alt.pon(ahora(), 0.035 * Math.sin(t * 61) * Math.sin(t * 17.3));
           if (C.X >= xFin) {
-            estado = 'fin'; C.vObj = 0; alt.viva = false; alt.pinta(0, true); rPlay.style.display = 'none'; bPlay.style.display = 'none';
+            estado = 'fin'; C.vObj = 0; alt.viva = false; alt.pinta(0, true); rPlay.style.display = 'none';
             MAG.botonera.enclava(null); MAG.botonera.rotulo(''); if (sopl) { sopl.parar(0.25); sopl = null; }
             if (!seguir) { seguir = ctx.seguir(); seguir.then(() => terminar()); }
           }
@@ -812,23 +724,26 @@
         if (alt.viva) alt.pinta(ahora(), false);
       });
       C.pinta(); alt.pinta(0, false);
-      function borra(deBotonera) {
-        if (estado !== 'listo') return;
-        if (deBotonera !== true) ctx.suena('a/b1_tecla.mp3', { db: -4 });
-        estado = 'borra'; C.vObj = 130; bob.style.display = ''; bBorra.disabled = true;
-        MAG.botonera.enclava('rec'); MAG.botonera.rotulo('BORRANDO');
-        sopl = ctx.suena('a/b1_soplido.mp3', { db: -10, bucle: true, entra: 0.2, desde: 0.05, bucleDesde: 0.05 });
+      function abajo() {
+        if (estado !== 'listo' && estado !== 'pausaBorra') return;
+        estado = 'borra'; C.vObj = 130; bob.style.display = '';
+        MAG.botonera.enclava('rec'); MAG.botonera.rotulo('BORRANDO'); ctx.senala('rec', '');
+        if (!sopl) sopl = ctx.suena('a/b1_soplido.mp3', { db: -10, bucle: true, entra: 0.2, desde: 0.05, bucleDesde: 0.05 });
       }
-      function play(deBotonera) {
+      function arriba() {
+        if (estado !== 'borra') return;
+        estado = 'pausaBorra'; C.vObj = 0; bob.style.display = 'none'; MAG.botonera.enclava(null); MAG.botonera.rotulo('');
+        if (sopl) { sopl.parar(0.15); sopl = null; }
+        ctx.senala('rec', '');
+      }
+      function play() {
         if (estado !== 'borrada') return;
-        if (deBotonera !== true) ctx.suena('a/b1_tecla.mp3', { db: -4 });
-        estado = 'suena'; C.vObj = LU.V; bPlay.disabled = true; rBlanco.style.display = 'none'; rPlay.style.display = '';
+        estado = 'suena'; C.vObj = LU.V; rBlanco.style.display = 'none'; rPlay.style.display = ''; ctx.senala(null);
         xFin = C.X + Math.min(330, L + 60);                         // unos segundos: lo justo para oír que no queda nada
         alt.t0 = ahora(); alt.n = 0; alt.viva = true; MAG.botonera.enclava('play'); MAG.botonera.rotulo('PLAY');
         sopl = ctx.suena('a/b1_soplido.mp3', { db: -4, bucle: true, entra: 0.15, desde: 0.05, bucleDesde: 0.05 });
       }
-      bBorra.addEventListener('click', () => borra(false)); bPlay.addEventListener('click', () => play(false));
-      ctx.botonera('rec', () => borra(true)); ctx.botonera('play', () => play(true));
+      ctx.mantener('rec', abajo, arriba); ctx.botonera('play', () => play());
       await fin;
     }
   });
@@ -872,10 +787,17 @@
       + '.b1-ficha b{display:block;font:700 33px/40px var(--maq);color:var(--crema)}.b1-ficha i{display:block;font:italic 400 26px/34px var(--maq);color:rgb(214,200,176)}';
     document.head.appendChild(st);
   }());
+  /* (18-oct, N21 de Iago: «solo dice bien, bien, es muy pesada») Odile va cambiando de frase, sin repetir la última; la del
+     final, siempre «Muy bien.». ElevenLabs (voz MAG · Odile 1), cortadas en odile18/corta.py, a la sonoridad de «Bien.». */
+  const TJ_BIEN = [['a/b1_O13.mp3', 'Bien.'], ['a/b1_bien_perfecto.mp3', '¡Perfecto!'], ['a/b1_bien_esoes.mp3', '¡Eso es!'], ['a/b1_bien_bravo.mp3', '¡Bravo!'],
+    ['a/b1_bien_clarisimo.mp3', 'Lo tienes clarísimo.'], ['a/b1_bien_exacto.mp3', '¡Exacto!'], ['a/b1_bien_asisehace.mp3', 'Así se hace.']];
+  const TJ_MAL = [['a/b1_O14.mp3', 'Non, non. Otra vez.'], ['a/b1_mal_ahino.mp3', 'Mmm, ahí no.'], ['a/b1_mal_casi.mp3', 'Casi. Prueba otra vez.']];
+  const TJ_FIN = ['a/b1_bien_muybien.mp3', 'Muy bien.'];
+  function sinRepetir(L, ult) { if (L.length < 2) return 0; let i; do { i = Math.floor(Math.random() * L.length); } while (i === ult); return i; }
   MAG.registra('b1_tarjetas', {
     titulo: 'Ordenar las tarjetas',
     fondo: 'i/b1_tarjetas_fondo.jpg',
-    recursos: ['i/b1_tarjetas_fondo.jpg', 'i/b1_tj_o06.png', 'i/b1_tj_o11.png', 'i/b1_tj_o12.png', 'a/b1_O13.mp3', 'a/b1_O14.mp3', 'a/b1_ding.mp3', 'a/b1_tuc.mp3'],
+    recursos: ['i/b1_tarjetas_fondo.jpg', 'i/b1_tj_o06.png', 'i/b1_tj_o11.png', 'i/b1_tj_o12.png', 'a/b1_ding.mp3', 'a/b1_tuc.mp3'].concat(TJ_BIEN.map(x => x[0]), TJ_MAL.map(x => x[0]), [TJ_FIN[0]]),
     async monta(ctx) {
       ctx.fondo('i/b1_tarjetas_fondo.jpg');
       const od = ctx.figura('i/b1_tj_o06.png', { caja: TJ.odile.caja }); od.el.style.zIndex = 2;
@@ -894,7 +816,7 @@
       const bDer = ctx.boton('', { clase: 'mbtn-sec', icono: MAG.ICO.sigue, titulo: 'Al magnetófono' });
       Object.assign(bIzq.style, { position: 'absolute', left: '138px', top: '294px', width: '68px', padding: '0', zIndex: 6 });
       Object.assign(bDer.style, { position: 'absolute', left: '794px', top: '294px', width: '68px', padding: '0', zIndex: 6 });
-      let k = 0, voz = null, sub = null, ocupado = false, terminar;
+      let k = 0, voz = null, sub = null, ocupado = false, terminar, uB = -1, uM = -1;
       const fin = new Promise(r => { terminar = r; });
       const actual = () => { const n = TJ.orden[k]; return { par: n >> 1, lado: n & 1, txt: TJ.pares[n >> 1][n & 1] }; };
       function muestra() {
@@ -913,13 +835,13 @@
           const h = cols[lado].huecos[a.par]; h.textContent = a.txt; h.classList.add('lleno');
           ctx.suena('a/b1_ding.mp3', { db: -7 });
           k++; muestra();
-          if (k >= TJ.orden.length) { ocupado = true; habla('i/b1_tj_o11.png', 'a/b1_O13.mp3', 'Bien.', suma); }
-          else habla('i/b1_tj_o11.png', 'a/b1_O13.mp3', 'Bien.', () => od.cambia('i/b1_tj_o06.png'));
+          if (k >= TJ.orden.length) { ocupado = true; habla('i/b1_tj_o11.png', TJ_FIN[0], TJ_FIN[1], suma); }
+          else { uB = sinRepetir(TJ_BIEN, uB); habla('i/b1_tj_o11.png', TJ_BIEN[uB][0], TJ_BIEN[uB][1], () => od.cambia('i/b1_tj_o06.png')); }
         } else {
           ctx.suena('a/b1_tuc.mp3', { db: -6 });
           Object.assign(carta.style, { left: C0.x + 'px', top: C0.y + 'px' });
           const c = cols[lado].el; c.classList.add('mal'); setTimeout(() => c.classList.remove('mal'), 700);
-          habla('i/b1_tj_o12.png', 'a/b1_O14.mp3', 'Non, non. Otra vez.', () => od.cambia('i/b1_tj_o06.png'));
+          uM = sinRepetir(TJ_MAL, uM); habla('i/b1_tj_o12.png', TJ_MAL[uM][0], TJ_MAL[uM][1], () => od.cambia('i/b1_tj_o06.png'));
         }
       }
       function suma() {                                          // lo que suma el magnetófono: las cuatro que solo hace la cinta

@@ -107,6 +107,9 @@
       blob = new Blob(partes, { type: r.headers.get('content-type') || '' });
     } else { blob = await r.blob(); if (alAvance) alAvance(blob.size, blob.size); }
     const o = { url: URL.createObjectURL(blob), bytes: blob.size, listo: true };
+    // (18-oct) las pistas de los tramos (p/…) suenan por un <audio>: no se decodifican (serían 90 MB de memoria por pista);
+    // las colas de las libretas se decodifican al usarlas (MAG.decodifica)
+    if (/^p\//.test(ruta)) { o.blob = blob; MAG.R[ruta] = o; return o; }
     if (ES_AUDIO.test(ruta)) {
       try { o.buf = await MAG.audio().decodeAudioData(await blob.arrayBuffer()); } catch (e) { console.warn('[MAG] no se pudo decodificar', ruta, e); }
     } else if (ES_IMG.test(ruta)) {
@@ -115,6 +118,13 @@
     MAG.R[ruta] = o; return o;
   }
   MAG.trae = trae;
+  /* el AudioBuffer de algo ya traído sin decodificar (las colas de las libretas, p/…_cola.m4a) */
+  MAG.decodifica = async function (ruta) {
+    const o = MAG.R[ruta] || await trae(ruta);
+    if (o.buf) return o.buf;
+    try { o.buf = await MAG.audio().decodeAudioData(await o.blob.arrayBuffer()); } catch (e) { console.warn('[MAG] no se pudo decodificar', ruta, e); o.buf = null; }
+    return o.buf;
+  };
   /* carga una lista; alProgreso(fraccion 0..1, texto) — tamaños aproximados si se pasan en pesos{ruta: bytes} */
   MAG.cargaTodo = async function (lista, alProgreso, pesos) {
     lista = Array.from(new Set(lista.filter(Boolean)));
@@ -243,24 +253,61 @@
   };
 
   // ───────────────────────── la botonera del magnetófono (arriba a la izquierda, como en el vídeo) ─────────────────────────
-  /* Mismo dibujo y sitio que la del vídeo (botonera.py: X0 36, Y0 30, teclas de 58×50). Mientras corre el vídeo es
-     transparente (se ve la del vídeo, la que pulsa el narrador) y recoge los clics; en las paradas se ve encima.
-     MAG.botonera.on('play'|'pausa'|'rew'|'ff'|'rec', fn) · .enclava(tecla|null) · .rotulo(texto|'') · .modo('video'|'propia') */
+  /* (18-oct, notas de Iago N2, N7, N8, N17) SIEMPRE A LA VISTA y OPACA, con el mismo dibujo y en el mismo sitio que la del vídeo
+     (botonera.py: X0 36, Y0 30, panel de 350×76, teclas de 58×50; el rótulo, Courier Prime 30, a su derecha): la tapa entera,
+     así que ya no se ven dos «PAUSA» ni la tecla que pulsa el narrador en la historia: lo que se ve es lo que hace la página
+     (▶ hundida mientras suena, ‖ en pausa…). El rótulo es la ventanita de la máquina: siempre dice algo (PLAY, PAUSA,
+     REBOBINANDO, AVANZANDO, GRABANDO, AHORA TÚ…). Las teclas que no sirven en ese momento, apagadas; ● solo donde se graba.
+     MAG.botonera.on('play'|'pausa'|'rew'|'ff'|'rec', fn): una pulsación · on('rec-abajo'|'rec-arriba', fn): con .mantener('rec', true),
+     se graba MANTENIENDO la tecla (también la R del teclado) y al soltar, para · .enclava(tecla|null) · .rotulo(texto|'') (''
+     = el de la tecla hundida o el de reposo) · .reposo(texto) · .usables([teclas]) · .apaga(tecla, si) · .senala(tecla|null, texto)
+     (una flechita y un letrero bajo esa tecla) · .modo() (ya no hace nada; se deja por compatibilidad). */
   MAG.botonera = (function () {
     const T = ['rew', 'play', 'pausa', 'ff', 'rec'];
     const ROT = { pausa: 'PAUSA', rew: 'REBOBINANDO', play: 'PLAY', ff: 'AVANZANDO', rec: 'GRABANDO' };
-    const oyentes = {}; let raiz = null, enclavada = null, quieta = {};
+    const TIT = { rew: 'Atrás (la frase anterior)', play: 'Reproducir', pausa: 'Pausa', ff: 'Adelante (la frase siguiente)', rec: 'Grabar' };
+    const oyentes = {}, quieta = {}, hold = {};
+    let raiz = null, rot = null, senal = null, enclavada = null, texto = null, reposoTx = '', sujeta = null;
+    const tecla = k => raiz && raiz.querySelector('.bot-' + k);
+    const avisa = (ev, arg) => (oyentes[ev] || []).slice().forEach(fn => { try { fn(arg); } catch (e) { console.error(e); } });
+    const clic = () => { try { if (MAG.R['a/ui_tecla.mp3']) MAG.suena('a/ui_tecla.mp3', { db: -8 }); } catch (e) {} };
     function monta(padre) {
-      raiz = MAG.el('div', { id: 'botonera', class: 'bot-video' });
+      raiz = MAG.el('div', { id: 'botonera' });
       const panel = MAG.el('div', { class: 'bot-panel' });
-      T.forEach((k, i) => {
-        const b = MAG.el('button', { class: 'bot-tecla bot-' + k, type: 'button', 'data-k': k, title: { rew: 'Escena anterior', play: 'Reproducir', pausa: 'Pausa', ff: 'Escena siguiente', rec: 'Grabar' }[k] },
-          [MAG.el('span', { class: 'bot-cara', html: ICO_B[k] })]);
-        b.addEventListener('pointerdown', ev => { ev.preventDefault(); ev.stopPropagation(); pulsa(k, true); });
+      T.forEach(k => {
+        const b = MAG.el('button', { class: 'bot-tecla bot-' + k, type: 'button', 'data-k': k, title: TIT[k] }, [MAG.el('span', { class: 'bot-cara', html: ICO_B[k] })]);
+        b.addEventListener('pointerdown', ev => {
+          ev.preventDefault(); ev.stopPropagation();
+          if (quieta[k]) return;
+          if (hold[k]) { try { b.setPointerCapture(ev.pointerId); } catch (e) {} abajo(k); return; }
+          pulsa(k, true);
+        });
+        const suelta = () => { if (sujeta === k) arriba(k); };
+        ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(e => b.addEventListener(e, suelta));
+        b.addEventListener('contextmenu', ev => ev.preventDefault());
         panel.appendChild(b);
       });
-      raiz.appendChild(panel); raiz.appendChild(MAG.el('div', { class: 'bot-rotulo' }));
-      padre.appendChild(raiz);
+      rot = MAG.el('div', { class: 'bot-rotulo' });
+      senal = MAG.el('div', { class: 'bot-senal', hidden: true }, [MAG.el('div', { class: 'bot-flecha' }), MAG.el('div', { class: 'bot-senal-tx' })]);
+      raiz.appendChild(panel); raiz.appendChild(rot); raiz.appendChild(senal);
+      padre.appendChild(raiz); pinta();
+      // la R del teclado: como la tecla ● (y, donde se graba manteniendo, mientras se tiene pulsada)
+      window.addEventListener('keydown', ev => {
+        if (ev.key !== 'r' && ev.key !== 'R') return;
+        if (ev.target && (/input|textarea|select/i.test(ev.target.tagName) || ev.target.isContentEditable)) return;
+        if (!raiz || raiz.classList.contains('bot-oculta') || quieta.rec) return;
+        ev.preventDefault(); if (ev.repeat) return;
+        if (hold.rec) { if (sujeta !== 'rec') abajo('rec'); } else pulsa('rec', true);
+      });
+      window.addEventListener('keyup', ev => { if ((ev.key === 'r' || ev.key === 'R') && sujeta === 'rec') arriba('rec'); });
+      window.addEventListener('blur', () => { if (sujeta) arriba(sujeta); });
+    }
+    function abajo(k) { sujeta = k; const b = tecla(k); if (b) b.classList.add('sujeta'); clic(); avisa(k + '-abajo'); }
+    function arriba(k) { sujeta = null; const b = tecla(k); if (b) b.classList.remove('sujeta'); avisa(k + '-arriba'); }
+    function pinta() {
+      if (!raiz) return;
+      T.forEach(t => { const b = tecla(t); b.classList.toggle('on', t === enclavada); b.classList.toggle('apagada', !!quieta[t]); });
+      rot.textContent = texto || (enclavada ? ROT[enclavada] : reposoTx) || '';
     }
     const ICO_B = {
       rew: '<svg viewBox="0 0 30 24"><path d="M15.5 2v20L3 12zM28 2v20L15.5 12z" fill="currentColor"/></svg>',
@@ -271,33 +318,52 @@
     };
     function pulsa(k, delUsuario) {
       if (!raiz) return;
-      const b = raiz.querySelector('.bot-' + k);
+      if (quieta[k] && delUsuario) return;                         // apagada: no hace nada
+      const b = tecla(k);
       if (b) { b.classList.add('baja'); setTimeout(() => b.classList.remove('baja'), 180); }
-      try { if (MAG.R['a/ui_tecla.mp3']) MAG.suena('a/ui_tecla.mp3', { db: -8 }); } catch (e) {}
-      if (quieta[k]) return;
-      (oyentes[k] || []).slice().forEach(fn => { try { fn(delUsuario); } catch (e) { console.error(e); } });
+      clic();
+      avisa(k, delUsuario);
+    }
+    function senala(k, txt) {
+      if (!raiz) return;
+      T.forEach(t => tecla(t).classList.toggle('senalada', t === k));
+      if (!k) { senal.hidden = true; return; }
+      const i = T.indexOf(k), cx = 2 + 10 + i * 66 + (i === 4 ? 8 : 0) + 29;      // el centro de la tecla (botonera.py: _kx)
+      senal.style.left = (cx - 23) + 'px'; senal.querySelector('.bot-senal-tx').textContent = txt || ''; senal.hidden = false;
     }
     return {
       monta, pulsa, teclas: T,
       on(k, fn) { (oyentes[k] = oyentes[k] || []).push(fn); return () => { oyentes[k] = (oyentes[k] || []).filter(f => f !== fn); }; },
-      enclava(k) { enclavada = k; if (!raiz) return; T.forEach(t => raiz.querySelector('.bot-' + t).classList.toggle('on', t === k)); },
-      rotulo(txt) { if (raiz) { const r = raiz.querySelector('.bot-rotulo'); r.textContent = txt == null ? (enclavada ? ROT[enclavada] : '') : txt; r.classList.toggle('ve', !!r.textContent); } },
-      modo(m) { if (raiz) { raiz.classList.toggle('bot-video', m === 'video'); raiz.classList.toggle('bot-propia', m !== 'video'); } },
-      apaga(k, si) { quieta[k] = !!si; if (raiz) raiz.querySelector('.bot-' + k).classList.toggle('apagada', !!si); },
-      get raiz() { return raiz; }
+      enclava(k) { enclavada = k || null; pinta(); },
+      rotulo(txt) { texto = txt ? String(txt) : null; pinta(); },
+      reposo(txt) { reposoTx = txt || ''; pinta(); },
+      usables(lista) { T.forEach(t => { quieta[t] = (lista || []).indexOf(t) < 0; }); pinta(); },
+      apaga(k, si) { quieta[k] = !!si; pinta(); },
+      mantener(k, si) { hold[k] = !!si; if (!si && sujeta === k) arriba(k); },
+      soltar() { if (sujeta) arriba(sujeta); },
+      senala,
+      modo() {},
+      get raiz() { return raiz; }, get enclavada() { return enclavada; }, get sujeta() { return sujeta; }, get usadas() { return T.filter(t => !quieta[t]); }
     };
   })();
 
   // ───────────────────────── el micrófono ─────────────────────────
   /* MAG.mic.graba(op) → { para(): Promise<AudioBuffer|null>, nivel(): 0..1 } — si no hay micro, null en .error */
+  /* (18-oct, N17) el permiso se pide UNA vez, al empezar la bobina que graba con el micro (el motor llama a .abre()); el micro
+     queda abierto hasta el final de la bobina (.suelta()), así que luego basta con la tecla ● */
   MAG.mic = {
-    stream: null,
+    stream: null, _pide: null,
     async abre() {
-      if (this.stream) return this.stream;
-      try { this.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } }); }
-      catch (e) { console.warn('[MAG] sin micrófono', e); this.stream = null; }
-      return this.stream;
+      if (this.stream && this.stream.getTracks().some(t => t.readyState === 'live')) return this.stream;
+      if (this._pide) return this._pide;
+      this._pide = (async () => {
+        try { this.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } }); }
+        catch (e) { console.warn('[MAG] sin micrófono', e); this.stream = null; }
+        this._pide = null; return this.stream;
+      })();
+      return this._pide;
     },
+    suelta() { try { if (this.stream) this.stream.getTracks().forEach(t => t.stop()); } catch (e) {} this.stream = null; },
     async graba(op) {
       op = op || {};
       const st = await this.abre(); if (!st) return { error: true, para: async () => null, nivel: () => 0 };
@@ -388,14 +454,28 @@
       figura(ruta, o) { const f = MAG.ui.figura(raiz, ruta, o); return f; },
       on(obj, ev, fn, o) { obj.addEventListener(ev, fn, o); quitar.push(() => obj.removeEventListener(ev, fn, o)); },
       botonera(k, fn) { const off = MAG.botonera.on(k, fn); quitar.push(off); },
+      /* (18-oct) las teclas que se usan en esta estación (las demás, apagadas; ◀◀ siempre vuelve a ver lo de antes y ▶▶, solo el profe) */
+      teclas(lista) { MAG.botonera.usables(Array.from(new Set((lista || []).concat(['rew'], op.profe ? ['ff'] : [])))); },
+      /* señalar la tecla que hay que pulsar (una flechita y un letrero debajo): ctx.senala('rec', 'MANTÉN PULSADO PARA GRABAR') */
+      senala(k, txt) { MAG.botonera.senala(k || null, txt); },
+      /* grabar manteniendo la tecla: abajo() al pulsarla, arriba() al soltarla (o al soltar la R) */
+      mantener(k, abajo, arriba) {
+        MAG.botonera.mantener(k, true);
+        const o1 = MAG.botonera.on(k + '-abajo', abajo), o2 = MAG.botonera.on(k + '-arriba', arriba);
+        quitar.push(() => { o1(); o2(); MAG.botonera.mantener(k, false); });
+      },
       cada(fn) { cadas.push(fn); if (!raf) { const paso = (t) => { if (!vivo) return; cadas.forEach(f => { try { f(t); } catch (e) { console.error(e); } }); raf = requestAnimationFrame(paso); }; raf = requestAnimationFrame(paso); } },
       espera: ms => MAG.espera(ms),
       datos: MAG.datos,
-      /* un tramo de vídeo en mitad de la estación (p. ej. llegar a un sitio del mapa): se oculta la interfaz mientras suena y
-         al acabar queda a la vista su último fotograma. id = el del tramo en el guion del motor. En el banco no hace nada. */
-      async video(id) {
-        const vis = raiz.style.visibility; raiz.style.visibility = 'hidden';
-        try { if (MAG.videoHook) await MAG.videoHook(id); else await MAG.espera(400); } finally { raiz.style.visibility = vis; }
+      /* un tramo de vídeo en mitad de la estación (p. ej. llegar a un sitio del mapa): al acabar queda a la vista su último
+         fotograma. id = el del tramo en el guion del motor. En el banco no hace nada.
+         (18-oct, N29) TODO A LA VEZ: el motor prepara el vídeo (cargado y en su primer fotograma) con la estación aún a la vista, y
+         en el MISMO fotograma esconde la interfaz (y el fondo, con op.sinFondo) y enseña el vídeo; así no hay fotogramas raros. */
+      async video(id, o2) {
+        o2 = o2 || {};
+        const vis = raiz.style.visibility;
+        const alMostrar = () => { raiz.style.visibility = 'hidden'; if (o2.sinFondo) { const f = MAG.$('#fondo'); if (f) f.classList.remove('ve'); } if (o2.alMostrar) o2.alMostrar(); };
+        try { if (MAG.videoHook) await MAG.videoHook(id, { alMostrar }); else { await MAG.espera(400); alMostrar(); } } finally { raiz.style.visibility = vis; }
       },
       /* cambia la imagen de fondo de la estación (#fondo, por encima del vídeo parado); null la quita */
       fondo(ruta) {
@@ -407,8 +487,8 @@
         sonidos.forEach(m => m.parar(0.08)); bucles.forEach(m => m.parar(0.5));
         quitar.forEach(f => { try { f(); } catch (e) {} });
         raiz.innerHTML = '';
+        MAG.botonera.soltar(); MAG.botonera.mantener('rec', false); MAG.botonera.senala(null);
         MAG.botonera.enclava(null); MAG.botonera.rotulo('');
-        ['play', 'pausa', 'rew', 'ff', 'rec'].forEach(k => MAG.botonera.apaga(k, false));
       }
     };
     return ctx;
@@ -486,13 +566,27 @@
   MAG.datos = MAG.lee('datos', { paris: [], clase: [], titulo: '', pieza: null, describe: {} });
   MAG.guardaDatos = () => MAG.guarda('datos', MAG.datos);
 
-  // el grupo de clase (para guardar los ruidos de cada grupo en el ordenador del aula): por la hora (horario_clases de GP)
-  MAG.grupoAhora = function () {
+  /* el grupo de clase (para guardar los ruidos de cada grupo en el ordenador del aula), por la hora: el horario de GP
+     (horario_clases 2026-27, el mismo que usa Voluntarios; comprobado el 18-oct): martes 18–19 2GpC y 19–20 2GpF; jueves 18–19
+     2GpF y 19–20 2GpC. Con cerca = true, fuera de clase da el de la clase MÁS CERCANA (la que acaba de pasar o la que viene). */
+  MAG.HORARIO_GP = [{ d: 2, i: 18, g: '2GpC' }, { d: 2, i: 19, g: '2GpF' }, { d: 4, i: 18, g: '2GpF' }, { d: 4, i: 19, g: '2GpC' }];
+  MAG.grupoAhora = function (cerca) {
     try {
-      const f = new Intl.DateTimeFormat('es-ES', { timeZone: 'Europe/Madrid', weekday: 'short', hour: '2-digit', hour12: false }).formatToParts(new Date());
-      const d = (f.find(p => p.type === 'weekday') || {}).value || '', h = +((f.find(p => p.type === 'hour') || {}).value || -1);
-      if (/mar/i.test(d)) return h === 18 ? '2GpC' : (h === 19 ? '2GpF' : null);
-      if (/jue/i.test(d)) return h === 18 ? '2GpF' : (h === 19 ? '2GpC' : null);
+      const p = {};
+      new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Madrid', weekday: 'short', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' })
+        .formatToParts(new Date()).forEach(x => { p[x.type] = x.value; });
+      const d = { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 7 }[p.weekday] || 1, m = (+p.hour % 24) * 60 + (+p.minute);
+      const ahora = (d - 1) * 1440 + m, SEM = 7 * 1440;
+      const en = MAG.HORARIO_GP.find(h => h.d === d && m >= h.i * 60 && m < h.i * 60 + 60);
+      if (en) return en.g;
+      if (!cerca) return null;
+      let mejor = null, dist = 1e9;
+      MAG.HORARIO_GP.forEach(h => {
+        const a = (h.d - 1) * 1440 + h.i * 60, b = a + 60;
+        const dd = Math.min(...[a, b].map(x => { const z = Math.abs(x - ahora) % SEM; return Math.min(z, SEM - z); }));
+        if (dd < dist) { dist = dd; mejor = h.g; }
+      });
+      return mejor;
     } catch (e) {}
     return null;
   };

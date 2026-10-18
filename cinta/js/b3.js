@@ -139,6 +139,16 @@
   const LAPIZ = '<svg viewBox="0 0 24 24" width="24" height="24"><path d="M4 20l1.2-4.6L16.6 4a2 2 0 0 1 2.8 0l.6.6a2 2 0 0 1 0 2.8L8.6 18.8z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14.5 6.2l3.3 3.3" stroke="currentColor" stroke-width="2.2"/></svg>';
 
   // ── los ruidos de ejemplo (los de la animática) ──
+  /* (18-oct, N44 de Iago) al escribir, el tecleado de una máquina de escribir de verdad (ElevenLabs, recortado tecla a tecla en
+     sfx18/teclas.py): diez golpes distintos y la barra espaciadora; el de antes (b3_tecla) sonaba «un poco martillero» */
+  const TECLEO = Array.from({ length: 10 }, (_, i) => 'a/b3_tecleo_' + (i + 1) + '.mp3').concat(['a/b3_tecleo_esp.mp3']);
+  let _ultTecla = -1;
+  function teclea(ctx, key, db) {
+    let r;
+    if (key === ' ') r = 'a/b3_tecleo_esp.mp3';
+    else { let i; do { i = Math.floor(Math.random() * 10); } while (i === _ultTecla); _ultTecla = i; r = TECLEO[i]; }
+    ctx.suena(r, { db: db == null ? -8 : db, rate: (key === 'Backspace' || key === 'Delete') ? 1.06 : 0.97 + Math.random() * 0.06 });
+  }
   const EJEMPLOS = [
     { nombre: 'lápices', tipo: 'CORTO', ruta: 'a/b3_ej_lapiz.mp3' },
     { nombre: 'las sillas', tipo: 'CORTO', ruta: 'a/b3_ej_silla.mp3' },
@@ -178,30 +188,34 @@
 
   // ═══════════════════════════ 1 · b3_clase: la clase graba cuatro ruidos ═══════════════════════════
   /* PARADA del vídeo en 0:13.04 (hasta 21.24); el tramo siguiente empieza en 0:21.64 («Listo. A ver qué dice Odile de esto…»).
-     Fondo: el último fotograma del tramo (el cuarto de hoy, P1m). Cuatro ranuras como etiquetas de bobina: ● → 3, 2, 1 (la
-     misma cuenta de la animática) → GRABANDO hasta ■ PARAR (máx. 12 s) → su onda, su nombre a máquina y LARGO / CORTO.
-     En el ordenador del aula (cuenta Protester) se guardan por grupo, para la clase siguiente; en casa, en el dispositivo. */
+     Fondo: el último fotograma del tramo (el cuarto de hoy, P1m). Cuatro casillas como etiquetas de bobina.
+     (18-oct, notas de Iago N33/N34/N41) Sin tic-tac. Sin botones en las casillas: se TOCA una casilla y se graba con la ● de la
+     botonera, MANTENIÉNDOLA pulsada (o la R del teclado); al soltarla, para (máx. 12 s). Sin 3, 2, 1. ▶ de la botonera: escuchar
+     la casilla elegida. El nombre es opcional (si no se escribe: «Ruido 1»…). Con los cuatro grabados: «Seguir con la historia».
+     El grupo (cuenta Protester, el ordenador del aula): el de la clase de esa hora (MAG.grupoAhora: el horario de GP); fuera de
+     hora, el de la clase más cercana (se cambia con un toque). Se guardan por grupo, para la clase siguiente; en casa, en el
+     dispositivo. El micrófono ya se pidió al empezar la bobina. */
   MAG.registra('b3_clase', {
     titulo: 'Los cuatro ruidos de tu clase',
-    recursos: ['a/b3_reloj.mp3', 'a/b3_ej_lapiz.mp3', 'a/b3_ej_silla.mp3', 'a/b3_ej_cremallera.mp3', 'a/b3_ej_libro.mp3', 'a/ui_tecla.mp3'],
+    micro: true,
+    recursos: ['a/b3_ej_lapiz.mp3', 'a/b3_ej_silla.mp3', 'a/b3_ej_cremallera.mp3', 'a/b3_ej_libro.mp3', 'a/ui_tecla.mp3'].concat(TECLEO),
     async monta(ctx) {
       const profe = esProfe(ctx);
-      const reloj = bucleLimpio(ctx, 'a/b3_reloj.mp3', -8);
       const panel = ctx.el('div', { class: 'b3-panel' }); Object.assign(panel.style, { left: '156px', top: '290px', width: '1608px', height: '566px' });
       panel.appendChild(MAG.el('div', { class: 'b3-tit', text: 'LA CLASE GRABA CUATRO RUIDOS', style: { position: 'absolute', left: '50px', top: '32px' } }));
-      panel.appendChild(MAG.el('div', { class: 'b3-txt', html: 'Pulsa <b style="color:rgb(206,48,38)">●</b>, espera al 3, 2, 1… y haz el ruido. Para con <b>■</b> y escríbele su nombre.', style: { position: 'absolute', left: '50px', top: '88px' } }));
-      // la fila de arriba a la derecha: el grupo (en el aula) y los de ejemplo
+      panel.appendChild(MAG.el('div', { class: 'b3-txt', html: 'Toca una casilla y <b>mantén pulsada la <span style="color:rgb(206,48,38)">●</span> de arriba</b> mientras haces el ruido.<br>Al soltarla, para. Con <b>▶</b>, lo escuchas.', style: { position: 'absolute', left: '50px', top: '82px', fontSize: '24px', lineHeight: '30px' } }));
+      // la fila de arriba a la derecha: el grupo (en el aula)
       const der = MAG.el('div', { style: { position: 'absolute', right: '40px', top: '26px', display: 'flex', alignItems: 'center', gap: '14px' } });
       const fila = MAG.el('div', { class: 'b3-fila' });
       panel.appendChild(der); panel.appendChild(fila);
       let grupo = 'casa';
       const chips = {};
       if (profe) {
-        grupo = MAG.grupoAhora() || MAG.lee('b3_grupo', '2GpC');
+        grupo = MAG.grupoAhora(true) || MAG.lee('b3_grupo', '2GpC');
         const caja = MAG.el('div', { class: 'b3-grupo' }, ['GRUPO']);
         ['2GpC', '2GpF'].forEach(gk => {
           const c = MAG.el('button', { class: 'b3-chip' + (gk === grupo ? ' on' : ''), type: 'button', text: gk });
-          c.addEventListener('click', () => { grupo = gk; MAG.guarda('b3_grupo', gk); Object.keys(chips).forEach(k => chips[k].classList.toggle('on', k === gk)); guardaTodo(); miraUltima(); });
+          c.addEventListener('click', () => { if (estado !== 'libre') return; grupo = gk; MAG.guarda('b3_grupo', gk); Object.keys(chips).forEach(k => chips[k].classList.toggle('on', k === gk)); guardaTodo(); miraUltima(); });
           chips[gk] = c; caja.appendChild(c);
         });
         der.appendChild(caja);
@@ -213,45 +227,58 @@
       const ranuras = MAG.el('div', { class: 'b3-ranuras', style: { left: '50px', top: '146px' } });
       panel.appendChild(ranuras);
 
-      // ── las cuatro ranuras ──
+      // ── las cuatro casillas (se tocan para elegirlas) ──
       const R = [];
       for (let i = 0; i < 4; i++) {
-        const el = MAG.el('div', { class: 'b3-ranura' });
+        const el = MAG.el('div', { class: 'b3-ranura', style: { cursor: 'pointer' } });
         const tipo = MAG.el('button', { class: 'b3-tipo', type: 'button', text: 'CORTO', title: 'Cambiar: corto o largo', hidden: true });
         const cab = MAG.el('div', { class: 'b3-rq' }, ['RUIDO ' + (i + 1), tipo]);
         const cv = MAG.el('canvas', { class: 'b3-cinta', width: 324, height: 104 });
-        const nombre = MAG.el('input', { class: 'b3-nombre', type: 'text', maxlength: '28', placeholder: '¿qué ruido es?', spellcheck: 'false', autocomplete: 'off' });
-        const rec = MAG.el('button', { class: 'b3-rec', type: 'button', title: 'Grabar' }, [MAG.el('span')]);
-        const oir = MAG.el('button', { class: 'b3-ico', type: 'button', title: 'Escuchar', html: MAG.ICO.play, disabled: true });
-        const dur = MAG.el('div', { class: 'b3-dur' });
-        el.appendChild(cab); el.appendChild(cv); el.appendChild(nombre); el.appendChild(MAG.el('div', { class: 'b3-mandos' }, [rec, oir, dur]));
+        const nombre = MAG.el('input', { class: 'b3-nombre', type: 'text', maxlength: '28', placeholder: 'ruido ' + (i + 1) + ' (¿qué es?)', spellcheck: 'false', autocomplete: 'off' });
+        const dur = MAG.el('div', { class: 'b3-dur', style: { marginLeft: '0' } });
+        const est_ = MAG.el('div', { class: 'b3-dur', style: { marginLeft: 'auto', fontStyle: 'italic' } });
+        el.appendChild(cab); el.appendChild(cv); el.appendChild(nombre); el.appendChild(MAG.el('div', { class: 'b3-mandos', style: { height: '40px' } }, [dur, est_]));
         ranuras.appendChild(el);
-        const r = { i, el, tipo, cv, nombre, rec, oir, dur, buf: null, ruta: null, t: 'CORTO', tipoTocado: false };
+        const r = { i, el, tipo, cv, nombre, dur, est: est_, buf: null, ruta: null, t: 'CORTO', tipoTocado: false };
         pintaOnda(cv, null);
-        rec.addEventListener('click', () => { if (estado === 'graba' && activa === i) para(); else if (estado === 'libre') graba(i); });
-        oir.addEventListener('click', () => escucha(r));
+        el.addEventListener('pointerdown', ev => { if (ev.target === nombre || ev.target === tipo) return; if (estado === 'libre') { activa = i; marca(); } });
         tipo.addEventListener('click', () => { r.t = r.t === 'LARGO' ? 'CORTO' : 'LARGO'; r.tipoTocado = true; pintaTipo(r); guardaTodo(); });
-        nombre.addEventListener('focus', () => { activa = i; marca(); });
-        nombre.addEventListener('input', () => { guardaTodo(); comprueba(); });
-        nombre.addEventListener('keydown', ev => { ev.stopPropagation(); if (ev.key === 'Enter') { nombre.blur(); const sig = R.find(x => !x.buf); if (sig) { activa = sig.i; marca(); } } });
+        nombre.addEventListener('focus', () => { if (estado === 'libre') { activa = i; marca(); } });
+        nombre.addEventListener('input', () => { guardaTodo(); });
+        nombre.addEventListener('keydown', ev => {
+          ev.stopPropagation(); if (ev.key === 'Enter') { nombre.blur(); return; }
+          if (!ev.repeat && (ev.key.length === 1 || ev.key === 'Backspace' || ev.key === 'Delete')) teclea(ctx, ev.key, -12);
+        });
         R.push(r);
       }
       let activa = 0, estado = 'libre', seguirP = null, sonando = null;
       const pintaTipo = r => { r.tipo.hidden = !r.buf; r.tipo.textContent = r.t; r.tipo.classList.toggle('largo', r.t === 'LARGO'); };
-      const marca = () => R.forEach(r => { r.el.classList.toggle('activa', r.i === activa && estado !== 'graba'); r.el.classList.toggle('graba', r.i === activa && estado === 'graba'); });
-      marca();
+      const marca = () => {
+        R.forEach(r => {
+          r.el.classList.toggle('activa', r.i === activa && estado !== 'graba'); r.el.classList.toggle('graba', r.i === activa && estado === 'graba');
+          r.est.textContent = (r.i === activa && estado === 'graba') ? 'GRABANDO' : (r.i === activa ? 'elegida' : '');
+        });
+        const queda = R.some(r => !r.buf);
+        if (estado === 'graba') ctx.senala('rec', 'SUELTA PARA PARAR');
+        else if (!R[activa].buf) ctx.senala('rec', 'MANTÉN PULSADO PARA GRABAR');
+        else if (queda) ctx.senala('rec', 'ELIGE OTRA CASILLA Y MANTÉN PULSADO');
+        else ctx.senala(null);
+      };
       const fmt = s => (Math.round(s * 10) / 10).toFixed(1).replace('.', ',') + ' s';
+      const nombreDe = r => r.nombre.value.trim() || ('ruido ' + (r.i + 1));
       function pon(r, buf, nombre, tipo, ruta) {
         r.buf = buf; r.ruta = ruta || null; B3.mem['clase_' + (r.i + 1)] = buf;
-        pintaOnda(r.cv, buf); r.oir.disabled = !buf; r.dur.textContent = buf ? fmt(buf.duration) : '';
+        pintaOnda(r.cv, buf); r.dur.textContent = buf ? fmt(buf.duration) : '';
         if (tipo) { r.t = tipo; r.tipoTocado = !!ruta; } else if (!r.tipoTocado) r.t = buf && buf.duration >= 2.5 ? 'LARGO' : 'CORTO';
         if (nombre != null) r.nombre.value = nombre;
         pintaTipo(r);
       }
       function escucha(r) {
-        if (!r.buf) return;
+        if (!r.buf || estado !== 'libre') return;
         if (sonando) sonando.parar(0.05);
-        sonando = ctx.suena(r.buf, { db: -2 });
+        const m = ctx.suena(r.buf, { db: -2 }); sonando = m;
+        MAG.botonera.enclava('play'); MAG.botonera.rotulo('');
+        m.fin.then(() => { if (sonando === m) { sonando = null; MAG.botonera.enclava(null); MAG.botonera.rotulo(''); } });
       }
       // ── guardar: en IndexedDB (por grupo en el aula; «casa» en el dispositivo) y en MAG.datos.clase ──
       let tGuarda = null;
@@ -261,7 +288,7 @@
           tGuarda = null;
           const lista = [];
           for (const r of R) {
-            const clave = 'clase_' + grupo + '_' + (r.i + 1), nom = r.nombre.value.trim();
+            const clave = 'clase_' + grupo + '_' + (r.i + 1), nom = nombreDe(r);
             if (r.buf) {
               const o = r.ruta ? { nombre: nom, tipo: r.t, ruta: r.ruta, fecha: new Date().toISOString() } : Object.assign(MAG.bufAObj(r.buf), { nombre: nom, tipo: r.t, fecha: new Date().toISOString() });
               await MAG.idbPon(clave, o);
@@ -286,110 +313,96 @@
         } else bUltima.hidden = true;
       }
       bUltima.addEventListener('click', async () => {
-        if (!guardados) return;
+        if (!guardados || estado !== 'libre') return;
         for (let i = 0; i < 4; i++) {
           const o = guardados[i]; if (!o) continue;
           let buf = null;
           if (o.ch) { try { buf = MAG.objABuf(o); } catch (e) {} } else if (o.ruta) buf = await bufDe(o.ruta);
-          if (buf) pon(R[i], buf, o.nombre || '', o.tipo, o.ruta || null);
+          if (buf) pon(R[i], buf, o.nombre && !/^ruido \d$/.test(o.nombre) ? o.nombre : '', o.tipo, o.ruta || null);
         }
-        bUltima.hidden = true; guardaTodo(); comprueba();
+        bUltima.hidden = true; guardaTodo(); marca(); comprueba();
       });
       bEjemplo.addEventListener('click', async () => {
-        if (estado === 'abre') { intento++; estado = 'libre'; marca(); }      // el permiso del micro sin contestar: no bloquea
         if (estado !== 'libre') return;
         for (let i = 0; i < 4; i++) { const e = EJEMPLOS[i]; pon(R[i], await bufDe(e.ruta), e.nombre, e.tipo, e.ruta); }
-        aviso.textContent = ''; bUltima.hidden = true; guardaTodo(); comprueba();
+        aviso.textContent = ''; bUltima.hidden = true; guardaTodo(); marca(); comprueba();
       });
       miraUltima();
 
-      // ── grabar: 3, 2, 1 y GRABANDO hasta ■ (máx. 12 s) ──
-      let g = null, tRec = 0, raf = null, intento = 0;
-      async function graba(i) {
+      // ── grabar MANTENIENDO la ● (máx. 12 s) ──
+      let g = null, tRec = 0, raf = null, suelto = false, nRec = 0;
+      const MAX = 12;
+      async function graba() {
         if (estado !== 'libre') return;
-        activa = i; estado = 'abre'; marca(); aviso.textContent = '';
+        const i = activa, r = R[i], mio = ++nRec;
+        estado = 'graba'; suelto = false; marca(); aviso.textContent = '';
         if (seguirP) { seguirP.cancela(); seguirP = null; }
         if (sonando) { sonando.parar(0.05); sonando = null; }
-        const mio = ++intento;
-        const st = await MAG.mic.abre();
-        if (!ctx.vivo() || mio !== intento) return;
-        if (!st) { estado = 'libre'; marca(); aviso.textContent = 'No hay micrófono: usa los de ejemplo.'; bEjemplo.classList.add('mbtn-prin'); bEjemplo.classList.remove('mbtn-sec'); return; }
-        if (reloj) reloj.volumen(-80, 0.15);
-        estado = 'cuenta';
-        const cu = ctx.el('div', { class: 'b3-cuenta' });
-        for (const n of [3, 2, 1]) { cu.textContent = String(n); bip(false); await MAG.espera(600); if (!ctx.vivo()) return; }
-        cu.remove();
-        bip(true);
-        estado = 'graba'; marca();
-        R[i].rec.classList.add('para'); R[i].rec.title = 'Parar';
         MAG.botonera.enclava('rec'); MAG.botonera.rotulo('GRABANDO');
-        const cv = R[i].cv, gg = cv.getContext('2d'); const W = cv.width, H = cv.height;
+        const cv = r.cv, gg = cv.getContext('2d'); const W = cv.width, H = cv.height;
         gg.fillStyle = 'rgb(74,48,33)'; gg.fillRect(0, 0, W, H);
         let x = 0, nivel = 0;
-        g = await MAG.mic.graba({ max: 12, alNivel: rms => { nivel = Math.max(nivel * 0.6, rms); } });
-        if (!ctx.vivo()) { try { await g.para(); } catch (e) {} return; }
-        tRec = performance.now();
+        const gr = await MAG.mic.graba({ max: MAX, alNivel: rms => { nivel = Math.max(nivel * 0.6, rms); } });
+        if (!ctx.vivo() || mio !== nRec) { try { if (gr) await gr.para(); } catch (e) {} return; }
+        if (gr.error) {
+          estado = 'libre'; MAG.botonera.enclava(null); MAG.botonera.rotulo(''); pon(r, r.buf, null, r.t, r.ruta); marca();
+          aviso.textContent = 'No hay micrófono (o no se le dio permiso): usa los de ejemplo.'; bEjemplo.classList.add('mbtn-prin'); bEjemplo.classList.remove('mbtn-sec');
+          return;
+        }
+        g = gr; tRec = performance.now();
+        if (suelto) { para(); return; }                     // ya se soltó mientras se abría el micro
         const paso = () => {
           if (!ctx.vivo() || estado !== 'graba') return;
           const s = (performance.now() - tRec) / 1000;
-          const nx = Math.min(W, Math.floor(s / 12 * W));
+          const nx = Math.min(W, Math.floor(s / MAX * W));
           gg.fillStyle = 'rgb(232,214,180)';
           for (; x < nx; x += 3) { const h = Math.max(2, Math.min(1, nivel * 5) * (H - 22)); gg.fillRect(x, (H - h) / 2, 2, h); }
-          R[i].dur.textContent = fmt(s);
-          if (s >= 12) { para(); return; }
+          r.dur.textContent = fmt(s);
+          if (s >= MAX) { para(); return; }
           raf = requestAnimationFrame(paso);
         };
         raf = requestAnimationFrame(paso);
       }
       async function para() {
+        suelto = true;
         if (estado !== 'graba' || !g) return;
         estado = 'para'; if (raf) cancelAnimationFrame(raf);
-        const r = R[activa];
+        const r = R[activa], dura = (performance.now() - tRec) / 1000;
         const buf = await g.para(); g = null;
         if (!ctx.vivo()) return;
-        r.rec.classList.remove('para'); r.rec.title = 'Grabar otra vez';
         MAG.botonera.enclava(null); MAG.botonera.rotulo('');
-        if (reloj) reloj.volumen(-8, 0.6);
         estado = 'libre';
-        if (buf) { r.tipoTocado = false; pon(r, buf, null, null, null); }
-        else pon(r, r.buf, null, r.t, r.ruta);
-        marca(); r.nombre.focus(); r.nombre.select();
-        guardaTodo(); comprueba();
+        if (buf && dura >= 0.35) { r.tipoTocado = false; pon(r, buf, null, null, null); }
+        else { pon(r, r.buf, null, r.t, r.ruta); aviso.textContent = 'Mantén pulsada la ● mientras haces el ruido.'; }
+        if (r.buf && R.some(x => !x.buf)) { const sig = R.find(x => !x.buf && x.i > activa) || R.find(x => !x.buf); if (sig) activa = sig.i; }
+        marca(); guardaTodo(); comprueba();
       }
-      alSalir(ctx, () => {
-        if (raf) cancelAnimationFrame(raf); if (g) { try { g.para(); } catch (e) {} g = null; }
-        MAG.botonera.enclava(null); MAG.botonera.rotulo('');
-        // suelta el micro (que el navegador deje de marcarlo como en uso); otra estación lo vuelve a abrir sin preguntar
-        try { if (MAG.mic.stream) { MAG.mic.stream.getTracks().forEach(t => t.stop()); MAG.mic.stream = null; } } catch (e) {}
-      });
-      // la botonera: ● graba en la ranura activa (o la siguiente vacía) o para; ‖ también para
-      ctx.botonera('rec', () => { if (estado === 'graba') para(); else if (estado === 'libre') { const v = R[activa].buf ? (R.find(x => !x.buf) || R[activa]) : R[activa]; graba(v.i); } });
-      ctx.botonera('pausa', () => { if (estado === 'graba') para(); });
+      alSalir(ctx, () => { if (raf) cancelAnimationFrame(raf); if (g) { try { g.para(); } catch (e) {} g = null; } });
+      ctx.teclas(['rec', 'play']);
+      ctx.mantener('rec', () => graba(), () => { if (estado === 'graba') para(); else suelto = true; });
+      ctx.botonera('play', () => escucha(R[activa]));
+      marca();
       /* escribiendo un nombre, el espacio y → son del texto, no de «Seguir» (que escucha en la captura de window: este oyente
          se apunta antes, así que va primero; no impide que se escriba el espacio) */
       ctx.on(window, 'keydown', ev => {
         if (ev.target && ev.target.classList && ev.target.classList.contains('b3-nombre') && (ev.key === ' ' || ev.key === 'ArrowRight')) ev.stopImmediatePropagation();
       }, true);
-      ctx.on(window, 'keydown', ev => {
-        if (ev.target && ev.target.tagName === 'INPUT') return;
-        if (ev.key === 'r' || ev.key === 'R') { ev.preventDefault(); MAG.botonera.pulsa('rec', true); }
-        else if ((ev.key === 's' || ev.key === 'S' || ev.key === 'Escape') && estado === 'graba') { ev.preventDefault(); para(); }
-      });
-      // ── cuando están los cuatro, con nombre: «Seguir con la historia» ──
+      // ── cuando están los cuatro grabados: «Seguir con la historia» (el nombre no hace falta) ──
       let acabar;
       const fin = new Promise(ok => { acabar = ok; });
       function comprueba() {
-        const listos = R.every(r => r.buf && r.nombre.value.trim().length > 0);
+        const listos = R.every(r => r.buf);
         if (listos && !seguirP && estado === 'libre') { seguirP = ctx.seguir(); seguirP.then(() => { seguirP = null; acabar(); }); }
         if (!listos && seguirP) { seguirP.cancela(); seguirP = null; }
       }
       await fin;
       if (tGuarda) { clearTimeout(tGuarda); tGuarda = null; }
+      if (sonando) { sonando.parar(0.05); sonando = null; }
       // el guardado final, sin esperar al temporizador
-      MAG.datos.clase = R.map(r => ({ id: 'clase_' + (r.i + 1), nombre: r.nombre.value.trim(), tipo: r.t, clave: r.buf && !r.ruta ? 'clase_' + grupo + '_' + (r.i + 1) : null, ruta: r.ruta }));
+      MAG.datos.clase = R.map(r => ({ id: 'clase_' + (r.i + 1), nombre: nombreDe(r), tipo: r.t, clave: r.buf && !r.ruta ? 'clase_' + grupo + '_' + (r.i + 1) : null, ruta: r.ruta }));
       MAG.guardaDatos();
       // (y en IndexedDB, sin esperar: la historia sigue mientras se escribe)
-      R.forEach(r => { if (r.buf && !r.ruta) MAG.idbPon('clase_' + grupo + '_' + (r.i + 1), Object.assign(MAG.bufAObj(r.buf), { nombre: r.nombre.value.trim(), tipo: r.t, fecha: new Date().toISOString() })); });
+      R.forEach(r => { if (r.buf && !r.ruta) MAG.idbPon('clase_' + grupo + '_' + (r.i + 1), Object.assign(MAG.bufAObj(r.buf), { nombre: nombreDe(r), tipo: r.t, fecha: new Date().toISOString() })); });
     }
   });
 
@@ -401,10 +414,10 @@
     titulo: 'Dos preguntas de Odile',
     fondo: 'i/b3_repaso_fondo.jpg',
     recursos: ['i/b3_repaso_fondo.jpg', 'i/b3_rp_o06.png', 'i/b3_rp_o11.png', 'i/b3_rp_o12.png', 'a/b3_OP1.mp3', 'a/b3_OP2.mp3',
-      'a/b3_Y35.mp3', 'a/b3_Y36.mp3', 'a/b3_Y37.mp3', 'a/b3_Y38.mp3', 'a/b3_Y39.mp3', 'a/b3_Y40.mp3', 'a/b3_O13.mp3', 'a/b3_O14.mp3', 'a/b3_reloj.mp3', 'a/ui_tecla.mp3'],
+      'a/b3_Y35.mp3', 'a/b3_Y36.mp3', 'a/b3_Y37.mp3', 'a/b3_Y38.mp3', 'a/b3_Y39.mp3', 'a/b3_Y40.mp3', 'a/b3_O13.mp3', 'a/b3_O14.mp3', 'a/ui_tecla.mp3'],
     async monta(ctx) {
       ctx.fondo('i/b3_repaso_fondo.jpg');
-      bucleLimpio(ctx, 'a/b3_reloj.mp3', -10);
+      // (18-oct, N41) sin el tic-tac: «es molesto»
       await MAG.quiz(ctx, {
         preguntas: [
           { q: '¿Por qué se puede volver a usar una cinta?', voz: 'a/b3_OP1.mp3', fijo: true, ops: [
@@ -464,7 +477,8 @@
       ponLista();
       B3.sonidosBobina().then(otros => {
         if (!ctx.vivo() || !otros.length) return;
-        otros.slice(0, 12).forEach(s => lista.push(s)); ponLista();
+        // (18-oct, N39) solo los CORTOS (un golpe por nota: con los largos, la melodía no se entiende)
+        otros.filter(s => s.tipo !== 'LARGO').slice(0, 12).forEach(s => lista.push(s)); ponLista();
       });
       // ── las teclas (sobre las de la foto) y sus notas ──
       const teclas = [];
@@ -482,22 +496,23 @@
       // ── la melodía, a la vista ──
       const mel = ctx.el('div', { class: 'b3-mel' }); Object.assign(mel.style, { left: '946px', top: '146px', width: '600px' });     // el atril, encima del fonógeno
       const cuenta = MAG.el('div', { class: 'b3-mel-cuenta' });
-      const bOir = MAG.ui.boton('', { clase: 'mbtn-sec', icono: MAG.ICO.play, titulo: 'Escuchar la melodía' });
-      Object.assign(bOir.style, { width: '42px', height: '42px', padding: '0' });
-      mel.appendChild(MAG.el('div', { class: 'b3-mel-cab' }, [MAG.el('div', { class: 'b3-mel-tit', text: 'FRÈRE JACQUES' }), cuenta, bOir]));
+      mel.appendChild(MAG.el('div', { class: 'b3-mel-cab' }, [MAG.el('div', { class: 'b3-mel-tit', text: 'FRÈRE JACQUES' }), cuenta]));
+      /* (18-oct, N39) solo hay que tocar las DOS PRIMERAS frases (do re mi do · do re mi do · mi fa sol · mi fa sol: 14 notas);
+         al acabarlas, el resto suena SOLO, rápido. Lo que toca el fonógeno solo, en gris claro. ▶ de arriba: escucharla entera. */
+      const META = FRASES_FJ[3][1];
       const notasEl = [];
       const filas = [0, 1, 2, 3].map(() => MAG.el('div', { class: 'b3-mel-fila' }));       // cuatro líneas: cada frase y su repetición
       FRASES_FJ.forEach(([a, b], f) => {
         const fila = filas[f >> 1];
         if (f % 2) fila.appendChild(MAG.el('div', { class: 'b3-sep' }));
-        for (let i = a; i < b; i++) { const e = MAG.el('div', { class: 'b3-n' + (FRERE[i][1] >= 2 ? ' larga' : ''), text: NOMBRE_B[FRERE[i][0]] }); fila.appendChild(e); notasEl.push(e); }
+        for (let i = a; i < b; i++) { const e = MAG.el('div', { class: 'b3-n' + (FRERE[i][1] >= 2 ? ' larga' : ''), text: NOMBRE_B[FRERE[i][0]] }); if (i >= META) e.style.opacity = '.45'; fila.appendChild(e); notasEl.push(e); }
       });
       filas.forEach(fl => mel.appendChild(fl));
       let pos = 0, tocadas = 0, demo = false, acabada = false;
       function pintaMel() {
         notasEl.forEach((e, i) => { e.classList.toggle('hecha', i < pos); e.classList.toggle('sig', i === pos && !acabada); });
-        teclas.forEach(t => t.el.classList.toggle('guia', !acabada && t.grado != null && pos < FRERE.length && t.grado === FRERE[pos][0]));
-        cuenta.textContent = pos + ' / ' + FRERE.length;
+        teclas.forEach(t => t.el.classList.toggle('guia', !acabada && t.grado != null && pos < META && t.grado === FRERE[pos][0]));
+        cuenta.textContent = Math.min(pos, META) + ' / ' + META;
       }
       pintaMel();
       // ── tocar: rate = 2^(semitonos/12). CORTO: el golpe entero (hasta 1,7 s); LARGO: suena mientras se mantiene la tecla ──
@@ -522,13 +537,18 @@
         if (demo) return;
         suelta(t.m); t.m = toca(t.semi);
         tocadas++;
-        if (!acabada && t.grado != null && pos < FRERE.length && t.grado === FRERE[pos][0]) {
+        if (!acabada && t.grado != null && pos < META && t.grado === FRERE[pos][0]) {
           pos++;
-          if (pos >= FRERE.length) {
+          if (pos >= META) {
             acabada = true; pintaMel();
-            // Lucien se queda escuchando (no habla: cambiará de pose al empezar su frase, ya en el vídeo)
+            // misión cumplida: el resto lo toca el fonógeno solo, rápido; Lucien se queda escuchando (cambia de pose al empezar su
+            // frase, ya en el vídeo)
             if (seguirP) { seguirP.cancela(); seguirP = null; }
-            setTimeout(() => acabar(), 1300);
+            (async () => {
+              await MAG.espera(Math.max(260, FRERE[META - 1][1] * 280));
+              await tocaSola(META, FRERE.length, 280, true);
+              await MAG.espera(900); acabar();
+            })();
             return;
           }
         }
@@ -549,17 +569,20 @@
         ev.preventDefault(); if (demo) return; enciende(t); pulsa(t);
       });
       ctx.on(window, 'keyup', ev => { const t = MAPA[String(ev.key).toLowerCase()]; if (t && !demo) apaga(t); });
-      // ── escuchar la melodía entera (ayuda: no cuenta como tocada) ──
-      bOir.addEventListener('click', async () => {
-        if (demo) return; demo = true; bOir.disabled = true;
-        const BEAT = 400;
-        for (let i = 0; i < FRERE.length && ctx.vivo(); i++) {
+      // ── el fonógeno toca solo: el resto de la melodía (al cumplir la misión) o, con ▶, entera (ayuda: no cuenta como tocada) ──
+      async function tocaSola(a, b, BEAT, marcar) {
+        demo = true;
+        MAG.botonera.enclava('play'); MAG.botonera.rotulo('');
+        for (let i = a; i < b && ctx.vivo(); i++) {
           const [gr, d] = FRERE[i]; const t = teclas[gr];
+          if (marcar) { pos = i + 1; notasEl.forEach((e, j) => { e.classList.toggle('hecha', j <= i); e.classList.remove('sig'); }); }
           t.m = toca(SEMI_B[gr]); enciende(t);
           await MAG.espera(d * BEAT * 0.85); apaga(t); await MAG.espera(d * BEAT * 0.15);
         }
-        demo = false; bOir.disabled = false;
-      });
+        demo = false; MAG.botonera.enclava(null); MAG.botonera.rotulo('');
+      }
+      ctx.teclas(['play']);
+      ctx.botonera('play', () => { if (!demo && !acabada) tocaSola(0, FRERE.length, 400, false); });
       await fin;
     }
   });
@@ -573,7 +596,7 @@
   MAG.registra('b3_titulo', {
     titulo: 'El título de tu estudio',
     fondo: 'i/b3_titulo_fondo.jpg',
-    recursos: ['i/b3_titulo_fondo.jpg', 'a/b3_tecla.mp3', 'a/b3_campana.mp3', 'a/b3_motor.mp3'],
+    recursos: ['i/b3_titulo_fondo.jpg', 'a/b3_campana.mp3', 'a/b3_motor.mp3'].concat(TECLEO),
     async monta(ctx) {
       ctx.fondo('i/b3_titulo_fondo.jpg');
       bucleLimpio(ctx, 'a/b3_motor.mp3', -16);
@@ -619,8 +642,7 @@
         if (ev.key === 'Enter') { ev.preventDefault(); confirma(); return; }
         if (ev.key.length === 1 || ev.key === 'Backspace' || ev.key === 'Delete') {
           if (ev.key.length === 1 && limpia(txt.textContent).length >= 40) { ev.preventDefault(); return; }
-          const r = ev.key === ' ' ? 0.86 : (ev.key === 'Backspace' || ev.key === 'Delete' ? 1.18 : 0.94 + Math.random() * 0.12);
-          ctx.suena('a/b3_tecla.mp3', { db: -7, rate: r });
+          teclea(ctx, ev.key, -8);
           if (abajo.classList.contains('mal')) { abajo.classList.remove('mal'); abajo.textContent = 'Escribe el título y pulsa Intro'; }
         }
       });

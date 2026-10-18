@@ -96,9 +96,9 @@
     } else { g.gain.setValueAtTime(1, t); src.start(t); }
     return { src, g, suelta(t2) { try { g.gain.cancelScheduledValues(t2); g.gain.setValueAtTime(g.gain.value, t2); g.gain.linearRampToValueAtTime(0, t2 + 0.35); src.stop(t2 + 0.4); } catch (e) {} } };
   }
-  async function renderPista(p) {
+  async function renderPista(p, cola) {
     if (!p.son || !p.son.buf || !p.ev.length) return null;
-    const oc = new OfflineAudioContext(2, SR * FR, SR);
+    const oc = new OfflineAudioContext(2, Math.round(SR * (FR + (cola || 0))), SR);      // cola: lo que suena después de la frase
     p.ev.forEach(e => { if (e.t < FR) nota(oc, oc.destination, p.son, e.st, e.t, p.son.tipo === 'LARGO' ? (e.d != null ? e.d : 0.5) : null); });
     let b = await oc.startRendering();
     p.revs.forEach(([a, z]) => { b = reves(b, a, z); });
@@ -112,7 +112,11 @@
     }
     return b;
   }
-  /* la pieza entera (o una lista de frases) en un buffer: cuatro frases seguidas, mezcla limpia (pico a -1 dBFS) */
+  /* la pieza entera (o una lista de frases) en un buffer: cuatro frases seguidas, mezcla limpia (pico a -1 dBFS).
+     (18-oct, N43 de Iago: «que entre frases haya como una especie de fundido, que no sea un corte tan seco») cada frase deja sonar su
+     cola y se funde con la siguiente: baja desde 0,45 s antes de su final hasta 0,55 s después (la siguiente ya ha entrado, con
+     un fundido de entrada cortito para que no chasque); la última acaba fundiéndose a los 32 s justos. */
+  const F_IN = 0.06, F_A = 0.45, F_B = 0.55;
   async function mezcla(frases) {
     const n = frases.length; if (!n) return null;
     const oc = new OfflineAudioContext(2, SR * FR * n, SR);
@@ -122,9 +126,12 @@
       for (const pq of frases[f].pistas) {
         if (!pq || !pq.ev || !pq.ev.length) continue;
         const son = Object.assign({}, pq.son); son.buf = await bufDe(pq.son); if (!son.buf) continue;
-        const b = await renderPista({ son, ev: pq.ev, revs: pq.revs || [] }); if (!b) continue;
-        const s = oc.createBufferSource(); s.buffer = b; const g = oc.createGain(); g.gain.value = pq.vol != null ? pq.vol : 0.85;
-        s.connect(g); g.connect(comp); s.start(f * FR);
+        const b = await renderPista({ son, ev: pq.ev, revs: pq.revs || [] }, f < n - 1 ? F_B + 0.05 : 0); if (!b) continue;
+        const s = oc.createBufferSource(); s.buffer = b; const g = oc.createGain(); const v = pq.vol != null ? pq.vol : 0.85, t0 = f * FR;
+        if (f > 0) { g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(v, t0 + F_IN); } else g.gain.setValueAtTime(v, t0);
+        if (f < n - 1) { g.gain.setValueAtTime(v, t0 + FR - F_A); g.gain.linearRampToValueAtTime(0, t0 + FR + F_B); }
+        else { g.gain.setValueAtTime(v, t0 + FR - 0.6); g.gain.linearRampToValueAtTime(0, t0 + FR); }
+        s.connect(g); g.connect(comp); s.start(t0);
       }
     }
     const out = await oc.startRendering();
@@ -456,8 +463,10 @@
       }
       function paraGrabacion() { if (S.grab) { const G = S.grab; if (ac.currentTime < G.t0) { S.grab = null; G.otras.forEach(m => m.parar(0.05)); cuenta.style.display = 'none'; MAG.botonera.enclava(null); MAG.botonera.rotulo(''); pintaTodo(); } else terminaGrabacion(); } }
 
-      // ── la botonera del magnetófono ──
-      ctx.botonera('rec', () => { if (S.grab) paraGrabacion(); else graba(); });
+      // ── la botonera del magnetófono (18-oct, N40: aquí SÍ, la ● con su 3, 2, 1, para que luego toques) ──
+      ctx.teclas(['rec', 'play', 'pausa']);
+      ctx.senala('rec', 'PULSA PARA GRABAR (3, 2, 1… Y TOCA)');
+      ctx.botonera('rec', () => { ctx.senala(null); if (S.grab) paraGrabacion(); else graba(); });
       ctx.botonera('play', () => { if (S.grab) return; if (S.fin) escuchaPieza(); else reproduce(); });
       ctx.botonera('pausa', () => { if (S.grab) paraGrabacion(); paraTodo(); if (piezaFuente) { piezaFuente.parar(0.05); piezaFuente = null; MAG.botonera.enclava(null); MAG.botonera.rotulo(''); } });
 
@@ -564,7 +573,7 @@
         const nombres = MAG.el('div', { class: 'b3p-f-nombres' }); final.appendChild(nombres);
         S.frases.forEach((fz, f) => nombres.appendChild(MAG.el('div', { class: 'b3p-f-nom', text: fz.pistas.map(pq => pq.son.nombre).join(' · ') })));
         const fila = MAG.el('div', { class: 'b3p-f-bots' }); final.appendChild(fila);
-        const bEsc = MAG.ui.boton('Escuchar mi pieza', { clase: 'mbtn-prin', icono: MAG.ICO.play, al: () => escuchaPieza() }); fila.appendChild(bEsc);
+        ctx.senala('play', 'ESCUCHA TU PIEZA');           // (18-oct, N18) se escucha con el ▶ de arriba, no con un botón «Escuchar»
         const bOtra = MAG.ui.boton('Empezar otra vez', { clase: 'mbtn-sec', icono: MAG.ICO.otra }); fila.appendChild(bOtra);
         let seguro = false;
         bOtra.addEventListener('click', () => {
@@ -572,6 +581,7 @@
           if (piezaFuente) { piezaFuente.parar(0.05); piezaFuente = null; }
           MAG.botonera.enclava(null); MAG.botonera.rotulo('');
           S.frases = []; S.k = 0; S.fin = false; piezaBuf = null; MAG.datos.pieza = null; MAG.guardaDatos();
+          ctx.senala('rec', 'PULSA PARA GRABAR (3, 2, 1… Y TOCA)');
           final.hidden = true; [cab, ayuda, bDado, bCortar, bReves, bSig, kb, cabezal, cuenta].forEach(e => { e.hidden = false; }); tarjetas.forEach(e => { e.hidden = false; }); calles.forEach(e => { e.hidden = false; });
           if (seguir) seguir.cancela(); seguir = null; pintaTodo();
         });
