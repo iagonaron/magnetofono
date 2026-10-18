@@ -2,74 +2,59 @@
    La portada, la carga de cada bobina, los tramos de vídeo, las estaciones entre tramo y tramo, la botonera del magnetófono
    (◀◀ ▶ ‖ ▶▶ ●), «Seguir con la historia» después de cada libreta, «Salir» y «Continuar», y lo especial de la bobina 3:
    la emisión suena con la pieza del alumno (filtro de radio) y su título sale en pantalla y en la etiqueta de la bobina.
-   v2 (18-oct, con las notas de Iago de esa mañana):
-   · N4 / N24 · el SONIDO de cada tramo seguido (de una estación a la siguiente, aunque el vídeo vaya en varias partes y aunque
-     pase del prólogo a la bobina 1) es UNA pista continua (cinta/p/*.m4a) que manda el reloj. Los vídeos van MUDOS y la siguen
-     (cambian de parte a su hora y corrigen la deriva con la velocidad), así que la música ya no se corta al cambiar de locutor
-     ni de plano.
+   v3 (18-oct, noche · «va a tirones»: como en La cabaña, que va fina en la pantalla del aula):
+   · cada TRAMO SEGUIDO (de una estación a la siguiente) es UN solo vídeo con su sonido DENTRO (cinta/r/: 1080p a 60
+     fotogramas; cinta/r3/: la versión ligera, 720p a 30). El navegador lleva la imagen y el sonido juntos: ya no hay vídeos
+     mudos persiguiendo a una pista, ni cambios de velocidad para corregir la deriva, ni cambios de fichero a mitad de tramo.
+   · TODO se carga en la memoria antes de «Empezar la bobina N» (con su barra y los MB): luego, nada espera a la red.
+   · el PERMISO del micrófono se pide al pulsar la bobina en la portada; el micro solo se abre en las estaciones que graban.
+   · 60 / 30 (arriba a la derecha): la versión ligera, por si un ordenador va justo (vale desde la próxima bobina que cargues).
+   De la v2 (18-oct, notas de Iago de esa mañana), lo que sigue igual:
    · N2b / N3 · ◀◀ y ▶▶ van por HITOS (cada frase o cada plano), con la cinta corriendo en pantalla y su sonido. ◀◀ al principio
      de un tramo vuelve a la estación de antes (o al final del tramo anterior).
    · N12 · tras la libreta, la música SIGUE (la «cola», en bucle) hasta «Seguir con la historia» (o ▶).
    · N2 / N7 / N8 · la botonera siempre a la vista (comun.js); ▶ hundida mientras suena; las teclas que no sirven, apagadas.
    · N6 · los mandos de arriba a la derecha se esconden mientras corre el vídeo (vuelven al mover el ratón o en pausa).
-   · N17 · el permiso del micrófono se pide al empezar la bobina que lo usa.
    · N29 · ir a un sitio del mapa: todo cambia en el mismo fotograma (ctx.video con alMostrar).
-   Reglas: nada de fundidos de imagen (todo cambia de golpe), carga ligera (lo justo para empezar y el resto por detrás, siempre
-   por delante de lo que se ve), nada de animaciones de interfaz en bucle. */
+   Reglas: nada de fundidos de imagen (todo cambia de golpe), nada de animaciones de interfaz en bucle. */
 (function () {
   'use strict';
   const MAG = window.MAG, $ = MAG.$;
-  const G = MAG.GUION;
+  const G = MAG.GUION, RUNS = MAG.RUNS || {};
   const PROFE = () => !!MAG.lee('profe', false);
   const est = { modo: 'portada', bobina: 0, paso: 0, pasos: [], vid: null, otro: null, enEst: null, sigue: null, run: null, desdeT: 0 };
   MAG.motor = est;
   const vA = $('#vA'), vB = $('#vB');
-  [vA, vB].forEach(v => { v.muted = true; v.defaultMuted = true; v.setAttribute('muted', ''); v.playsInline = true; v.preload = 'auto'; v.disablePictureInPicture = true; });
+  [vA, vB].forEach(v => { v.muted = false; v.defaultMuted = false; v.removeAttribute('muted'); v.playsInline = true; v.preload = 'auto'; v.disablePictureInPicture = true; });
   // la cinta corriendo (◀◀ ▶▶): una capa encima del vídeo
   const fxC = MAG.el('div', { id: 'fxCinta' }, [MAG.el('i')]);
   $('#escenario').insertBefore(fxC, $('#capaOver'));
 
-  // ───────────────── la PISTA: un solo <audio> para toda la sesión, por Web Audio ─────────────────
-  /* Uno solo: en Safari, el primero que suena con un toque queda «desbloqueado» para los demás tramos. */
-  const pista = new Audio(); pista.preload = 'auto';
-  let pistaG = null, pistaRuta = '';
-  function conectaPista() {
-    if (pistaG) return;
-    try { const a = MAG.audio(); const s = a.createMediaElementSource(pista); pistaG = a.createGain(); s.connect(pistaG); pistaG.connect(MAG.master); }
-    catch (e) { console.warn('[MAG] la pista suena sin Web Audio', e); pistaG = { gain: null }; }
+  // ───────────────── el sonido de los vídeos: cada <video> suena por Web Audio (para poder subirlo y bajarlo) ─────────────────
+  const gVid = new Map();
+  function conecta(el) {
+    if (gVid.has(el)) return gVid.get(el);
+    let g = null;
+    try { const a = MAG.audio(); const s = a.createMediaElementSource(el); g = a.createGain(); s.connect(g); g.connect(MAG.master); }
+    catch (e) { console.warn('[MAG] el vídeo suena sin Web Audio', e); g = null; }
+    gVid.set(el, g); return g;
   }
-  function volPista(v, t) {
-    if (pistaG && pistaG.gain) { const a = MAG.audio(), n = a.currentTime; pistaG.gain.cancelScheduledValues(n); pistaG.gain.setValueAtTime(pistaG.gain.value, n); pistaG.gain.linearRampToValueAtTime(v, n + (t || 0.01)); }
-    else { try { pista.volume = Math.max(0, Math.min(1, v)); } catch (e) {} }
+  function volVid(el, v, t) {
+    if (!el) return;
+    const g = conecta(el);
+    if (g) { const a = MAG.audio(), n = a.currentTime; g.gain.cancelScheduledValues(n); g.gain.setValueAtTime(g.gain.value, n); g.gain.linearRampToValueAtTime(v, n + (t || 0.01)); return; }
+    try { el.volume = Math.max(0, Math.min(1, v)); } catch (e) {}          // sin Web Audio (en el iPad no se puede: de golpe)
   }
-  function cargaPista(ruta) {
-    return new Promise(ok => {
-      if (pistaRuta === ruta && pista.readyState >= 1) { ok(true); return; }
-      pistaRuta = ruta; let hecho = false;
-      const fin = (b) => { if (hecho) return; hecho = true; pista.removeEventListener('loadedmetadata', si); pista.removeEventListener('error', no); ok(b); };
-      const si = () => fin(true), no = () => fin(false);
-      pista.addEventListener('loadedmetadata', si); pista.addEventListener('error', no);
-      pista.src = MAG.url(ruta); pista.load();
-      setTimeout(() => fin(pista.readyState >= 1), 8000);
-    });
-  }
-  function buscaPista(t) {
-    return new Promise(ok => {
-      if (Math.abs(pista.currentTime - t) < 0.01) { ok(); return; }
-      let h = false; const f = () => { if (h) return; h = true; pista.removeEventListener('seeked', f); ok(); };
-      pista.addEventListener('seeked', f); try { pista.currentTime = t; } catch (e) { f(); } setTimeout(f, 2000);
-    });
-  }
-  const paraPista = () => { try { pista.pause(); } catch (e) {} };
+  const callaVideos = () => [vA, vB].forEach(v => { try { v.pause(); } catch (e) {} });
 
-  // ───────────────── los pasos de una bobina (cada tramo, en sus partes) ─────────────────
+  // ───────────────── los pasos de una bobina (las partes del guion: ahora son MARCAS dentro del vídeo de su tramo seguido) ─────────────────
   function pasosDe(n) {
     const B = G.bobinas[n], out = [];
     B.pasos.forEach(p => {
       if (p.t === 'v') {
         let rt = p.rt0 || 0;
         p.partes.forEach((q, i) => {
-          out.push({ t: 'v', id: p.id, parte: i, nPartes: p.partes.length, f: q.f, dur: q.dur, bytes: q.bytes, b7: q.b7, nombre: p.nombre,
+          out.push({ t: 'v', id: p.id, parte: i, nPartes: p.partes.length, f: q.f, dur: q.dur, nombre: p.nombre,
             libreta: !!p.libreta && i === p.partes.length - 1, pieza: q.pieza, titulo: q.titulo, etiqueta: q.etiqueta, ruidos: q.ruidos, run: p.run, rt0: rt });
           rt += q.dur;
         });
@@ -80,34 +65,26 @@
   }
   const runDe = id => { const B = G.bobinas[est.bobina]; return (B && B.runs && B.runs[id]) || null; };
   const partesDeRun = id => est.pasos.filter(p => p.t === 'v' && p.run === id);
-  const es720 = () => MAG.lee('calidad', '1080') === '720' && !!G.v7;
-  /* la calidad se fija al cargar cada bobina (lo precargado es lo que se ve); el botón vale para la próxima carga */
-  function rutaVideo(f) { return (est.c720 == null ? es720() : est.c720) ? f.replace(/^v\//, 'v7/') : f; }
-  const peso = q => ((est.c720 == null ? es720() : est.c720) && q.b7) || q.bytes || 3e6;
+  /* el vídeo de un tramo seguido (cinta/js/runs.js) */
+  const vidDe = (n, id) => (RUNS[n] && RUNS[n][id]) || null;
+  /* 60 (normal) o 30 (ligera); se fija al cargar cada bobina (lo cargado es lo que se ve); el botón vale para la próxima carga */
+  const hay30 = () => !!MAG.RUNS30 && Object.values(RUNS).some(B => Object.values(B).some(x => x.f3));
+  function calidad() { let c = String(MAG.lee('calidad', '60')); if (c === '720') c = '30'; if (c === '1080') c = '60'; return c === '30' && hay30() ? '30' : '60'; }
+  const ligera = () => (est.c30 == null ? calidad() === '30' : est.c30);
+  const rutaDe = X => (ligera() && X.f3) ? X.f3 : X.f;
+  const trozosDe = X => (ligera() && X.f3) ? X.t3 : X.t;
+  const bytesDe = X => (ligera() && X.f3) ? X.b3 : X.b;
   const UI_SON = ['a/ui_tecla.mp3', 'a/ui_rebobina.mp3', 'a/ui_avanza.mp3'];
-  /* lo que hay que tener ANTES de empezar: lo de todas las estaciones (imágenes y sonidos: pocos MB), los sitios del mapa y los
-     primeros tramos con sus pistas (unos 20 MB desde donde se empieza). El resto se va cargando por detrás, siempre por delante
-     de lo que se ve (rueda). */
-  const PRIMERO = 20e6, DELANTE = 70e6, DETRAS = 3;
-  function porTraer(n, P) {               // en orden: la pista (y su cola) de cada tramo seguido, y luego sus partes de vídeo
-    const L = [], vistos = {};
-    P.forEach(p => {
-      if (p.t !== 'v') return;
-      if (p.run && !vistos[p.run]) {
-        vistos[p.run] = 1; const R = (G.bobinas[n].runs || {})[p.run];
-        if (R && R.f) { L.push({ i: p.i, r: R.f, b: R.bytes || 2e6 }); if (R.cola) L.push({ i: p.i, r: R.cola.f, b: R.cola.bytes || 1e6 }); }
-      }
-      L.push({ i: p.i, r: rutaVideo(p.f), b: peso(p) });
+  /* TODO lo de una bobina, para tenerlo en la memoria antes de empezar: el vídeo de cada tramo seguido (con su sonido; también
+     los de los sitios del mapa), las colas de las libretas, lo de todas las estaciones (imágenes y sonidos) y los de la botonera */
+  function recursosDe(n) {
+    const B = G.bobinas[n], L = [], pesos = {}, trozos = {}, P = pasosDe(n);
+    Object.keys(B.runs || {}).forEach(id => {
+      const X = vidDe(n, id); if (!X) { console.warn('[MAG] falta el vídeo del tramo', id); return; }
+      const r = rutaDe(X); L.push(r); pesos[r] = bytesDe(X) || 4e6; const t = trozosDe(X); if (t && t.length) trozos[r] = t;
+      const R = B.runs[id]; if (R && R.cola) { L.push(R.cola.f); pesos[R.cola.f] = R.cola.bytes || 4e5; }
     });
-    return L;
-  }
-  function recursosDe(n, desde) {
-    const B = G.bobinas[n], L = [], pesos = {}, P = pasosDe(n);
     P.forEach(p => { if (p.t === 'v' && p.pieza) L.push('a/b3_pieza_ejemplo.mp3'); });
-    Object.values(B.lugares || {}).forEach(l => {
-      const R = l.run && B.runs ? B.runs[l.run] : null; if (R && R.f) { L.push(R.f); pesos[R.f] = R.bytes || 4e5; }
-      l.partes.forEach(q => { const r = rutaVideo(q.f); L.push(r); pesos[r] = peso(q); });
-    });
     B.pasos.filter(p => p.t === 'e').forEach(p => {
       const d = MAG.est[p.id]; if (!d) return;
       let r = d.recursos || []; if (typeof r === 'function') { try { r = r(); } catch (e) { r = []; } }
@@ -115,16 +92,8 @@
       if (d.fondo) { L.push(d.fondo); pesos[d.fondo] = 260000; }
     });
     UI_SON.forEach(x => L.push(x));
-    desde = desde || 0;
-    // si se continúa en una estación, el tramo de antes (su último fotograma es el fondo)
-    if (P[desde] && P[desde].t === 'e') { const ant = P.slice(0, desde).reverse().find(q => q.t === 'v'); if (ant) { const r = rutaVideo(ant.f); L.push(r); pesos[r] = peso(ant); } }
-    let ac = 0;
-    for (const x of porTraer(n, P).filter(x => x.i >= desde)) { if (ac >= PRIMERO) break; L.push(x.r); pesos[x.r] = x.b; ac += x.b; }
-    // si se empieza a mitad de un tramo seguido: su pista
-    if (P[desde] && P[desde].t === 'v' && P[desde].run) { const R = (B.runs || {})[P[desde].run]; if (R && R.f) { L.push(R.f); pesos[R.f] = R.bytes || 2e6; } }
-    return { L: Array.from(new Set(L)), pesos };
+    return { L: Array.from(new Set(L)), pesos, trozos };
   }
-  // ── la rueda: una cosa cada vez, en orden, hasta ~70 MB por delante; y suelta (de la memoria) los vídeos que quedan atrás ──
   const enCurso = {};
   const listo = r => !!(MAG.R[r] && MAG.R[r].url);
   function trae(r) {
@@ -136,32 +105,21 @@
     const o = MAG.R[r]; if (!o || enCurso[r] || [vA, vB].some(v => v.dataset.ruta === r)) return;
     try { URL.revokeObjectURL(o.url); } catch (e) {} delete MAG.R[r];
   }
-  async function rueda(n, ficha) {
-    while (est.rueda === ficha && est.bobina === n && !est.cancelado) {
-      const L = porTraer(n, est.pasos);
-      const k = L.findIndex(v => v.i >= est.paso);
-      L.forEach((v, j) => { if (k >= 0 && j < k - DETRAS * 2 && /^v7?\//.test(v.r) && L.slice(j + 1).every(w => w.r !== v.r)) suelta(v.r); });
-      let delante = 0, sig = null;
-      for (let j = Math.max(0, k); j < L.length && k >= 0; j++) { if (listo(L[j].r)) delante += L[j].b; else { sig = L[j]; break; } }
-      if (sig && delante < DELANTE) { const ok = await trae(sig.r); if (!ok) await MAG.espera(4000); }
-      else await MAG.espera(1500);
-    }
-  }
-  /* algo que hace falta YA (si aún no está: «CARGANDO» en la ventanita, sin más) */
-  async function asegura(r) {
-    if (listo(r)) return true;
+  /* algo que hace falta YA y no está (no debería pasar: todo se carga antes de empezar): «CARGANDO» en la ventanita */
+  async function asegura(X) {
+    const r = rutaDe(X); if (listo(r)) return true;
     MAG.botonera.rotulo('CARGANDO');
-    const ok = await trae(r);
+    let ok = true; try { await MAG.traeTrozos(r, trozosDe(X)); } catch (e) { console.warn('[MAG] no se pudo cargar', r, e && e.message); ok = false; }
     MAG.botonera.rotulo('');
     return ok;
   }
 
-  // ───────────────── los dos vídeos (mudos: el sonido es la pista) ─────────────────
+  // ───────────────── los dos vídeos: el que se ve y el que espera ya preparado (para cambiar en el mismo fotograma) ─────────────────
   function prepara(el, ruta) {
     return new Promise(ok => {
       const url = MAG.url(ruta);
       if (el.dataset.ruta === ruta && el.readyState >= 2) { try { el.pause(); } catch (e) {} ok(); return; }
-      el.dataset.ruta = ruta; el.dataset.listo = '';
+      el.dataset.ruta = ruta;
       let hecho = false; const fin = () => { if (hecho) return; hecho = true; el.removeEventListener('loadeddata', fin); el.removeEventListener('error', fin); ok(); };
       el.addEventListener('loadeddata', fin); el.addEventListener('error', fin);
       el.src = url; el.load();
@@ -170,7 +128,7 @@
   }
   function buscaVid(el, t) {
     return new Promise(ok => {
-      if (Math.abs(el.currentTime - t) < 0.02) { ok(); return; }
+      if (Math.abs(el.currentTime - t) < 0.01 && !el.seeking) { ok(); return; }
       let h = false; const f = () => { if (h) return; h = true; el.removeEventListener('seeked', f); ok(); };
       el.addEventListener('seeked', f); try { el.currentTime = t; } catch (e) { f(); } setTimeout(f, 2000);
     });
@@ -178,7 +136,20 @@
   function muestra(el) { [vA, vB].forEach(v => v.classList.toggle('ve', v === el)); est.vid = el; est.otro = elOtro(el); }
   function elOtro(el) { return el === vA ? vB : vA; }
   const visible = () => [vA, vB].find(v => v.classList.contains('ve')) || null;
-  function ultimoFotograma(el) { try { el.pause(); if (el.duration && el.currentTime < el.duration - 0.06) el.currentTime = Math.max(0, el.duration - 0.04); } catch (e) {} }
+  /* el vídeo de un tramo seguido, en el elemento que NO se ve, parado en el segundo t (listo para enseñarlo de golpe) */
+  async function enEspera(X, t) {
+    const vis = visible(); const el = vis === vA ? vB : vA;
+    await prepara(el, rutaDe(X));
+    try { el.pause(); } catch (e) {}
+    await buscaVid(el, Math.max(0, Math.min(t || 0, Math.max(0, (el.duration || X.dur || 0) - 0.02))));
+    return el;
+  }
+  /* deja preparado (parado en su principio) el vídeo del siguiente tramo, mientras tanto */
+  function adelanta(X) {
+    if (!X || !listo(rutaDe(X))) return;
+    const vis = visible(), el = vis === vA ? vB : vA, r = rutaDe(X);
+    prepara(el, r).then(() => { if (visible() !== el && el.dataset.ruta === r) { try { el.pause(); } catch (e) {} if (el.currentTime > 0.01) buscaVid(el, 0); } });
+  }
 
   // ───────────────── la cinta corriendo (◀◀ ▶▶): la capa, la botonera y el sonido ─────────────────
   let sRew = null;
@@ -203,15 +174,16 @@
   window.addEventListener('pointermove', () => { tMandos = performance.now() + 2600; mandos(); }, { passive: true });
   window.addEventListener('pointerdown', () => { tMandos = performance.now() + 2600; mandos(); }, { passive: true, capture: true });
 
-  // ───────────────── UN TRAMO SEGUIDO: la pista manda y los vídeos (mudos) la siguen ─────────────────
-  /* o: { R (la pista: f, dur, hitos, cola), partes: [{ f, dur, rt0, i?, pieza?, titulo?, etiqueta? }], desde (s del tramo seguido),
-          lugar (un sitio del mapa), alMostrar (al enseñar el primer fotograma) }
+  // ───────────────── UN TRAMO SEGUIDO: un solo vídeo, con su sonido dentro ─────────────────
+  /* o: { X (el vídeo: runs.js), R (del guion: hitos, cola, finPartes), partes: [{ rt0, dur, i?, pieza?, titulo?, etiqueta?, ruidos? }],
+          desde (s del tramo seguido), lugar (un sitio del mapa), alMostrar (al enseñar el primer fotograma) }
+     Las «partes» ya no son ficheros: son marcas dentro del vídeo (por dónde va la historia, y las ventanas de la bobina 3).
      Resuelve: 'fin' (llegó al final o ▶▶ hasta el final), 'atras' (◀◀ antes de su principio), 'salir', 'error'. */
   function corrida(o) {
     return new Promise(resuelve => {
-      const R = o.R, P = o.partes;
+      const R = o.R, P = o.partes, X = o.X;
       const fin = P.length ? P[P.length - 1].rt0 + P[P.length - 1].dur : 0;
-      const run = { R, P, fin, k: -1, el: null, pausada: false, salto: false, objetivo: null, dir: 0, vivo: true, lugar: !!o.lugar, ov: null, sig: null };
+      const run = { R, P, X, fin, k: -1, el: null, pausada: false, salto: false, objetivo: null, dir: 0, vivo: true, lugar: !!o.lugar, ov: null };
       est.run = run;
       if (R && R.cola) run.colaBuf = trae(R.cola.f).then(() => MAG.decodifica(R.cola.f)).catch(() => null);
       let acabado = false;
@@ -224,42 +196,24 @@
         mandos(); resuelve(r);
       };
       run.acabar = acaba;
-      const reloj = () => run.maestro === 'pista' ? pista.currentTime : ((run.el ? run.el.currentTime : 0) + (run.k >= 0 ? P[run.k].rt0 : 0));
+      const reloj = () => (run.el ? run.el.currentTime : 0);
       const parteEn = T => { let k = 0; for (let j = 0; j < P.length; j++) if (P[j].rt0 <= T + 1e-4) k = j; return k; };
       const anota = () => { const q = P[run.k]; if (q && q.i != null) { est.paso = q.i; MAG.guarda('progreso', { bobina: est.bobina, paso: est.paso, v: G.version }); } };
-
-      /* pone la parte k en el elemento que no se ve, en el segundo «off», y lo deja listo (sin enseñarlo) */
-      async function enParte(k, off) {
-        const q = P[k], ruta = rutaVideo(q.f);
-        if (!listo(ruta)) { await asegura(ruta); if (!run.vivo) return null; }
-        const vis = visible();
-        let el = (run.sig && run.sig.k === k && run.sig.el !== vis) ? run.sig.el : (vis === vA ? vB : vA);
-        if (vis === el) el = elOtro(el);
-        await prepara(el, ruta);
-        if (!run.vivo) return null;
-        if (off > 0.03) await buscaVid(el, Math.min(off, Math.max(0, (el.duration || q.dur) - 0.05)));
-        else if (el.currentTime > 0.03) await buscaVid(el, 0);
-        el.muted = run.maestro !== 'video';
-        return el;
-      }
-      function enseña(k, el) {
-        const ant = run.el;
-        run.k = k; run.el = el; muestra(el);
-        if (ant && ant !== el) { try { ant.pause(); } catch (e) {} ant.muted = true; }
-        if (o.alMostrar) { const f = o.alMostrar; o.alMostrar = null; try { f(); } catch (e) { console.error(e); } }
-        montaOverlays(P[k], run);
-        anota();
-        run.sig = null;
+      /* la parte (la marca) por la que va: lo que se apunta y las ventanas de la bobina 3 */
+      function enParte(k, forzar) {
+        if (k === run.k && !forzar) return;
+        run.k = k; montaOverlays(P[k], run); anota();
+        if (!run.pausada && !run.salto && run.ov && run.el && !run.el.paused) run.ov.sonar();
       }
       function suena() {
-        if (!run.vivo || run.pausada || run.salto) return;
-        if (run.maestro === 'pista') { est.desbloqueo = null; volPista(1, 0.02); pista.play().catch(e => { if (e && e.name === 'NotAllowedError') { console.warn('[MAG] play', e); muestraPlayManual(); } }); }
-        if (run.el) { run.el.play().catch(e => { if (run.maestro === 'video' && e && e.name === 'NotAllowedError') { console.warn('[MAG] play', e); muestraPlayManual(); } }); }
+        if (!run.vivo || run.pausada || run.salto || !run.el) return;
+        est.desbloqueo = null; volVid(run.el, 1, 0.02);
+        const otro = elOtro(run.el); if (!otro.paused && otro !== est.colaVid) { try { otro.pause(); } catch (e) {} }
+        run.el.play().catch(e => { if (e && e.name === 'NotAllowedError') { console.warn('[MAG] play', e); muestraPlayManual(); } });
         if (run.ov) run.ov.sonar();
         MAG.botonera.enclava('play'); MAG.botonera.rotulo(''); mandos();
       }
       function calla() {
-        if (run.maestro === 'pista') paraPista();
         if (run.el) { try { run.el.pause(); } catch (e) {} }
         if (run.ov) run.ov.parar();
       }
@@ -294,76 +248,46 @@
         const obj = run.objetivo;
         if (!run.vivo) return;
         if (obj === -1) { acaba('atras'); return; }
-        if (obj >= fin - 0.05) { if (run.el) ultimoFotograma(run.el); acaba('fin'); return; }
-        const k = parteEn(obj);
-        const el = await enParte(k, obj - P[k].rt0);
-        if (!run.vivo || !el) return;
-        if (run.maestro === 'pista') await buscaPista(obj);
+        if (obj >= fin - 0.05) { alFinal(true); return; }
+        await buscaVid(run.el, obj);
         if (!run.vivo) return;
         if (run.objetivo !== obj) return;                     // otra pulsación mientras tanto: ya vendrá su termina()
-        enseña(k, el);
+        enParte(parteEn(obj), true);
         fxFuera(); run.salto = false; run.objetivo = null; run.pausada = false;
         suena();
       }
+      /* el final del tramo: sin cola, el vídeo se queda parado en su último fotograma; con cola (una libreta), el vídeo sigue
+         sonando lo que le queda (el principio de la cola; su imagen es el mismo último fotograma) y la cola entra encima */
+      function alFinal(saltado) {
+        const el = run.el;
+        if (R && R.cola && !saltado && el && !el.paused && !el.ended) est.colaVid = el;
+        else if (el) { try { el.pause(); } catch (e) {} if (saltado) { try { el.currentTime = Math.max(0, fin - 0.02); } catch (e) {} } }
+        acaba('fin');
+      }
 
-      // el reloj: cada fotograma
+      // el reloj: cada fotograma (solo mira por dónde va: el vídeo y su sonido van solos)
       function paso() {
         if (!run.vivo) return;
         run.raf = requestAnimationFrame(paso);
         mandos();
-        if (run.pausada || run.salto || run.cambiando) return;
-        const T = reloj(), k = run.k, q = P[k], el = run.el;
-        if (run.maestro === 'pista' && (T >= fin - 0.025 || pista.ended)) { if (el) ultimoFotograma(el); acaba('fin'); return; }
-        if (run.maestro === 'video' && k === P.length - 1 && el && el.ended) { acaba('fin'); return; }
-        // la parte siguiente, a su hora (con la pista) o al acabar la anterior (sin pista)
-        if (k + 1 < P.length && (run.maestro === 'pista' ? T >= P[k + 1].rt0 : (el && el.ended))) {
-          if (run.sig && run.sig.k === k + 1 && run.sig.listo) {
-            const e2 = run.sig.el; enseña(k + 1, e2);
-            if (run.maestro === 'video') e2.muted = false;
-            e2.play().catch(() => {});
-            if (run.ov) run.ov.sonar();
-          } else {                                             // aún no está preparada: se espera (CARGANDO) con todo parado
-            run.cambiando = true; calla();
-            enParte(k + 1, Math.max(0, T - P[k + 1].rt0)).then(e2 => {
-              run.cambiando = false; if (!run.vivo || !e2) return;
-              enseña(k + 1, e2); if (!run.pausada && !run.salto) suena();
-            });
-          }
-          return;
-        }
-        // preparar la siguiente en el otro elemento, en cuanto esté cargada
-        if (k + 1 < P.length && !run.sig && listo(rutaVideo(P[k + 1].f))) {
-          const e2 = elOtro(el); const sg = { k: k + 1, el: e2, listo: false }; run.sig = sg;
-          prepara(e2, rutaVideo(P[k + 1].f)).then(() => { if (run.sig === sg && e2.currentTime > 0.03) return buscaVid(e2, 0); }).then(() => { if (run.sig === sg) { e2.muted = run.maestro !== 'video'; sg.listo = true; } });
-        }
-        // la deriva: el vídeo sigue a la pista
-        if (run.maestro === 'pista' && el && !el.seeking) {
-          const exp = T - q.rt0, d = el.currentTime - exp, dur = el.duration || q.dur;
-          if (exp < dur - 0.04) {
-            if (Math.abs(d) > 0.3) { try { el.currentTime = Math.max(0, exp); } catch (e) {} }
-            else { const r = Math.max(0.94, Math.min(1.06, 1 - d * 0.6)); if (Math.abs(el.playbackRate - r) > 0.004) el.playbackRate = r; }
-            if (el.paused && !pista.paused) el.play().catch(() => {});
-          }
-        }
-        if (run.ov) run.ov.mira(T - q.rt0);
+        if (run.pausada || run.salto || !run.el) return;
+        const T = reloj();
+        if (T >= fin - 0.025 || run.el.ended) { alFinal(false); return; }
+        const k = parteEn(T); if (k !== run.k) enParte(k);
+        if (run.ov) run.ov.mira(T - P[run.k].rt0);
       }
 
       // arranque
       (async () => {
-        run.maestro = (R && R.f) ? 'pista' : 'video';
-        if (run.maestro === 'pista') {
-          const ok = (await asegura(R.f)) && (await cargaPista(R.f));
-          if (!run.vivo) return;
-          if (!ok) { console.warn('[MAG] sin pista, con el sonido de cada vídeo', R.f); run.maestro = 'video'; }
-        }
+        if (!X) { console.warn('[MAG] tramo sin vídeo'); acaba('error'); return; }
+        if (!(await asegura(X)) || !run.vivo) { if (run.vivo) acaba('error'); return; }
         const T0 = Math.max(0, Math.min(o.desde || 0, Math.max(0, fin - 0.1)));
-        const k = parteEn(T0);
-        const el = await enParte(k, T0 - P[k].rt0);
-        if (!run.vivo || !el) { if (!el) acaba('error'); return; }
-        if (run.maestro === 'pista') { conectaPista(); await buscaPista(T0); }
+        const el = await enEspera(X, T0);
         if (!run.vivo) return;
-        enseña(k, el);
-        if (run.maestro === 'video') el.muted = false;
+        conecta(el);
+        run.el = el; muestra(el);
+        if (o.alMostrar) { const f = o.alMostrar; o.alMostrar = null; try { f(); } catch (e) { console.error(e); } }
+        enParte(parteEn(T0), true);
         suena();
         run.raf = requestAnimationFrame(paso);
       })().catch(e => { console.error('[MAG] tramo', e); acaba('error'); });
@@ -378,12 +302,13 @@
   }
 
   // ───────────────── lo especial de la bobina 3: la pieza del alumno y su título ─────────────────
-  /* run.ov = { sonar(), parar(), mira(t) }: la pieza suena por Web Audio a la hora de la pista; el título y la etiqueta, por t
+  /* run.ov = { sonar(), parar(), mira(t) }: la pieza suena por Web Audio a la hora del vídeo; el título y la etiqueta, por t
      (segundos desde el principio de esa parte) */
   function montaOverlays(q, run) {
     quitaOverlays();
     const ov = { piezas: [], sonar() {}, parar() {}, mira() {} };
     run.ov = ov;
+    const tParte = () => (run.el ? run.el.currentTime : 0) - q.rt0;
     if (q.pieza) {
       const o = { t: q.pieza.t, fuente: null, buf: null, deAlumno: false, g: null };
       const ejemplo = () => (MAG.R['a/b3_pieza_ejemplo.mp3'] && MAG.R['a/b3_pieza_ejemplo.mp3'].buf) || null;
@@ -398,7 +323,7 @@
       const para = () => { if (o.fuente) { try { o.fuente.stop(); } catch (e) {} try { o.g.disconnect(); } catch (e) {} o.fuente = null; } };
       const programa = () => {
         para(); if (!o.buf || !run.vivo || run.pausada || run.salto || P_k(run) !== q) return;
-        const a = MAG.audio(), t = run.maestro === 'pista' ? pista.currentTime - q.rt0 : (run.el ? run.el.currentTime : 0);
+        const a = MAG.audio(), t = tParte();
         const dt = o.t - t, off = Math.max(0, -dt);
         if (off >= o.buf.duration - 0.05) return;
         const f = MAG.filtro('radio'), g = a.createGain(); g.gain.value = MAG.db(o.db);
@@ -413,7 +338,7 @@
         if (est.pieza !== o) return;
         o.deAlumno = !!b; o.buf = b || ejemplo(); o.db = o.buf ? ganancia(o.buf) : -6;
         window.__magPieza = o.deAlumno ? 'alumno' : (o.buf ? 'ejemplo' : 'ninguna');
-        if (run.vivo && !run.pausada && !run.salto) programa();
+        if (run.vivo && !run.pausada && !run.salto && run.el && !run.el.paused) programa();
       });
     }
     const vistas = [];
@@ -433,16 +358,16 @@
       mide(c, () => ajustaTexto(c.querySelector('.etq-tx'), 358, 33, 14));
       vistas.push({ c, t0: q.etiqueta.t0, t1: q.etiqueta.t1 });
     }
-    if (q.ruidos) montaRuidos(q, run, ov, vistas);
+    if (q.ruidos) montaRuidos(q, run, ov, vistas, tParte);
     if (vistas.length) ov.mira = (t) => vistas.forEach(v => { const h = !(t >= v.t0 && t < v.t1); if (v.c.hidden !== h) v.c.hidden = h; if (!h && v.pinta) v.pinta(t); });
   }
   /* (18-oct, N37 de Iago) «la mesa de montaje»: Odile escucha los cuatro ruidos de TU clase, uno tras otro. El sonido del tramo
-     (limpio) no los trae: aquí suenan los de la clase (MAG.b3.sonidosClase(); si no hay, los de ejemplo) a su hora de la pista, y
+     (limpio) no los trae: aquí suenan los de la clase (MAG.b3.sonidosClase(); si no hay, los de ejemplo) a su hora del vídeo, y
      encima del panel del vídeo va el mismo panel con SUS nombres y su onda, que se dibuja mientras suena (como en la animática:
      panel_lanes de b3v35.py, en (90, 100), 1120 × 734, un carril cada 156 px, 290 px por segundo).
      q.ruidos = { t: [4], d: [4], panel: [t0, t1] } (segundos desde el principio de esta parte). */
   const RUIDOS_EJ = [['LÁPIZ', 'a/b3_ej_lapiz.mp3'], ['SILLA', 'a/b3_ej_silla.mp3'], ['LIBRO', 'a/b3_ej_libro.mp3'], ['CREMALLERA', 'a/b3_ej_cremallera.mp3']];
-  function montaRuidos(q, run, ov, vistas) {
+  function montaRuidos(q, run, ov, vistas, tParte) {
     const R_ = q.ruidos, n = R_.t.length, PXS = 290;
     const c = MAG.el('div', { class: 'rd-panel' }, [MAG.el('div', { class: 'rd-tit', text: 'LOS RUIDOS DE TU CLASE' })]);
     const ets = [];
@@ -458,7 +383,7 @@
     };
     const programa = () => {
       para(); if (!o.bufs.length || !run.vivo || run.pausada || run.salto || P_k(run) !== q) return;
-      const a = MAG.audio(), now = run.maestro === 'pista' ? pista.currentTime - q.rt0 : (run.el ? run.el.currentTime : 0);
+      const a = MAG.audio(), now = tParte();
       o.bufs.forEach((x, i) => {
         if (!x) return;
         const t0 = R_.t[i], d = R_.d[i], dt = t0 - now, off = Math.max(0, -dt);
@@ -506,7 +431,7 @@
         const mx = Math.max(1e-6, ...env); o.env[i] = env.map(v => Math.pow(v / mx, 0.75));
       });
       window.__magRuidos = L.map(x => x.nombre).join(' | ');
-      o.ult = -1; if (run.vivo && !run.pausada && !run.salto) programa();
+      o.ult = -1; if (run.vivo && !run.pausada && !run.salto && run.el && !run.el.paused) programa();
     });
   }
   const P_k = run => run.P[run.k];
@@ -540,21 +465,25 @@
     const def = MAG.est[p.id];
     if (!def) { console.warn('[MAG] falta la estación', p.id); return 'falta'; }
     est.modo = 'estacion'; est.piezaPromesa = null;           // (si se rehace la pieza, se vuelve a mezclar)
-    paraPista();
+    paraColaVid();
     MAG.botonera.enclava(null); MAG.botonera.rotulo(''); MAG.botonera.reposo('AHORA TÚ'); MAG.botonera.usables(tecDefecto());
     if (est.vid) { try { est.vid.pause(); } catch (e) {} }
+    // (v3) el micro, abierto solo en las estaciones que graban (el permiso ya se pidió al pulsar la bobina)
+    const conMicro = !!def.micro;
+    if (conMicro) MAG.mic.abre();
     const fondo = $('#fondo');
     if (def.fondo) { fondo.src = MAG.url(def.fondo); fondo.classList.add('ve'); }
     const raiz = $('#capaEst'); raiz.innerHTML = '';
     const ctx = MAG.contexto(raiz, { profe: PROFE(), bobina: est.bobina });
     est.enEst = ctx;
-    // la siguiente parte de vídeo, ya preparada mientras tanto
-    const sig = siguienteVideo(); if (sig && listo(rutaVideo(sig.f))) { const otro = est.vid ? elOtro(est.vid) : vA; prepara(otro, rutaVideo(sig.f)); }
+    // el vídeo del tramo siguiente, ya preparado (parado en su principio) mientras tanto
+    const sig = siguienteVideo(); if (sig) adelanta(vidDe(est.bobina, sig.run));
     let r = 'fin';
     try {
       r = await Promise.race([def.monta(ctx).then(() => 'fin'), new Promise(ok => { est.sigue = ok; })]);
     } catch (e) { console.error('[MAG] estación', p.id, e); r = 'error'; }
     est.sigue = null; ctx.limpia(); est.enEst = null;
+    if (conMicro) MAG.mic.suelta();
     fondo.classList.remove('ve');
     $('#subs').innerHTML = ''; $('#capaTop').innerHTML = '';
     MAG.botonera.reposo('PLAY');
@@ -578,14 +507,14 @@
   }
   async function corre(n, desde) {
     est.bobina = n; est.pasos = pasosDe(n); est.paso = desde || 0; est.modo = 'historia'; est.cancelado = false; est.piezaPromesa = null; est.desdeT = 0;
-    const ficha = {}; est.rueda = ficha; rueda(n, ficha);
     MAG.videoHook = videoPorId;
     portada(false); $('#mandos').classList.add('enHistoria');
     MAG.botonera.raiz.classList.remove('bot-oculta'); MAG.botonera.reposo('PLAY');
     // si se continúa a mitad (en una estación), se enseña el último fotograma del tramo de antes
     if (est.paso > 0 && est.pasos[est.paso].t === 'e') {
       const ant = est.pasos.slice(0, est.paso).reverse().find(q => q.t === 'v');
-      if (ant) { const el = vA; await asegura(rutaVideo(ant.f)); await prepara(el, rutaVideo(ant.f)); try { el.currentTime = Math.max(0, el.duration - 0.05); } catch (e) {} muestra(el); }
+      const X = ant && vidDe(n, ant.run);
+      if (X && await asegura(X)) { const el = await enEspera(X, ant.rt0 + ant.dur - 0.02); muestra(el); }
     }
     while (est.paso < est.pasos.length && !est.cancelado) {
       const p = est.pasos[est.paso];
@@ -600,7 +529,7 @@
         MAG.botonera.usables(['rew', 'play', 'pausa', 'ff']); MAG.botonera.reposo('PLAY');
         const Ps = partesDeRun(p.run);
         const desdeT = est.desdeT || p.rt0; est.desdeT = 0;
-        const r = await corrida({ R: runDe(p.run), partes: Ps, desde: desdeT });
+        const r = await corrida({ X: vidDe(n, p.run), R: runDe(p.run), partes: Ps, desde: desdeT });
         if (est.cancelado || r === 'salir') break;
         if (r === 'atras') {                                   // ◀◀ antes del principio de este tramo
           const i0 = Ps[0].i;
@@ -616,7 +545,7 @@
           const r2 = await seguirTrasLibreta(p.run);
           if (est.cancelado) break;
           if (r2 === 'atras') continue;
-        } else paraPista();
+        } else paraColaVid();
         est.paso = ult.i + 1;
       } else {
         const r = await estacion(p);
@@ -636,6 +565,7 @@
     est.modo = 'libreta';
     MAG.botonera.enclava('pausa'); MAG.botonera.rotulo(''); MAG.botonera.usables(['rew', 'play', 'ff']);
     const cola = await empiezaCola(runDe(runId));
+    const sig = siguienteVideo(); if (sig) adelanta(vidDe(est.bobina, sig.run));
     return new Promise(ok => {
       const pr = MAG.ui.seguir($('#capaTop'), 'Seguir con la historia');
       const sal = (m) => { est.sigue = null; pr.cancela(); paraCola(cola); est.modo = 'historia'; ok(m); };
@@ -643,19 +573,28 @@
       pr.then(() => sal('fin'));
     });
   }
+  /* el vídeo de la libreta sigue sonando (su sonido dura 1,5 s más que la imagen: el principio de la cola); se calla con la cola */
+  function paraColaVid(seg) {
+    const el = est.colaVid; est.colaVid = null; if (!el) return;
+    if (!seg) { try { el.pause(); } catch (e) {} return; }
+    volVid(el, 0, seg);
+    setTimeout(() => { if (est.run && est.run.el === el) return; try { el.pause(); } catch (e) {} volVid(el, 1, 0.01); }, seg * 1000 + 60);
+  }
   async function empiezaCola(R) {
-    if (!R || !R.cola) { paraPista(); return null; }
+    const el = est.colaVid;
+    if (!R || !R.cola) { paraColaVid(); return null; }
     let buf = null;
     try { buf = await trae(R.cola.f).then(() => MAG.decodifica(R.cola.f)); } catch (e) { buf = null; }
-    if (!buf) { paraPista(); return null; }
+    if (!buf) { paraColaVid(); return null; }
     const a = MAG.audio(), t = a.currentTime;
-    const off = Math.max(0, Math.min(buf.duration - 0.2, pista.paused ? 0 : pista.currentTime - (R.finPartes || 0)));
+    const sigue = el && !el.paused && !el.ended;
+    const off = Math.max(0, Math.min(buf.duration - 0.2, sigue ? el.currentTime - (R.finPartes || 0) : 0));
     const s = a.createBufferSource(); s.buffer = buf; s.loop = true;
     if (R.cola.bucle) { s.loopStart = R.cola.bucle[0]; s.loopEnd = R.cola.bucle[1]; }
     const g = a.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(1, t + 0.2);
     s.connect(g); g.connect(MAG.master); s.start(t, off);
-    // la pista (que ya suena con el principio de la cola) se va en esos mismos 0,2 s
-    volPista(0, 0.2); setTimeout(() => { paraPista(); volPista(1, 0.01); }, 260);
+    // el vídeo (que ya suena con el principio de la cola) se va en esos mismos 0,2 s y se queda parado en su último fotograma
+    paraColaVid(0.2);
     return { s, g };
   }
   function paraCola(c) {
@@ -672,8 +611,8 @@
     est.modo = 'lugar'; est.sigue = null;
     let rt = 0; const P = l.partes.map(q => { const x = Object.assign({}, q, { rt0: rt }); rt += q.dur; return x; });
     MAG.botonera.usables(['rew', 'play', 'pausa', 'ff']);
-    await corrida({ R: l.run && B.runs ? B.runs[l.run] : null, partes: P, desde: 0, lugar: true, alMostrar: op.alMostrar });
-    paraPista();
+    await corrida({ X: vidDe(est.bobina, l.run || id), R: l.run && B.runs ? B.runs[l.run] : null, partes: P, desde: 0, lugar: true, alMostrar: op.alMostrar });
+    paraColaVid();
     est.sigue = sigueEst;
     if (!est.cancelado) { est.modo = modoAntes; MAG.botonera.usables(usablesAntes); MAG.botonera.enclava(null); MAG.botonera.rotulo(''); }
   }
@@ -716,8 +655,8 @@
       est.cancelado = true;
       if (est.run) est.run.acabar('salir');
       if (est.sigue) est.sigue('salir');
-      paraPista(); fxFuera();
-      [vA, vB].forEach(v => { try { v.pause(); } catch (e) {} v.classList.remove('ve'); });
+      est.colaVid = null; callaVideos(); fxFuera();
+      [vA, vB].forEach(v => v.classList.remove('ve'));
       quitaOverlays(); $('#capaEst').innerHTML = ''; $('#subs').innerHTML = ''; $('#capaTop').innerHTML = ''; $('#fondo').classList.remove('ve');
       MAG.botonera.raiz.classList.add('bot-oculta'); $('#mandos').classList.remove('enHistoria', 'escondidos');
       $('#finBobina').hidden = true;
@@ -747,45 +686,58 @@
   }
   /* ¿esta bobina graba con el micrófono? (las estaciones con «micro: true»: b1_grabar, b3_clase) */
   const usaMicro = n => (G.bobinas[n].pasos || []).some(p => p.t === 'e' && MAG.est[p.id] && MAG.est[p.id].micro);
+  const MB = b => Math.round(b / 1e6);
   async function elige(n, desde) {
-    MAG.audio(); est.modo = 'cargando'; est.c720 = es720();
+    // (v3, nota de Iago) el permiso del micrófono, YA, con el toque en la bobina (y se suelta enseguida); mientras, se carga
+    est.pm = usaMicro(n) ? MAG.mic.permiso() : null;
+    let micPend = !!est.pm;
+    MAG.audio(); est.modo = 'cargando'; est.c30 = calidad() === '30';
     const vista = $('#pCarga'); $('#pBobinas').hidden = true; vista.hidden = false;
     const tx = vista.querySelector('.pc-tx'), barra = vista.querySelector('.pc-barra i'), bot = vista.querySelector('.pc-bot');
-    bot.innerHTML = ''; tx.textContent = 'Cargando la bobina ' + n + ' · 0 %'; barra.style.width = '0%';
+    let ultTx = 'Cargando la bobina ' + n + ' · 0 %';
+    const pinta = () => { tx.textContent = (micPend ? 'Dale permiso al micrófono (arriba, junto a la dirección) mientras se carga la bobina ' + n + '. ' : '') + ultTx; };
+    bot.innerHTML = ''; pinta(); barra.style.width = '0%';
+    if (est.pm) est.pm.then(() => { micPend = false; pinta(); }, () => { micPend = false; pinta(); });
     const volver = MAG.ui.boton('', { clase: 'mbtn-sec pc-volver', icono: '<svg viewBox="0 0 24 24" width="22" height="22"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>', titulo: 'Volver' });
     let anulado = false, tecla = null;
     volver.addEventListener('click', () => { anulado = true; if (tecla) window.removeEventListener('keydown', tecla, true); vista.hidden = true; $('#pBobinas').hidden = false; est.modo = 'portada'; });
     bot.appendChild(volver);
     est.bobina = n; est.pasos = pasosDe(n);
-    const { L, pesos } = recursosDe(n, desde);
-    const mios = new Set(porTraer(n, est.pasos).map(x => x.r).concat(L));
-    Object.keys(MAG.R).forEach(r => { if (/^(v7?|p)\//.test(r) && !mios.has(r)) suelta(r); });
-    const fallos = await MAG.cargaTodo(L, f => { const p = Math.round(f * 100); tx.textContent = 'Cargando la bobina ' + n + ' · ' + p + ' %'; barra.style.width = p + '%'; }, pesos);
+    const { L, pesos, trozos } = recursosDe(n);
+    // fuera de la memoria, los vídeos de las otras bobinas (y los de la otra calidad); los <video> los sueltan antes
+    const mios = new Set(L);
+    [vA, vB].forEach(v => { if (v.dataset.ruta && !mios.has(v.dataset.ruta)) { try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {} delete v.dataset.ruta; } });
+    Object.keys(MAG.R).forEach(r => { if (/^(r3?|v7?|p)\//.test(r) && !mios.has(r)) suelta(r); });
+    const fallos = await MAG.cargaTodo(L, (f, hecho, tot) => {
+      const p = Math.round(f * 100); ultTx = 'Cargando la bobina ' + n + ' · ' + p + ' %' + (tot > 2e6 ? ' · ' + MB(hecho) + ' de ' + MB(tot) + ' MB' : '');
+      pinta(); barra.style.width = p + '%';
+    }, pesos, trozos);
     if (anulado) return;
     if (fallos.length) console.warn('[MAG] no se pudo cargar', fallos);
-    const micro = usaMicro(n);
-    tx.textContent = (desde ? 'La bobina ' + n + ' está lista: sigue donde la dejaste.' : 'La bobina ' + n + ' está lista.') + (micro ? ' Te pedirá el micrófono: dale permiso.' : '');
+    ultTx = (desde ? 'La bobina ' + n + ' está lista: sigue donde la dejaste.' : 'La bobina ' + n + ' está lista.') + (fallos.length ? ' (Falta algún archivo: puede saltarse algo.)' : '');
+    pinta();
     barra.style.width = '100%';
     const emp = MAG.ui.boton(desde ? 'Continuar la bobina ' + n : 'Empezar la bobina ' + n, { clase: 'mbtn-prin', icono: MAG.ICO.play });
     bot.insertBefore(emp, volver);
     const arranca = () => {
       window.removeEventListener('keydown', tecla, true); emp.disabled = true;
-      // con el toque: la pista queda «desbloqueada» (Safari) y se pide el micro (una vez, para toda la bobina)
+      // con el toque: los dos vídeos quedan «desbloqueados» para sonar (Safari) y conectados a Web Audio
       try {
-        conectaPista(); const R0 = est.pasos[desde || 0] && runDe(est.pasos[desde || 0].run);
-        if (R0 && R0.f && listo(R0.f)) {
-          const tok = {}; est.desbloqueo = tok; volPista(0, 0.001); pistaRuta = R0.f; pista.src = MAG.url(R0.f);
-          const pr = pista.play(); if (pr) pr.then(() => { if (est.desbloqueo === tok) { pista.pause(); volPista(1, 0.01); } }).catch(() => {});
+        const p1 = est.pasos.slice(desde || 0).find(q => q.t === 'v'), X0 = p1 && vidDe(n, p1.run);
+        if (X0 && listo(rutaDe(X0))) {
+          const tok = {}; est.desbloqueo = tok;
+          [vA, vB].forEach(v => {
+            conecta(v); volVid(v, 0, 0.001);
+            if (!v.getAttribute('src')) { v.dataset.ruta = rutaDe(X0); v.src = MAG.url(rutaDe(X0)); }
+            const pr = v.play();
+            if (pr) pr.then(() => { if (!(est.run && est.run.el === v)) { v.pause(); if (est.desbloqueo === tok) volVid(v, 1, 0.01); } }).catch(() => {});
+          });
         }
       } catch (e) {}
-      const pm = micro ? MAG.mic.abre() : null;
-      // (18-oct, V3 de Iago) con la cuenta Protester y en hora de clase, tras el micro, «Seleccionar voluntario» en el medio;
-      // la bobina empieza al cerrarlo (o con «Ahora no»). Sin seleccionador (alumnos, o fuera de hora), empieza ya.
-      // (18-oct, tarde) mientras se espera el permiso del micro (y, en hora de clase, el seleccionador), sigue a la vista el panel
-      // de carga con lo que hay que hacer (antes se volvía a ver la portada y parecía que no pasaba nada)
+      // (18-oct, V3 de Iago) con la cuenta Protester y en hora de clase, «Seleccionar voluntario» en el medio (tras el permiso del
+      // micro, si se pidió); la bobina empieza al cerrarlo (o con «Ahora no»). Sin seleccionador (alumnos, o fuera de hora), empieza ya.
       let ya = false; const sigue = () => { if (ya || anulado) return; ya = true; vista.hidden = true; $('#pBobinas').hidden = false; corre(n, desde); };
-      if (pm) { tx.textContent = 'Dale permiso al micrófono (arriba, junto a la dirección de la página) y empieza la bobina ' + n + '.'; pm.then(() => { if (!ya && !anulado) tx.textContent = 'La bobina ' + n + ' está lista.'; }, () => {}); }
-      try { if (window.LMVoluntarios && typeof window.LMVoluntarios.ofrece === 'function') { window.LMVoluntarios.ofrece({ tras: pm, dia: n }).then(sigue, sigue); return; } } catch (e) {}
+      try { if (window.LMVoluntarios && typeof window.LMVoluntarios.ofrece === 'function') { window.LMVoluntarios.ofrece({ tras: est.pm || null, dia: n }).then(sigue, sigue); return; } } catch (e) {}
       sigue();
     };
     tecla = ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); arranca(); } };
@@ -795,7 +747,7 @@
   function finBobina(n) {
     const hechas = MAG.lee('hechas', []); if (hechas.indexOf(n) < 0) { hechas.push(n); MAG.guarda('hechas', hechas); }
     MAG.guarda('progreso', null);
-    paraPista(); MAG.mic.suelta();
+    paraColaVid(); MAG.mic.suelta();
     est.modo = 'fin'; MAG.botonera.enclava(null); MAG.botonera.reposo('FIN'); MAG.botonera.usables([]);
     const c = $('#finBobina'); c.hidden = false;
     c.querySelector('.fb-t').textContent = 'Fin de la bobina ' + n;
@@ -813,10 +765,12 @@
     const pc = MAG.el('button', { class: 'mnd', id: 'bPantalla', type: 'button', title: 'Pantalla completa',
       html: '<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' });
     pc.addEventListener('click', () => { try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); } catch (e) {} });
-    const cal = MAG.el('button', { class: 'mnd txt', id: 'bCalidad', type: 'button', title: 'Calidad del vídeo: 720 es la versión ligera, por si va a tirones (vale desde la próxima bobina que cargues)' });
-    const pinta = () => { cal.textContent = MAG.lee('calidad', '1080') === '720' ? '720' : '1080'; };
-    cal.addEventListener('click', () => { MAG.guarda('calidad', MAG.lee('calidad', '1080') === '720' ? '1080' : '720'); pinta(); });
-    pinta(); if (!G.v7) cal.hidden = true;
+    // (v3) 60 / 30: la versión ligera, por si un ordenador va justo (vale desde la próxima bobina que cargues). El id sigue siendo
+    // «bCalidad» (el seleccionador de voluntarios pone su botón delante de él)
+    const cal = MAG.el('button', { class: 'mnd txt', id: 'bCalidad', type: 'button', title: '60 fotogramas (normal) · 30: versión ligera, por si va a tirones (vale desde la próxima bobina que cargues)' });
+    const pinta = () => { cal.textContent = calidad(); };
+    cal.addEventListener('click', () => { MAG.guarda('calidad', calidad() === '30' ? '60' : '30'); pinta(); });
+    pinta(); if (!hay30()) cal.hidden = true;
     const sal = MAG.el('button', { class: 'mnd', id: 'bSalir', type: 'button', title: 'Salir a la portada (se guarda por dónde ibas)',
       html: '<svg viewBox="0 0 24 24"><path d="M10 5H5v14h5M14 8l4 4-4 4M18 12H9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' });
     sal.addEventListener('click', () => portada(true));
@@ -836,5 +790,4 @@
   // desde el aviso de la campana («&dia=N»): esa bobina, directamente
   try { const ir = window.MagHitos ? window.MagHitos.ir() : 0; if (ir && G.bobinas[ir] && (!window.MagHitos || window.MagHitos.abierto(ir))) setTimeout(() => elige(ir, 0), 300); } catch (e) {}
   window.__mag = est;
-  est._pista = pista;                                                     // (para las pruebas)
 })();

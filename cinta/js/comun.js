@@ -118,6 +118,24 @@
     MAG.R[ruta] = o; return o;
   }
   MAG.trae = trae;
+  /* (motor v3) un vídeo partido en trozos (GitHub no deja subir a mano ficheros de más de 25 MB): se traen en orden y se unen
+     en un solo Blob, que es lo que se reproduce. alAvance(bytes traídos hasta ahora) */
+  MAG.traeTrozos = async function (ruta, trozos, alAvance) {
+    if (MAG.R[ruta] && MAG.R[ruta].listo) return MAG.R[ruta];
+    if (!trozos || !trozos.length) return trae(ruta, alAvance);
+    const partes = []; let n = 0;
+    for (const t of trozos) {
+      const r = await fetch(MAG.base + t, { cache: 'force-cache' });
+      if (!r.ok) throw new Error('No se encuentra ' + t + ' (' + r.status + ')');
+      if (r.body && r.body.getReader) {
+        const rd = r.body.getReader();
+        for (;;) { const { done, value } = await rd.read(); if (done) break; partes.push(value); n += value.length; if (alAvance) alAvance(n, 0); }
+      } else { const b = await r.blob(); partes.push(b); n += b.size; if (alAvance) alAvance(n, 0); }
+    }
+    const blob = new Blob(partes, { type: 'video/mp4' });
+    const o = { url: URL.createObjectURL(blob), bytes: blob.size, listo: true };
+    MAG.R[ruta] = o; return o;
+  };
   /* el AudioBuffer de algo ya traído sin decodificar (las colas de las libretas, p/…_cola.m4a) */
   MAG.decodifica = async function (ruta) {
     const o = MAG.R[ruta] || await trae(ruta);
@@ -125,17 +143,19 @@
     try { o.buf = await MAG.audio().decodeAudioData(await o.blob.arrayBuffer()); } catch (e) { console.warn('[MAG] no se pudo decodificar', ruta, e); o.buf = null; }
     return o.buf;
   };
-  /* carga una lista; alProgreso(fraccion 0..1, texto) — tamaños aproximados si se pasan en pesos{ruta: bytes} */
-  MAG.cargaTodo = async function (lista, alProgreso, pesos) {
+  /* carga una lista; alProgreso(fraccion 0..1, bytes hechos, bytes en total) — tamaños aproximados si se pasan en pesos{ruta: bytes}
+     (motor v3) trozos{ruta: [trozos]}: los vídeos que van partidos se traen con MAG.traeTrozos */
+  MAG.cargaTodo = async function (lista, alProgreso, pesos, trozos) {
     lista = Array.from(new Set(lista.filter(Boolean)));
     const tot = lista.reduce((s, r) => s + ((pesos && pesos[r]) || 200000), 0);
     const hecho = {}; let fallos = [];
-    const avisa = () => { if (alProgreso) { const n = Object.values(hecho).reduce((s, v) => s + v, 0); alProgreso(Math.min(1, n / tot)); } };
+    const avisa = () => { if (alProgreso) { const n = Object.values(hecho).reduce((s, v) => s + v, 0); alProgreso(Math.min(1, n / tot), n, tot); } };
     let i = 0;
     async function obrero() {
       while (i < lista.length) {
-        const ruta = lista[i++]; const p = (pesos && pesos[ruta]) || 200000;
-        try { await trae(ruta, (n, t) => { hecho[ruta] = t ? p * n / t : Math.min(p, n); avisa(); }); }
+        const ruta = lista[i++]; const p = (pesos && pesos[ruta]) || 200000, tz = trozos && trozos[ruta];
+        const cb = (n, t) => { hecho[ruta] = t ? p * n / t : Math.min(p, n); avisa(); };
+        try { await (tz ? MAG.traeTrozos(ruta, tz, cb) : trae(ruta, cb)); }
         catch (e) { console.warn('[MAG]', e.message); fallos.push(ruta); }
         hecho[ruta] = p; avisa();
       }
@@ -349,21 +369,38 @@
 
   // ───────────────────────── el micrófono ─────────────────────────
   /* MAG.mic.graba(op) → { para(): Promise<AudioBuffer|null>, nivel(): 0..1 } — si no hay micro, null en .error */
-  /* (18-oct, N17) el permiso se pide UNA vez, al empezar la bobina que graba con el micro (el motor llama a .abre()); el micro
-     queda abierto hasta el final de la bobina (.suelta()), así que luego basta con la tecla ● */
+  /* (motor v3, 18-oct noche, nota de Iago) el PERMISO se pide al pulsar la bobina en la portada (.permiso(): pide el micro y lo
+     suelta enseguida). El micro solo se abre en las estaciones que graban (el motor llama a .abre() al entrar y a .suelta() al
+     salir): así, mientras corre la historia, el iPad no tiene el micro abierto (con él abierto, el sonido del iPad va peor). */
   MAG.mic = {
-    stream: null, _pide: null,
+    stream: null, _pide: null, _perm: null, ok: null,
+    permiso() {
+      if (this.stream && this.stream.getTracks().some(t => t.readyState === 'live')) return Promise.resolve(true);
+      if (this._perm) return this._perm;
+      this._perm = (async () => {
+        try {
+          const s = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+          s.getTracks().forEach(t => t.stop()); this.ok = true;
+        } catch (e) { console.warn('[MAG] sin micrófono', e); this.ok = false; this._perm = null; }
+        return this.ok;
+      })();
+      return this._perm;
+    },
     async abre() {
+      this._quiere = true;
       if (this.stream && this.stream.getTracks().some(t => t.readyState === 'live')) return this.stream;
       if (this._pide) return this._pide;
       this._pide = (async () => {
-        try { this.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } }); }
-        catch (e) { console.warn('[MAG] sin micrófono', e); this.stream = null; }
-        this._pide = null; return this.stream;
+        let s = null;
+        try { s = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } }); }
+        catch (e) { console.warn('[MAG] sin micrófono', e); s = null; }
+        // (v3) si mientras tanto se soltó (se salió de la estación antes de que llegara el micro), se cierra ya
+        if (s && !this._quiere) { try { s.getTracks().forEach(t => t.stop()); } catch (e) {} s = null; }
+        this.stream = s; this._pide = null; return this.stream;
       })();
       return this._pide;
     },
-    suelta() { try { if (this.stream) this.stream.getTracks().forEach(t => t.stop()); } catch (e) {} this.stream = null; },
+    suelta() { this._quiere = false; try { if (this.stream) this.stream.getTracks().forEach(t => t.stop()); } catch (e) {} this.stream = null; },
     async graba(op) {
       op = op || {};
       const st = await this.abre(); if (!st) return { error: true, para: async () => null, nivel: () => 0 };
