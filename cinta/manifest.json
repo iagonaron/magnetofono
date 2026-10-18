@@ -1,16 +1,16 @@
 {
- "version": "18oct-d0ffee",
+ "version": "18oct-2a90d9",
  "generado": "18-oct-2026",
- "ficheros": 338,
- "bytes": 534265449,
+ "ficheros": 414,
+ "bytes": 572817271,
  "mayor": {
-  "f": "cinta/v/b1_00_g.mp4",
-  "bytes": 8712105
+  "f": "cinta/v/b3_08_b.mp4",
+  "bytes": 8993955
  },
  "lista": [
   {
    "f": "cinta/LEEME.txt",
-   "bytes": 4011
+   "bytes": 6239
   },
   {
    "f": "cinta/banco.html",
@@ -18,7 +18,7 @@
   },
   {
    "f": "cinta/estilo.css",
-   "bytes": 10972
+   "bytes": 14079
   },
   {
    "f": "cinta/a/b1_O13.mp3",
@@ -27,6 +27,34 @@
   {
    "f": "cinta/a/b1_O14.mp3",
    "bytes": 41318
+  },
+  {
+   "f": "cinta/a/b1_bien_asisehace.mp3",
+   "bytes": 25121
+  },
+  {
+   "f": "cinta/a/b1_bien_bravo.mp3",
+   "bytes": 20524
+  },
+  {
+   "f": "cinta/a/b1_bien_clarisimo.mp3",
+   "bytes": 32644
+  },
+  {
+   "f": "cinta/a/b1_bien_esoes.mp3",
+   "bytes": 21359
+  },
+  {
+   "f": "cinta/a/b1_bien_exacto.mp3",
+   "bytes": 20106
+  },
+  {
+   "f": "cinta/a/b1_bien_muybien.mp3",
+   "bytes": 18852
+  },
+  {
+   "f": "cinta/a/b1_bien_perfecto.mp3",
+   "bytes": 25121
   },
   {
    "f": "cinta/a/b1_clic.mp3",
@@ -57,6 +85,10 @@
    "bytes": 28779
   },
   {
+   "f": "cinta/a/b1_disco_raspa.mp3",
+   "bytes": 36909
+  },
+  {
    "f": "cinta/a/b1_disco_raya.mp3",
    "bytes": 17928
   },
@@ -67,6 +99,14 @@
   {
    "f": "cinta/a/b1_lupa_amb.mp3",
    "bytes": 241416
+  },
+  {
+   "f": "cinta/a/b1_mal_ahino.mp3",
+   "bytes": 38914
+  },
+  {
+   "f": "cinta/a/b1_mal_casi.mp3",
+   "bytes": 34316
   },
   {
    "f": "cinta/a/b1_motor.mp3",
@@ -165,6 +205,22 @@
    "bytes": 2760246
   },
   {
+   "f": "cinta/a/b2_od_adonde.mp3",
+   "bytes": 26793
+  },
+  {
+   "f": "cinta/a/b2_od_adondequieres.mp3",
+   "bytes": 28465
+  },
+  {
+   "f": "cinta/a/b2_od_otrositio.mp3",
+   "bytes": 30555
+  },
+  {
+   "f": "cinta/a/b2_od_siguiente.mp3",
+   "bytes": 29719
+  },
+  {
    "f": "cinta/a/b2_p_cafe_0.mp3",
    "bytes": 144866
   },
@@ -174,7 +230,7 @@
   },
   {
    "f": "cinta/a/b2_p_cafe_2.mp3",
-   "bytes": 15090
+   "bytes": 39789
   },
   {
    "f": "cinta/a/b2_p_cafe_3.mp3",
@@ -226,7 +282,7 @@
   },
   {
    "f": "cinta/a/b2_p_muelles_0.mp3",
-   "bytes": 241415
+   "bytes": 241389
   },
   {
    "f": "cinta/a/b2_p_muelles_1.mp3",
@@ -337,6 +393,26 @@
    "bytes": 14151
   },
   {
+   "f": "cinta/a/b2_y_reac1.mp3",
+   "bytes": 32013
+  },
+  {
+   "f": "cinta/a/b2_y_reac2.mp3",
+   "bytes": 44829
+  },
+  {
+   "f": "cinta/a/b2_y_reac3.mp3",
+   "bytes": 29277
+  },
+  {
+   "f": "cinta/a/b2_y_reac4.mp3",
+   "bytes": 35613
+  },
+  {
+   "f": "cinta/a/b2_y_reac5.mp3",
+   "bytes": 38493
+  },
+  {
    "f": "cinta/a/b3_O13.mp3",
    "bytes": 14151
   },
@@ -413,6 +489,50 @@
    "bytes": 5792
   },
   {
+   "f": "cinta/a/b3_tecleo_1.mp3",
+   "bytes": 3805
+  },
+  {
+   "f": "cinta/a/b3_tecleo_10.mp3",
+   "bytes": 3387
+  },
+  {
+   "f": "cinta/a/b3_tecleo_2.mp3",
+   "bytes": 3805
+  },
+  {
+   "f": "cinta/a/b3_tecleo_3.mp3",
+   "bytes": 3805
+  },
+  {
+   "f": "cinta/a/b3_tecleo_4.mp3",
+   "bytes": 2969
+  },
+  {
+   "f": "cinta/a/b3_tecleo_5.mp3",
+   "bytes": 3805
+  },
+  {
+   "f": "cinta/a/b3_tecleo_6.mp3",
+   "bytes": 3805
+  },
+  {
+   "f": "cinta/a/b3_tecleo_7.mp3",
+   "bytes": 3805
+  },
+  {
+   "f": "cinta/a/b3_tecleo_8.mp3",
+   "bytes": 3805
+  },
+  {
+   "f": "cinta/a/b3_tecleo_9.mp3",
+   "bytes": 3805
+  },
+  {
+   "f": "cinta/a/b3_tecleo_esp.mp3",
+   "bytes": 3805
+  },
+  {
    "f": "cinta/a/b3p_Y46.mp3",
    "bytes": 31392
   },
@@ -459,6 +579,14 @@
   {
    "f": "cinta/a/portada_musica.mp3",
    "bytes": 1536984
+  },
+  {
+   "f": "cinta/a/ui_avanza.mp3",
+   "bytes": 12333
+  },
+  {
+   "f": "cinta/a/ui_rebobina.mp3",
+   "bytes": 12333
   },
   {
    "f": "cinta/a/ui_tecla.mp3",
@@ -510,7 +638,7 @@
   },
   {
    "f": "cinta/i/b1_disco_fondo.jpg",
-   "bytes": 242043
+   "bytes": 221190
   },
   {
    "f": "cinta/i/b1_disco_liso.jpg",
@@ -682,11 +810,11 @@
   },
   {
    "f": "cinta/i/b3_titulo_fondo.jpg",
-   "bytes": 375535
+   "bytes": 375136
   },
   {
    "f": "cinta/i/b3p_fondo.jpg",
-   "bytes": 237970
+   "bytes": 238167
   },
   {
    "f": "cinta/i/portada.jpg",
@@ -710,655 +838,831 @@
   },
   {
    "f": "cinta/js/b1.js",
-   "bytes": 71797
+   "bytes": 64976
   },
   {
    "f": "cinta/js/b2.js",
-   "bytes": 79341
+   "bytes": 81013
   },
   {
    "f": "cinta/js/b3.js",
-   "bytes": 46720
+   "bytes": 48581
   },
   {
    "f": "cinta/js/b3pieza.js",
-   "bytes": 57440
+   "bytes": 58583
   },
   {
    "f": "cinta/js/comun.js",
-   "bytes": 34703
+   "bytes": 41489
   },
   {
    "f": "cinta/js/guion.js",
-   "bytes": 14358
+   "bytes": 24645
   },
   {
    "f": "cinta/js/motor.js",
-   "bytes": 32223
+   "bytes": 55203
   },
   {
    "f": "cinta/js/sonidos_paris.js",
-   "bytes": 4710
+   "bytes": 4709
+  },
+  {
+   "f": "cinta/p/p_b1_00.m4a",
+   "bytes": 5072938
+  },
+  {
+   "f": "cinta/p/p_b1_02.m4a",
+   "bytes": 608729
+  },
+  {
+   "f": "cinta/p/p_b1_02_cola.m4a",
+   "bytes": 425274
+  },
+  {
+   "f": "cinta/p/p_b1_03.m4a",
+   "bytes": 612443
+  },
+  {
+   "f": "cinta/p/p_b1_04.m4a",
+   "bytes": 1372784
+  },
+  {
+   "f": "cinta/p/p_b1_05.m4a",
+   "bytes": 1293121
+  },
+  {
+   "f": "cinta/p/p_b1_06.m4a",
+   "bytes": 436926
+  },
+  {
+   "f": "cinta/p/p_b1_07.m4a",
+   "bytes": 559576
+  },
+  {
+   "f": "cinta/p/p_b1_08.m4a",
+   "bytes": 549196
+  },
+  {
+   "f": "cinta/p/p_b1_09.m4a",
+   "bytes": 400756
+  },
+  {
+   "f": "cinta/p/p_b1_09_cola.m4a",
+   "bytes": 425129
+  },
+  {
+   "f": "cinta/p/p_b1_10.m4a",
+   "bytes": 64652
+  },
+  {
+   "f": "cinta/p/p_b2_01.m4a",
+   "bytes": 492425
+  },
+  {
+   "f": "cinta/p/p_b2_02.m4a",
+   "bytes": 2386296
+  },
+  {
+   "f": "cinta/p/p_b2_02_cola.m4a",
+   "bytes": 426000
+  },
+  {
+   "f": "cinta/p/p_b2_03.m4a",
+   "bytes": 262107
+  },
+  {
+   "f": "cinta/p/p_b2_04.m4a",
+   "bytes": 528749
+  },
+  {
+   "f": "cinta/p/p_b2_05.m4a",
+   "bytes": 1301330
+  },
+  {
+   "f": "cinta/p/p_b2_05_cola.m4a",
+   "bytes": 425420
+  },
+  {
+   "f": "cinta/p/p_b2_06.m4a",
+   "bytes": 67754
+  },
+  {
+   "f": "cinta/p/p_b2_lugar_cafe.m4a",
+   "bytes": 133266
+  },
+  {
+   "f": "cinta/p/p_b2_lugar_estacion.m4a",
+   "bytes": 136286
+  },
+  {
+   "f": "cinta/p/p_b2_lugar_mercado.m4a",
+   "bytes": 135763
+  },
+  {
+   "f": "cinta/p/p_b2_lugar_muelles.m4a",
+   "bytes": 179710
+  },
+  {
+   "f": "cinta/p/p_b3_01.m4a",
+   "bytes": 267086
+  },
+  {
+   "f": "cinta/p/p_b3_02.m4a",
+   "bytes": 540845
+  },
+  {
+   "f": "cinta/p/p_b3_03.m4a",
+   "bytes": 1690996
+  },
+  {
+   "f": "cinta/p/p_b3_03_cola.m4a",
+   "bytes": 426218
+  },
+  {
+   "f": "cinta/p/p_b3_04.m4a",
+   "bytes": 913811
+  },
+  {
+   "f": "cinta/p/p_b3_05.m4a",
+   "bytes": 747917
+  },
+  {
+   "f": "cinta/p/p_b3_06.m4a",
+   "bytes": 110683
+  },
+  {
+   "f": "cinta/p/p_b3_07.m4a",
+   "bytes": 184991
+  },
+  {
+   "f": "cinta/p/p_b3_07_cola.m4a",
+   "bytes": 428686
+  },
+  {
+   "f": "cinta/p/p_b3_08.m4a",
+   "bytes": 3626206
   },
   {
    "f": "cinta/v/b1_00_a.mp4",
-   "bytes": 7470291
+   "bytes": 7460282
   },
   {
    "f": "cinta/v/b1_00_b.mp4",
-   "bytes": 2457001
+   "bytes": 6441987
   },
   {
    "f": "cinta/v/b1_00_c.mp4",
-   "bytes": 3965158
+   "bytes": 7532774
   },
   {
    "f": "cinta/v/b1_00_d.mp4",
-   "bytes": 7589738
+   "bytes": 2830238
   },
   {
    "f": "cinta/v/b1_00_e.mp4",
-   "bytes": 4997952
+   "bytes": 8582779
   },
   {
    "f": "cinta/v/b1_00_f.mp4",
-   "bytes": 3194239
-  },
-  {
-   "f": "cinta/v/b1_00_g.mp4",
-   "bytes": 8712105
+   "bytes": 5917952
   },
   {
    "f": "cinta/v/b1_01_a.mp4",
-   "bytes": 6314501
+   "bytes": 6414849
   },
   {
    "f": "cinta/v/b1_01_b.mp4",
-   "bytes": 5561588
+   "bytes": 5469162
   },
   {
    "f": "cinta/v/b1_01_c.mp4",
-   "bytes": 3879912
+   "bytes": 3871573
   },
   {
    "f": "cinta/v/b1_01_d.mp4",
-   "bytes": 3219772
+   "bytes": 3206848
   },
   {
    "f": "cinta/v/b1_01_e.mp4",
-   "bytes": 4371840
+   "bytes": 4368555
   },
   {
    "f": "cinta/v/b1_01_f.mp4",
-   "bytes": 5426678
+   "bytes": 5347265
   },
   {
    "f": "cinta/v/b1_01_g.mp4",
-   "bytes": 2186245
+   "bytes": 2186838
   },
   {
    "f": "cinta/v/b1_01_h.mp4",
-   "bytes": 2756317
+   "bytes": 3923544
   },
   {
    "f": "cinta/v/b1_02_a.mp4",
-   "bytes": 2031512
+   "bytes": 2779255
   },
   {
    "f": "cinta/v/b1_02_b.mp4",
-   "bytes": 4322683
+   "bytes": 4501627
   },
   {
    "f": "cinta/v/b1_03_a.mp4",
-   "bytes": 5642231
+   "bytes": 5589447
   },
   {
    "f": "cinta/v/b1_03_b.mp4",
-   "bytes": 4445449
+   "bytes": 4506824
   },
   {
    "f": "cinta/v/b1_04_a.mp4",
-   "bytes": 5253320
+   "bytes": 3939425
   },
   {
    "f": "cinta/v/b1_04_b.mp4",
-   "bytes": 3557755
+   "bytes": 2106787
   },
   {
    "f": "cinta/v/b1_04_c.mp4",
-   "bytes": 2915491
+   "bytes": 3636504
   },
   {
    "f": "cinta/v/b1_04_d.mp4",
-   "bytes": 4895653
+   "bytes": 2864966
+  },
+  {
+   "f": "cinta/v/b1_04_e.mp4",
+   "bytes": 4983592
   },
   {
    "f": "cinta/v/b1_05_a.mp4",
-   "bytes": 3505564
+   "bytes": 3305298
   },
   {
    "f": "cinta/v/b1_05_b.mp4",
-   "bytes": 3803134
+   "bytes": 3724378
   },
   {
    "f": "cinta/v/b1_05_c.mp4",
-   "bytes": 3671927
+   "bytes": 3645844
   },
   {
    "f": "cinta/v/b1_05_d.mp4",
-   "bytes": 2790156
+   "bytes": 2740406
   },
   {
    "f": "cinta/v/b1_06.mp4",
-   "bytes": 4227422
+   "bytes": 4259341
   },
   {
    "f": "cinta/v/b1_07_a.mp4",
-   "bytes": 2337436
+   "bytes": 3469610
   },
   {
    "f": "cinta/v/b1_07_b.mp4",
-   "bytes": 3256975
+   "bytes": 2139662
   },
   {
    "f": "cinta/v/b1_08_a.mp4",
-   "bytes": 2657605
+   "bytes": 2636228
   },
   {
    "f": "cinta/v/b1_08_b.mp4",
-   "bytes": 2952624
+   "bytes": 2854853
   },
   {
    "f": "cinta/v/b1_09.mp4",
-   "bytes": 7135440
+   "bytes": 6953627
   },
   {
    "f": "cinta/v/b1_10.mp4",
-   "bytes": 775836
+   "bytes": 773885
   },
   {
    "f": "cinta/v/b2_01_a.mp4",
-   "bytes": 6586010
+   "bytes": 6561824
   },
   {
    "f": "cinta/v/b2_01_b.mp4",
-   "bytes": 4193775
+   "bytes": 4206751
   },
   {
    "f": "cinta/v/b2_02_a.mp4",
-   "bytes": 5250390
+   "bytes": 5487601
   },
   {
    "f": "cinta/v/b2_02_b.mp4",
-   "bytes": 4915208
+   "bytes": 6714152
   },
   {
    "f": "cinta/v/b2_02_c.mp4",
-   "bytes": 4562814
+   "bytes": 4657585
   },
   {
    "f": "cinta/v/b2_02_d.mp4",
-   "bytes": 5304199
+   "bytes": 5482482
   },
   {
    "f": "cinta/v/b2_02_e.mp4",
-   "bytes": 4306641
+   "bytes": 4315494
   },
   {
    "f": "cinta/v/b2_02_f.mp4",
-   "bytes": 5582446
+   "bytes": 5699144
   },
   {
    "f": "cinta/v/b2_03.mp4",
-   "bytes": 5410118
+   "bytes": 5561177
   },
   {
    "f": "cinta/v/b2_04.mp4",
-   "bytes": 7427886
+   "bytes": 8040941
   },
   {
    "f": "cinta/v/b2_05_a.mp4",
-   "bytes": 3604490
+   "bytes": 5192665
   },
   {
    "f": "cinta/v/b2_05_b.mp4",
-   "bytes": 4284812
+   "bytes": 3848628
   },
   {
    "f": "cinta/v/b2_05_c.mp4",
-   "bytes": 5098206
+   "bytes": 4455678
   },
   {
    "f": "cinta/v/b2_05_d.mp4",
-   "bytes": 5518134
+   "bytes": 5528150
   },
   {
    "f": "cinta/v/b2_06.mp4",
-   "bytes": 867239
+   "bytes": 802876
   },
   {
    "f": "cinta/v/b2_lugar_cafe.mp4",
-   "bytes": 1419219
+   "bytes": 1419941
   },
   {
    "f": "cinta/v/b2_lugar_estacion.mp4",
-   "bytes": 2767087
+   "bytes": 2876016
   },
   {
    "f": "cinta/v/b2_lugar_mercado.mp4",
-   "bytes": 2156235
+   "bytes": 2155750
   },
   {
    "f": "cinta/v/b2_lugar_muelles.mp4",
-   "bytes": 3380795
+   "bytes": 3379848
   },
   {
    "f": "cinta/v/b3_01.mp4",
-   "bytes": 3560898
+   "bytes": 3562580
   },
   {
    "f": "cinta/v/b3_02_a.mp4",
-   "bytes": 4066167
+   "bytes": 5912202
   },
   {
    "f": "cinta/v/b3_02_b.mp4",
-   "bytes": 6008301
+   "bytes": 3939949
   },
   {
    "f": "cinta/v/b3_03_a.mp4",
-   "bytes": 3842448
+   "bytes": 3842089
   },
   {
    "f": "cinta/v/b3_03_b.mp4",
-   "bytes": 6641806
+   "bytes": 4165840
   },
   {
    "f": "cinta/v/b3_03_c.mp4",
-   "bytes": 5878640
+   "bytes": 2845500
   },
   {
    "f": "cinta/v/b3_03_d.mp4",
-   "bytes": 5461113
+   "bytes": 1751240
+  },
+  {
+   "f": "cinta/v/b3_03_e.mp4",
+   "bytes": 4974707
+  },
+  {
+   "f": "cinta/v/b3_03_f.mp4",
+   "bytes": 4117061
   },
   {
    "f": "cinta/v/b3_04_a.mp4",
-   "bytes": 1379625
+   "bytes": 1348893
   },
   {
    "f": "cinta/v/b3_04_b.mp4",
-   "bytes": 4128691
+   "bytes": 3908580
   },
   {
    "f": "cinta/v/b3_04_c.mp4",
-   "bytes": 2566683
+   "bytes": 2553584
   },
   {
    "f": "cinta/v/b3_04_d.mp4",
-   "bytes": 2974457
+   "bytes": 2929670
   },
   {
    "f": "cinta/v/b3_05_a.mp4",
-   "bytes": 4142691
+   "bytes": 4138630
   },
   {
    "f": "cinta/v/b3_05_b.mp4",
-   "bytes": 4899228
+   "bytes": 4895901
   },
   {
    "f": "cinta/v/b3_06.mp4",
-   "bytes": 1159732
+   "bytes": 1187528
   },
   {
    "f": "cinta/v/b3_07.mp4",
-   "bytes": 1985292
+   "bytes": 1947511
   },
   {
    "f": "cinta/v/b3_08_a.mp4",
-   "bytes": 1914364
+   "bytes": 3472650
   },
   {
    "f": "cinta/v/b3_08_b.mp4",
-   "bytes": 1781650
+   "bytes": 8993955
   },
   {
    "f": "cinta/v/b3_08_c.mp4",
-   "bytes": 7524117
+   "bytes": 1968097
   },
   {
    "f": "cinta/v/b3_08_d.mp4",
-   "bytes": 5772639
-  },
-  {
-   "f": "cinta/v/b3_08_e.mp4",
-   "bytes": 2928394
+   "bytes": 6839482
   },
   {
    "f": "cinta/v/b3_09_a.mp4",
-   "bytes": 4149297
+   "bytes": 4126312
   },
   {
    "f": "cinta/v/b3_09_b.mp4",
-   "bytes": 7433712
+   "bytes": 1879361
   },
   {
    "f": "cinta/v/b3_09_c.mp4",
-   "bytes": 2403390
+   "bytes": 1823943
   },
   {
    "f": "cinta/v/b3_09_d.mp4",
-   "bytes": 7885653
+   "bytes": 1880868
+  },
+  {
+   "f": "cinta/v/b3_09_e.mp4",
+   "bytes": 1728536
+  },
+  {
+   "f": "cinta/v/b3_09_f.mp4",
+   "bytes": 2294216
+  },
+  {
+   "f": "cinta/v/b3_09_g.mp4",
+   "bytes": 4318423
+  },
+  {
+   "f": "cinta/v/b3_09_h.mp4",
+   "bytes": 3744689
   },
   {
    "f": "cinta/v7/b1_00_a.mp4",
-   "bytes": 3806322
+   "bytes": 3823520
   },
   {
    "f": "cinta/v7/b1_00_b.mp4",
-   "bytes": 1374178
+   "bytes": 3573268
   },
   {
    "f": "cinta/v7/b1_00_c.mp4",
-   "bytes": 2167642
+   "bytes": 4235170
   },
   {
    "f": "cinta/v7/b1_00_d.mp4",
-   "bytes": 4239004
+   "bytes": 1630992
   },
   {
    "f": "cinta/v7/b1_00_e.mp4",
-   "bytes": 2867189
+   "bytes": 4962681
   },
   {
    "f": "cinta/v7/b1_00_f.mp4",
-   "bytes": 1788376
-  },
-  {
-   "f": "cinta/v7/b1_00_g.mp4",
-   "bytes": 4638915
+   "bytes": 2938066
   },
   {
    "f": "cinta/v7/b1_01_a.mp4",
-   "bytes": 3501688
+   "bytes": 3561996
   },
   {
    "f": "cinta/v7/b1_01_b.mp4",
-   "bytes": 3252000
+   "bytes": 3218333
   },
   {
    "f": "cinta/v7/b1_01_c.mp4",
-   "bytes": 2304054
+   "bytes": 2289255
   },
   {
    "f": "cinta/v7/b1_01_d.mp4",
-   "bytes": 1908842
+   "bytes": 1897674
   },
   {
    "f": "cinta/v7/b1_01_e.mp4",
-   "bytes": 2557707
+   "bytes": 2546507
   },
   {
    "f": "cinta/v7/b1_01_f.mp4",
-   "bytes": 3171748
+   "bytes": 3118313
   },
   {
    "f": "cinta/v7/b1_01_g.mp4",
-   "bytes": 1178402
+   "bytes": 1178995
   },
   {
    "f": "cinta/v7/b1_01_h.mp4",
-   "bytes": 1455188
+   "bytes": 2096737
   },
   {
    "f": "cinta/v7/b1_02_a.mp4",
-   "bytes": 1197680
+   "bytes": 1582492
   },
   {
    "f": "cinta/v7/b1_02_b.mp4",
-   "bytes": 2365787
+   "bytes": 2442491
   },
   {
    "f": "cinta/v7/b1_03_a.mp4",
-   "bytes": 3298105
+   "bytes": 3293732
   },
   {
    "f": "cinta/v7/b1_03_b.mp4",
-   "bytes": 2592037
+   "bytes": 2621428
   },
   {
    "f": "cinta/v7/b1_04_a.mp4",
-   "bytes": 3209684
+   "bytes": 2323099
   },
   {
    "f": "cinta/v7/b1_04_b.mp4",
-   "bytes": 2087495
+   "bytes": 1221369
   },
   {
    "f": "cinta/v7/b1_04_c.mp4",
-   "bytes": 1647067
+   "bytes": 2070475
   },
   {
    "f": "cinta/v7/b1_04_d.mp4",
-   "bytes": 2772325
+   "bytes": 1629794
+  },
+  {
+   "f": "cinta/v7/b1_04_e.mp4",
+   "bytes": 2810205
   },
   {
    "f": "cinta/v7/b1_05_a.mp4",
-   "bytes": 1908408
+   "bytes": 1799137
   },
   {
    "f": "cinta/v7/b1_05_b.mp4",
-   "bytes": 2144144
+   "bytes": 2117257
   },
   {
    "f": "cinta/v7/b1_05_c.mp4",
-   "bytes": 1920703
+   "bytes": 1911840
   },
   {
    "f": "cinta/v7/b1_05_d.mp4",
-   "bytes": 1469158
+   "bytes": 1451039
   },
   {
    "f": "cinta/v7/b1_06.mp4",
-   "bytes": 2262481
+   "bytes": 2267860
   },
   {
    "f": "cinta/v7/b1_07_a.mp4",
-   "bytes": 1250416
+   "bytes": 1863379
   },
   {
    "f": "cinta/v7/b1_07_b.mp4",
-   "bytes": 1718322
+   "bytes": 1108101
   },
   {
    "f": "cinta/v7/b1_08_a.mp4",
-   "bytes": 1464665
+   "bytes": 1451902
   },
   {
    "f": "cinta/v7/b1_08_b.mp4",
-   "bytes": 1665066
+   "bytes": 1638942
   },
   {
    "f": "cinta/v7/b1_09.mp4",
-   "bytes": 3868922
+   "bytes": 3767974
   },
   {
    "f": "cinta/v7/b1_10.mp4",
-   "bytes": 388050
+   "bytes": 388916
   },
   {
    "f": "cinta/v7/b2_01_a.mp4",
-   "bytes": 3583175
+   "bytes": 3583500
   },
   {
    "f": "cinta/v7/b2_01_b.mp4",
-   "bytes": 2506689
+   "bytes": 2512907
   },
   {
    "f": "cinta/v7/b2_02_a.mp4",
-   "bytes": 2973359
+   "bytes": 3015868
   },
   {
    "f": "cinta/v7/b2_02_b.mp4",
-   "bytes": 2902720
+   "bytes": 3973653
   },
   {
    "f": "cinta/v7/b2_02_c.mp4",
-   "bytes": 2391006
+   "bytes": 2468862
   },
   {
    "f": "cinta/v7/b2_02_d.mp4",
-   "bytes": 2820268
+   "bytes": 2936089
   },
   {
    "f": "cinta/v7/b2_02_e.mp4",
-   "bytes": 2273579
+   "bytes": 2312549
   },
   {
    "f": "cinta/v7/b2_02_f.mp4",
-   "bytes": 2903366
+   "bytes": 2960124
   },
   {
    "f": "cinta/v7/b2_03.mp4",
-   "bytes": 2769483
+   "bytes": 2796795
   },
   {
    "f": "cinta/v7/b2_04.mp4",
-   "bytes": 4083137
+   "bytes": 4383940
   },
   {
    "f": "cinta/v7/b2_05_a.mp4",
-   "bytes": 1838860
+   "bytes": 2728713
   },
   {
    "f": "cinta/v7/b2_05_b.mp4",
-   "bytes": 2508192
+   "bytes": 2246359
   },
   {
    "f": "cinta/v7/b2_05_c.mp4",
-   "bytes": 3026253
+   "bytes": 2593643
   },
   {
    "f": "cinta/v7/b2_05_d.mp4",
-   "bytes": 3014262
+   "bytes": 2999704
   },
   {
    "f": "cinta/v7/b2_06.mp4",
-   "bytes": 427696
+   "bytes": 416017
   },
   {
    "f": "cinta/v7/b2_lugar_cafe.mp4",
-   "bytes": 915954
+   "bytes": 916676
   },
   {
    "f": "cinta/v7/b2_lugar_estacion.mp4",
-   "bytes": 1585513
+   "bytes": 1619234
   },
   {
    "f": "cinta/v7/b2_lugar_mercado.mp4",
-   "bytes": 1325431
+   "bytes": 1324946
   },
   {
    "f": "cinta/v7/b2_lugar_muelles.mp4",
-   "bytes": 1865913
+   "bytes": 1864966
   },
   {
    "f": "cinta/v7/b3_01.mp4",
-   "bytes": 1919127
+   "bytes": 1920400
   },
   {
    "f": "cinta/v7/b3_02_a.mp4",
-   "bytes": 2318134
+   "bytes": 3376036
   },
   {
    "f": "cinta/v7/b3_02_b.mp4",
-   "bytes": 3296619
+   "bytes": 2313999
   },
   {
    "f": "cinta/v7/b3_03_a.mp4",
-   "bytes": 2037238
+   "bytes": 2036879
   },
   {
    "f": "cinta/v7/b3_03_b.mp4",
-   "bytes": 3756293
+   "bytes": 2311518
   },
   {
    "f": "cinta/v7/b3_03_c.mp4",
-   "bytes": 3444654
+   "bytes": 1603457
   },
   {
    "f": "cinta/v7/b3_03_d.mp4",
-   "bytes": 2965436
+   "bytes": 1048019
+  },
+  {
+   "f": "cinta/v7/b3_03_e.mp4",
+   "bytes": 2857540
+  },
+  {
+   "f": "cinta/v7/b3_03_f.mp4",
+   "bytes": 2183727
   },
   {
    "f": "cinta/v7/b3_04_a.mp4",
-   "bytes": 790423
+   "bytes": 779289
   },
   {
    "f": "cinta/v7/b3_04_b.mp4",
-   "bytes": 2420756
+   "bytes": 2403211
   },
   {
    "f": "cinta/v7/b3_04_c.mp4",
-   "bytes": 1550251
+   "bytes": 1552612
   },
   {
    "f": "cinta/v7/b3_04_d.mp4",
-   "bytes": 1755266
+   "bytes": 1747376
   },
   {
    "f": "cinta/v7/b3_05_a.mp4",
-   "bytes": 2502712
+   "bytes": 2501698
   },
   {
    "f": "cinta/v7/b3_05_b.mp4",
-   "bytes": 2836137
+   "bytes": 2837477
   },
   {
    "f": "cinta/v7/b3_06.mp4",
-   "bytes": 703747
+   "bytes": 698011
   },
   {
    "f": "cinta/v7/b3_07.mp4",
-   "bytes": 948208
+   "bytes": 978103
   },
   {
    "f": "cinta/v7/b3_08_a.mp4",
-   "bytes": 1141576
+   "bytes": 2103252
   },
   {
    "f": "cinta/v7/b3_08_b.mp4",
-   "bytes": 1086428
+   "bytes": 5586352
   },
   {
    "f": "cinta/v7/b3_08_c.mp4",
-   "bytes": 4684958
+   "bytes": 1180577
   },
   {
    "f": "cinta/v7/b3_08_d.mp4",
-   "bytes": 3467008
-  },
-  {
-   "f": "cinta/v7/b3_08_e.mp4",
-   "bytes": 1715411
+   "bytes": 4069898
   },
   {
    "f": "cinta/v7/b3_09_a.mp4",
-   "bytes": 2288566
+   "bytes": 2282610
   },
   {
    "f": "cinta/v7/b3_09_b.mp4",
-   "bytes": 4700568
+   "bytes": 1161273
   },
   {
    "f": "cinta/v7/b3_09_c.mp4",
-   "bytes": 1539582
+   "bytes": 1131371
   },
   {
    "f": "cinta/v7/b3_09_d.mp4",
-   "bytes": 4504816
+   "bytes": 1151662
+  },
+  {
+   "f": "cinta/v7/b3_09_e.mp4",
+   "bytes": 1120216
+  },
+  {
+   "f": "cinta/v7/b3_09_f.mp4",
+   "bytes": 1470288
+  },
+  {
+   "f": "cinta/v7/b3_09_g.mp4",
+   "bytes": 2178443
+  },
+  {
+   "f": "cinta/v7/b3_09_h.mp4",
+   "bytes": 2054984
   },
   {
    "f": "prueba.html",
-   "bytes": 12258
+   "bytes": 12376
   }
  ]
 }

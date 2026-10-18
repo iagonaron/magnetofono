@@ -66,29 +66,47 @@ body { font-family: var(--maq); color: var(--crema); -webkit-font-smoothing: ant
 .mbtn-seguir .mbtn-ic { order: 2; }
 .figura { position: absolute; pointer-events: none; user-select: none; }
 
-/* ── la botonera del magnetófono (botonera.py: X0 36, Y0 30; teclas 58×50; canto 6) ── */
-#botonera { position: absolute; left: 36px; top: 30px; z-index: 30; width: 680px; height: 92px; pointer-events: none; }
+/* ── la botonera del magnetófono (botonera.py: X0 36, Y0 30; panel 350×76; teclas 58×50; canto 6) ──
+   (18-oct, notas N2/N7/N8) SIEMPRE A LA VISTA y OPACA: tapa del todo la que va dibujada en el vídeo, y el rótulo (la ventanita de
+   la máquina, de ancho fijo) tapa el rótulo dibujado (Courier Prime 30 en x 362–588, y 15–61 de la botonera). */
+#botonera { position: absolute; left: 36px; top: 30px; z-index: 30; width: 640px; height: 160px; pointer-events: none; }
 #botonera .bot-panel { position: absolute; left: 0; top: 0; width: 350px; height: 76px; box-sizing: border-box; border-radius: 11px;
-  background: rgba(18, 15, 12, .87); border: 2px solid var(--lino); pointer-events: auto; }
+  background: rgb(18, 15, 12); border: 2px solid var(--lino); pointer-events: auto; }
 #botonera .bot-tecla { position: absolute; top: 8px; width: 58px; height: 50px; padding: 0; border: 0; border-radius: 6px; background: var(--marfil);
-  box-shadow: 0 6px 0 var(--canto); color: var(--tinta2); cursor: pointer; outline: none; }
+  box-shadow: 0 6px 0 var(--canto); color: var(--tinta2); cursor: pointer; outline: none; touch-action: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
 #botonera .bot-tecla:nth-child(1) { left: 8px; } #botonera .bot-tecla:nth-child(2) { left: 74px; }
 #botonera .bot-tecla:nth-child(3) { left: 140px; } #botonera .bot-tecla:nth-child(4) { left: 206px; } #botonera .bot-tecla:nth-child(5) { left: 280px; }
-#botonera .bot-cara { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+#botonera .bot-cara { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; pointer-events: none; }
 #botonera .bot-rew svg, #botonera .bot-ff svg { width: 26px; height: 21px; }
 #botonera .bot-play svg { width: 21px; height: 22px; } #botonera .bot-pausa svg { width: 20px; height: 22px; } #botonera .bot-rec svg { width: 20px; height: 20px; }
 #botonera .bot-rec { color: rgb(176, 60, 50); }
-#botonera .bot-tecla.on, #botonera .bot-tecla.baja { transform: translateY(6px); box-shadow: 0 0 0 var(--canto); background: var(--marfil2); }
+#botonera .bot-tecla.on, #botonera .bot-tecla.baja, #botonera .bot-tecla.sujeta { transform: translateY(6px); box-shadow: 0 0 0 var(--canto); background: var(--marfil2); }
 #botonera .bot-play.on { color: var(--verde2); } #botonera .bot-pausa.on, #botonera .bot-rew.on, #botonera .bot-ff.on { color: var(--ambar); }
-#botonera .bot-rec.on { color: rgb(206, 48, 38); }
-#botonera .bot-tecla.apagada { opacity: .55; cursor: default; }
-#botonera .bot-rotulo { position: absolute; left: 362px; top: 20px; height: 36px; box-sizing: border-box; padding: 0 12px; display: none; align-items: center;
-  border-radius: 6px; background: rgba(18, 15, 12, .82); border: 1px solid rgba(205, 190, 160, .55); color: var(--crema); font: 700 21px/1 var(--maq); letter-spacing: 2px; }
-#botonera .bot-rotulo.ve { display: flex; }
-#botonera.bot-video .bot-panel { opacity: 0; }
-#botonera.bot-video .bot-rotulo { display: none; }
-#botonera.bot-video .bot-panel:active { opacity: 1; }
+#botonera .bot-rec.on, #botonera .bot-rec.sujeta { color: rgb(206, 48, 38); }
+#botonera .bot-tecla.apagada { opacity: .34; cursor: default; }
+#botonera .bot-tecla.senalada { box-shadow: 0 6px 0 var(--canto), 0 0 0 4px rgb(239, 229, 207), 0 0 0 8px rgb(200, 58, 44); }
+#botonera .bot-tecla.senalada.on, #botonera .bot-tecla.senalada.baja, #botonera .bot-tecla.senalada.sujeta { box-shadow: 0 0 0 4px rgb(239, 229, 207), 0 0 0 8px rgb(200, 58, 44); }
+#botonera .bot-rotulo { position: absolute; left: 360px; top: 13px; width: 244px; height: 50px; box-sizing: border-box; padding: 0 0 0 16px;
+  display: flex; align-items: center; border-radius: 10px; background: rgb(18, 15, 12); color: rgb(240, 228, 200);
+  font: 700 30px/1 var(--maq); letter-spacing: 0; white-space: nowrap; overflow: hidden; }
+/* señalar una tecla: la flechita y el letrero, debajo (quietos: nada parpadea) */
+#botonera .bot-senal { position: absolute; top: 80px; display: flex; flex-direction: column; align-items: flex-start; }
+#botonera .bot-senal[hidden] { display: none; }
+#botonera .bot-flecha { width: 0; height: 0; margin-left: 9px; border-left: 14px solid transparent; border-right: 14px solid transparent; border-bottom: 18px solid rgb(239, 229, 207); }
+#botonera .bot-senal-tx { margin-top: -1px; padding: 12px 18px 11px; background: rgb(239, 229, 207); color: var(--tinta); border: 2px solid var(--borde); border-radius: 9px;
+  font: 700 23px/1 var(--maq); letter-spacing: 1px; white-space: nowrap; box-shadow: 0 6px 16px rgba(0, 0, 0, .45); }
+#botonera .bot-senal-tx:empty { display: none; }
 #botonera.bot-oculta { display: none; }
+
+/* ── ◀◀ / ▶▶ por hitos: la cinta corriendo (0,6 s; aparece y se va de golpe) ── */
+#fxCinta { position: absolute; inset: 0; z-index: 7; pointer-events: none; overflow: hidden; display: none; }
+#fxCinta.ve { display: block; }
+#fxCinta i { position: absolute; left: 0; right: 0; top: -160px; height: 1400px;
+  background: repeating-linear-gradient(0deg, rgba(240, 228, 200, 0) 0 34px, rgba(240, 228, 200, .13) 34px 38px, rgba(10, 8, 6, .22) 38px 44px, rgba(240, 228, 200, 0) 44px 160px);
+  animation: fxBandas .16s linear infinite; }
+#fxCinta.atras i { animation-direction: reverse; }
+@keyframes fxBandas { from { transform: translateY(0); } to { transform: translateY(160px); } }
+#escenario.fxCinta video.tramo { filter: blur(2.2px) saturate(.55) brightness(.92); }
 
 /* ── los mandos de arriba a la derecha (cuadrados 1×1, solo icono; el texto, al pasar el ratón) ── */
 #mandos { position: absolute; right: 36px; top: 34px; z-index: 30; display: flex; gap: 10px; }
@@ -98,6 +116,8 @@ body { font-family: var(--maq); color: var(--crema); -webkit-font-smoothing: ant
 #mandos .mnd svg { width: 28px; height: 28px; display: block; }
 #mandos .mnd.txt { width: auto; padding: 0 14px; font: 700 20px/1 var(--maq); letter-spacing: 1px; }
 #mandos [hidden] { display: none !important; }
+/* (18-oct, N6) mientras corre el vídeo, los mandos se esconden (de golpe) para no tapar los carteles; vuelven al mover el ratón */
+#mandos.escondidos { visibility: hidden; }
 
 /* ── el repaso (tarjeta_quiz de las animáticas) ── */
 .quiz { position: absolute; box-sizing: border-box; background: rgba(239, 229, 207, .985); color: var(--tinta); border: 3px solid var(--borde);
@@ -119,3 +139,10 @@ body { font-family: var(--maq); color: var(--crema); -webkit-font-smoothing: ant
 .qz-marca { position: absolute; right: 20px; top: 50%; width: 36px; height: 36px; margin-top: -18px; }
 .qz-op.bien .qz-marca { background: no-repeat center/contain url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><path d='M4 19l9 9L33 8' fill='none' stroke='rgb(62,128,72)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/></svg>"); }
 .qz-op.mal .qz-marca { background: no-repeat center/contain url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><path d='M7 7l22 22M29 7L7 29' fill='none' stroke='rgb(200,58,44)' stroke-width='6' stroke-linecap='round'/></svg>"); }
+
+/* (18-oct, N37) b3_03 · el panel de los ruidos de la clase, encima del del vídeo (mismo sitio, mismo dibujo) */
+.rd-panel { position: absolute; left: 90px; top: 100px; width: 1120px; height: 734px; box-sizing: border-box; border: 3px solid rgb(150,128,96);
+  border-radius: 14px; background: rgb(239,229,207); box-shadow: 0 10px 28px rgba(0,0,0,.55); }
+.rd-panel .rd-tit { position: absolute; left: 47px; top: 21px; font: 900 32px/1 "Bodoni Moda", Georgia, serif; letter-spacing: 4px; color: rgb(200,58,44); }
+.rd-panel .rd-et { position: absolute; left: 47px; font: 700 25px/1 "Courier Prime", "Courier New", monospace; color: rgb(30,26,22); white-space: nowrap; max-width: 290px; overflow: hidden; text-overflow: ellipsis; }
+.rd-panel .rd-lienzo { position: absolute; left: 347px; top: 95px; width: 760px; }

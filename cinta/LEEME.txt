@@ -1,11 +1,14 @@
 MAGNETÓFONO · PARÍS, 1951 — versión interactiva (página de prueba)
-2.º de Grado Profesional · Unidad 4 · LM at home · Claude para Iago, 18-oct-2026
+2.º de Grado Profesional · Unidad 4 · LM at home · Claude para Iago, 18-oct-2026 (tarde: con las notas N2–N50 y V3 de la mañana)
 
 QUÉ ES
   prueba.html + esta carpeta cinta/. Las animáticas (prólogo y bobinas 1, 2 y 3) partidas en TRAMOS de vídeo, y entre tramo y
   tramo las ESTACIONES interactivas (donde el vídeo tenía «PARADA · AHORA TÚ» o un repaso). Una portada con las tres bobinas;
   antes de empezar cada bobina se carga lo justo (sus estaciones y los primeros ~20 MB de vídeo: «Cargando la bobina N · 43 %»)
   y el resto se va cargando por detrás, siempre por delante de lo que se ve; luego todo va sin esperas ni negros.
+  El SONIDO de cada tramo seguido (los tramos que van uno tras otro sin estación en medio) es UNA pista continua (p/): los
+  vídeos van mudos y la siguen, así que la música no se corta en los cambios de plano ni de locutor (N4, N24). Después de
+  cada libreta, su música y su ambiente siguen sonando en bucle hasta «Seguir con la historia» (N12).
   La página es «noindex» y no está enlazada desde ningún sitio: solo se llega con la dirección.
 
 QUITARLA
@@ -17,16 +20,29 @@ CÓMO SE ABRE
   prueba.html              sin nada: lo último guardado en ese navegador (si nunca entró un alumno, todo abierto: el ordenador de clase).
 
 LOS MANDOS
-  La botonera del magnetófono (arriba a la izquierda):
-    ▶ / ‖   reproducir / pausa (también Espacio, K o un clic en la imagen)
-    ◀◀      al principio del tramo (si va por más de 2 s); si no, al paso anterior (Mayús + ←)
-    ▶▶      el siguiente paso (Mayús + →). En una estación, solo el profe se la puede saltar.
-    ●       lo usan las estaciones que graban.
-  Arriba a la derecha: los voluntarios, 1080/720 (si existe cinta/v7/), pantalla completa y «Salir» (se guarda por dónde ibas:
-  en la portada, esa bobina dice «Continuar»).
-  Después de cada libreta, «Seguir con la historia» (o Intro). Al final, «Fin de la bobina N».
+  La botonera del magnetófono (arriba a la izquierda), siempre a la vista; las teclas que no sirven en ese momento, apagadas:
+    ▶ / ‖   reproducir / pausa (también Espacio, K o un clic en la imagen). Mientras suena, la hundida es la ▶ (N8).
+    ◀◀ ▶▶   por HITOS: cada plano y cada frase (Mayús + ← / →); varias pulsaciones seguidas suman, con su animación y su sonido
+            de cinta que corre (N2b, N3). Al principio de un tramo, ◀◀ vuelve a la estación de antes; en una estación, ▶▶ solo
+            se la salta el profe. En una libreta, ▶ o ▶▶ siguen con la historia.
+    ●       solo donde se graba: con el micro, MANTENIÉNDOLA pulsada (al soltar, para; menos de un minuto) (N17, N33); en los
+            sitios del mapa de París, se queda hundida sola lo que dura cada grabación (N26); en «Tu pieza», con 3, 2, 1 (N40).
+            El permiso del micrófono se pide una vez, al empezar la bobina.
+  Arriba a la derecha: 1080/720 (si existe cinta/v7/), pantalla completa y «Salir» (se guarda por dónde ibas: en la portada,
+  esa bobina dice «Continuar»). Mientras se reproduce se esconden, para no tapar los carteles del vídeo (N6).
+  Los VOLUNTARIOS (V3): ya no hay botón. Con la cuenta Protester y en hora de clase, al «Empezar la bobina N» (tras el permiso
+  del micro) sale en el medio «Seleccionar voluntario», con el grupo de esa hora; la bobina empieza al cerrarlo (o con «Ahora
+  no»). En casa o fuera de hora, no sale. (El seleccionador es https://gp.lmathome.es/voluntarios/lm-voluntarios.js, v3.)
+
+LA BOBINA 1
+  b1_disco (N10): el alumno recorta EN CÍRCULO, con el cúter de Odile, el trozo sin grabar (entre el amarillo y el azul):
+  arrastrando el cúter por la línea de puntos (o con →, Espacio o Intro). Casi a media vuelta sigue el vídeo: el último trozo
+  del corte y el disco que se rompe, con su ruido.
 
 LA BOBINA 3
+  La mesa de montaje (b3_03, N37): Odile escucha los cuatro ruidos de LA CLASE (los que grabaron en b3_clase): suenan a su hora
+  y su panel («LOS RUIDOS DE TU CLASE», con sus nombres y su onda dibujándose) va encima del del vídeo. Si no hay grabaciones,
+  los de ejemplo. El sonido de ese tramo no lleva los ruidos de ejemplo de la animática.
   La emisión de la radio suena con LA PIEZA DEL ALUMNO (la que montó en la estación b3_pieza, por un filtro de radio) y su
   TÍTULO sale en la tarjeta «Esta noche, en la radio» y en la pegatina de la cinta del final. Si aún no ha hecho la pieza,
   suena la de ejemplo (a/b3_pieza_ejemplo.mp3); si no le ha puesto título, sale «Estudio de los lápices». Los trozos de
@@ -34,19 +50,21 @@ LA BOBINA 3
 
 LO QUE HAY AQUÍ
   js/comun.js     lo común (escenario, sonido, subtítulos, tarjetas, botones, botonera, micro, datos, precarga)
-  js/guion.js     el guion: los pasos de cada bobina (generado; no se edita a mano)
-  js/motor.js     el motor: portada, carga, tramos, estaciones, botonera, salir y continuar, la emisión
+  js/guion.js     el guion: los pasos de cada bobina, las pistas y sus hitos (generado; no se edita a mano)
+  js/motor.js     el motor: portada, carga, tramos con su pista, estaciones, botonera, salir y continuar, la emisión, los ruidos
   js/b1.js, b2.js, b3.js, b3pieza.js, sonidos_paris.js   las estaciones de cada bobina
-  v/              los tramos en 1080p (H.264 + AAC, 30 fps, ≤ 9 MB por fichero; los largos, en partes _a, _b, _c… que se
-                  encadenan solas, cortadas siempre en un cambio de plano o de texto)
+  v/              los tramos en 1080p (H.264, 30 fps, ≤ 9 MB por fichero; los largos, en partes _a, _b, _c… que se encadenan
+                  solas, cortadas siempre en un cambio de plano o de texto)
   v7/             (si está) los mismos tramos en 720p, con las mismas partes
+  p/              las pistas de sonido de los tramos seguidos (AAC 160k) y las colas de las libretas (<pista>_cola.m4a)
   i/, a/          imágenes y sonidos de las estaciones; icono/ los iconos; estilo.css el aspecto
   banco.html      el banco de pruebas: abre UNA estación suelta (banco.html?m=b2&e=b2_describe&auto=1)
   manifest.json   todos los ficheros con sus bytes
 
 DE DÓNDE SALE
-  Animáticas: prólogo v5.2, bobina 1 v3.5, bobina 2 v3.4, bobina 3 v3.4 (sus dos últimos tramos, b3_08 y b3_09, de la v3.3,
-  que ahí no cambia) (láminas de ChatGPT, voces de ElevenLabs, la voz de
-  Iago como «TÚ», música y sonidos de su biblioteca de Splice). Cortes exactos de fotograma, recodificados (x264 high, crf 21).
-  Re-renderizados limpios: la emisión y la pegatina de la bobina 3 (sin la pieza ni el título de ejemplo) y los sitios del
-  mapa de la bobina 2 (mercado, café, muelles: sin el contador «EN LA BOBINA n/8» del orden fijo de la animática).
+  Animáticas: prólogo v5.3, bobina 1 v3.6, bobina 2 v3.5 y bobina 3 v3.5 (láminas de ChatGPT, voces de ElevenLabs, la voz de
+  Iago como «TÚ», música y sonidos de su biblioteca de Splice), en su versión INTERACTIVA (la música de las libretas no baja:
+  sigue en la cola). Cortes exactos de fotograma, recodificados (x264 high, crf 21).
+  Re-renderizados limpios: la emisión y la pegatina de la bobina 3 (sin la pieza ni el título de ejemplo), el sonido de la
+  mesa de montaje (sin los cuatro ruidos de ejemplo) y los sitios del mapa de la bobina 2 (mercado, café, muelles: sin el
+  contador «EN LA BOBINA n/8» del orden fijo de la animática).
