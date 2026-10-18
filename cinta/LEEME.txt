@@ -1,0 +1,52 @@
+MAGNETÓFONO · PARÍS, 1951 — versión interactiva (página de prueba)
+2.º de Grado Profesional · Unidad 4 · LM at home · Claude para Iago, 18-oct-2026
+
+QUÉ ES
+  prueba.html + esta carpeta cinta/. Las animáticas (prólogo y bobinas 1, 2 y 3) partidas en TRAMOS de vídeo, y entre tramo y
+  tramo las ESTACIONES interactivas (donde el vídeo tenía «PARADA · AHORA TÚ» o un repaso). Una portada con las tres bobinas;
+  antes de empezar cada bobina se carga lo justo (sus estaciones y los primeros ~20 MB de vídeo: «Cargando la bobina N · 43 %»)
+  y el resto se va cargando por detrás, siempre por delante de lo que se ve; luego todo va sin esperas ni negros.
+  La página es «noindex» y no está enlazada desde ningún sitio: solo se llega con la dirección.
+
+QUITARLA
+  Borrar prueba.html y la carpeta cinta/. No toca nada más del portal (sus datos van en el navegador con el prefijo lm_mag_).
+
+CÓMO SE ABRE
+  prueba.html#c=<cuenta>   el profe: todo abierto y el ▶▶ salta también las estaciones.
+  prueba.html#cu=<cuenta>&dias=1.2&dia=N   el alumno, con las bobinas que tenga abiertas (los hitos); dia=N va directo a esa bobina.
+  prueba.html              sin nada: lo último guardado en ese navegador (si nunca entró un alumno, todo abierto: el ordenador de clase).
+
+LOS MANDOS
+  La botonera del magnetófono (arriba a la izquierda):
+    ▶ / ‖   reproducir / pausa (también Espacio, K o un clic en la imagen)
+    ◀◀      al principio del tramo (si va por más de 2 s); si no, al paso anterior (Mayús + ←)
+    ▶▶      el siguiente paso (Mayús + →). En una estación, solo el profe se la puede saltar.
+    ●       lo usan las estaciones que graban.
+  Arriba a la derecha: los voluntarios, 1080/720 (si existe cinta/v7/), pantalla completa y «Salir» (se guarda por dónde ibas:
+  en la portada, esa bobina dice «Continuar»).
+  Después de cada libreta, «Seguir con la historia» (o Intro). Al final, «Fin de la bobina N».
+
+LA BOBINA 3
+  La emisión de la radio suena con LA PIEZA DEL ALUMNO (la que montó en la estación b3_pieza, por un filtro de radio) y su
+  TÍTULO sale en la tarjeta «Esta noche, en la radio» y en la pegatina de la cinta del final. Si aún no ha hecho la pieza,
+  suena la de ejemplo (a/b3_pieza_ejemplo.mp3); si no le ha puesto título, sale «Estudio de los lápices». Los trozos de
+  vídeo de la emisión y de la pegatina están renderizados SIN la pieza ni el título de ejemplo.
+
+LO QUE HAY AQUÍ
+  js/comun.js     lo común (escenario, sonido, subtítulos, tarjetas, botones, botonera, micro, datos, precarga)
+  js/guion.js     el guion: los pasos de cada bobina (generado; no se edita a mano)
+  js/motor.js     el motor: portada, carga, tramos, estaciones, botonera, salir y continuar, la emisión
+  js/b1.js, b2.js, b3.js, b3pieza.js, sonidos_paris.js   las estaciones de cada bobina
+  v/              los tramos en 1080p (H.264 + AAC, 30 fps, ≤ 9 MB por fichero; los largos, en partes _a, _b, _c… que se
+                  encadenan solas, cortadas siempre en un cambio de plano o de texto)
+  v7/             (si está) los mismos tramos en 720p, con las mismas partes
+  i/, a/          imágenes y sonidos de las estaciones; icono/ los iconos; estilo.css el aspecto
+  banco.html      el banco de pruebas: abre UNA estación suelta (banco.html?m=b2&e=b2_describe&auto=1)
+  manifest.json   todos los ficheros con sus bytes
+
+DE DÓNDE SALE
+  Animáticas: prólogo v5.2, bobina 1 v3.5, bobina 2 v3.4, bobina 3 v3.4 (sus dos últimos tramos, b3_08 y b3_09, de la v3.3,
+  que ahí no cambia) (láminas de ChatGPT, voces de ElevenLabs, la voz de
+  Iago como «TÚ», música y sonidos de su biblioteca de Splice). Cortes exactos de fotograma, recodificados (x264 high, crf 21).
+  Re-renderizados limpios: la emisión y la pegatina de la bobina 3 (sin la pieza ni el título de ejemplo) y los sitios del
+  mapa de la bobina 2 (mercado, café, muelles: sin el contador «EN LA BOBINA n/8» del orden fijo de la animática).

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Magnetófono · banco de pruebas de las estaciones</title>
+<!-- Banco de pruebas (Claude): abre UNA estación suelta sobre su fondo. Uso: banco.html?m=b2&e=b2_describe&fondo=i/b2_bus_vuelta.jpg
+     m = el módulo (b1, b2, b3; varios con comas) · e = la estación · fondo = imagen de fondo (opcional) · auto=1 empieza sin clic -->
+<link rel="stylesheet" href="estilo.css">
+<script>window.MAG = { base: '' };</script>
+<script src="js/comun.js"></script>
+<style>
+#arranca { position: absolute; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.55); }
+#estadoBanco { position: absolute; right: 36px; bottom: 20px; z-index: 70; font: 700 18px var(--maq); color: rgba(239,229,207,.5); }
+</style>
+</head>
+<body>
+<div id="marco"><div id="escenario">
+  <img id="fondo" alt="">
+  <div id="capaEst"></div>
+  <div id="subs"></div>
+  <div id="capaTop"></div>
+  <div id="mandos"></div>
+  <div id="arranca"></div>
+  <div id="estadoBanco"></div>
+</div></div>
+<script>
+(async function () {
+  const q = new URLSearchParams(location.search);
+  const mods = (q.get('m') || 'b1').split(',');
+  const id = q.get('e'), fondo = q.get('fondo');
+  window.__banco = { estado: 'cargando-modulos' };
+  const pon = t => { document.getElementById('estadoBanco').textContent = t; window.__banco.estado = t; };
+  MAG.ajusta();
+  MAG.botonera.monta(document.getElementById('escenario'));
+  MAG.botonera.modo('propia');
+  for (const m of mods) await new Promise(ok => { const s = document.createElement('script'); s.src = 'js/' + m + '.js?' + Date.now(); s.onload = ok; s.onerror = ok; document.head.appendChild(s); });
+  const def = MAG.est[id];
+  if (!def) { pon('no existe la estación ' + id); return; }
+  if (fondo) { const f = document.getElementById('fondo'); f.src = fondo; f.classList.add('ve'); }
+  pon('cargando recursos');
+  const fallos = await MAG.cargaTodo((def.recursos || []).concat(['a/ui_tecla.mp3']), p => pon('cargando ' + Math.round(p * 100) + ' %'));
+  if (fallos.length) console.warn('faltan', fallos);
+  window.__banco.fallos = fallos;
+  const go = async () => {
+    document.getElementById('arranca').remove();
+    MAG.audio();
+    pon('corriendo');
+    const ctx = MAG.contexto(document.getElementById('capaEst'), { banco: true, profe: q.get('profe') === '1' });
+    window.__ctx = ctx;
+    try { await def.monta(ctx); pon('fin'); } catch (e) { console.error(e); window.__banco.error = String(e && e.stack || e); pon('error: ' + e); }
+    ctx.limpia();
+  };
+  if (q.get('auto') === '1') go();
+  else { const b = MAG.ui.boton('Empezar la estación', { clase: 'mbtn-prin', icono: MAG.ICO.play, al: go }); document.getElementById('arranca').appendChild(b); pon('listo'); }
+})();
+</script>
+</body>
+</html>

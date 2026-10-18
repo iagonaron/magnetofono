@@ -1,0 +1,121 @@
+/* Magnetófono · versión interactiva · los estilos comunes (los de las animáticas: crema, tinta, rojo de «grabando», Bodoni y
+   letra de máquina). Nada de transiciones ni animaciones de interfaz: en la pantalla del aula los cambios van DE GOLPE. */
+@font-face { font-family: "Bodoni Moda"; src: url(fuentes/bodoni-600.woff2) format("woff2"); font-weight: 600; font-display: block; }
+@font-face { font-family: "Bodoni Moda"; src: url(fuentes/bodoni-900.woff2) format("woff2"); font-weight: 900; font-display: block; }
+@font-face { font-family: "Courier Prime"; src: url(fuentes/courier-400.woff2) format("woff2"); font-weight: 400; font-display: block; }
+@font-face { font-family: "Courier Prime"; src: url(fuentes/courier-700.woff2) format("woff2"); font-weight: 700; font-display: block; }
+@font-face { font-family: "Courier Prime"; src: url(fuentes/courier-400i.woff2) format("woff2"); font-weight: 400; font-style: italic; font-display: block; }
+@font-face { font-family: "Mano"; src: url(fuentes/mano.woff2) format("woff2"); font-display: block; }
+
+:root {
+  --crema: rgb(239, 229, 207); --crema2: rgb(248, 243, 230); --tinta: rgb(30, 26, 22); --tinta2: rgb(52, 44, 37);
+  --rojo: rgb(200, 58, 44); --rojo2: rgb(229, 72, 59); --borde: rgb(150, 128, 96); --borde2: rgb(176, 156, 120);
+  --oscuro: rgba(18, 15, 12, .745); --oscuro2: rgba(34, 24, 16, .80); --marfil: rgb(233, 224, 200); --marfil2: rgb(212, 201, 174);
+  --canto: rgb(128, 114, 92); --verde: rgb(62, 128, 72); --verde2: rgb(64, 168, 86); --ambar: rgb(222, 150, 36);
+  --lino: rgb(205, 190, 160); --nota: rgb(120, 100, 76);
+  --maq: "Courier Prime", "Courier New", Courier, monospace; --tit: "Bodoni Moda", Didot, "Bodoni 72", Georgia, serif;
+  color-scheme: dark;
+}
+html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+body { font-family: var(--maq); color: var(--crema); -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; }
+#marco { position: fixed; inset: 0; background: #000; overflow: hidden; }
+#escenario { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; background: #000; contain: strict; }
+#escenario video.tramo { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; display: none; background: #000; }
+#escenario video.tramo.ve { display: block; }
+#fondo { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; display: none; }
+#fondo.ve { display: block; }
+#capaEst { position: absolute; inset: 0; z-index: 5; }
+#capaEst:empty { pointer-events: none; }
+#subs { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
+#capaTop { position: absolute; inset: 0; z-index: 25; pointer-events: none; }
+#capaTop > * { pointer-events: auto; }
+
+/* ── los subtítulos, como en el vídeo (vida.tarjeta / tarjeta_p: Courier Prime 44, abajo y centrados) ── */
+.sub { position: absolute; left: 50%; bottom: 60px; transform: translateX(-50%); width: max-content; max-width: 1461px; box-sizing: border-box;
+  padding: 22px 44px 26px; border-radius: 10px; font: 400 44px/58px var(--maq); text-align: left; white-space: normal; }
+.sub .sub-q { font: 700 22px/30px var(--maq); letter-spacing: 4px; margin-bottom: 0; }
+.sub .sub-x { white-space: pre-line; }
+.sub-n { background: var(--oscuro); color: var(--crema); }
+.sub-n .sub-q { color: var(--lino); }
+.sub-n .sub-x { font-style: italic; }
+.sub-t { background: rgba(239, 229, 207, .957); color: var(--tinta); border: 2px solid var(--borde); box-shadow: 0 6px 18px rgba(0, 0, 0, .43); }
+.sub-t .sub-q { font: 900 30px/32px var(--tit); letter-spacing: 2px; color: var(--rojo); }
+.sub-p { background: var(--oscuro2); color: var(--crema); border: 2px solid rgba(239, 229, 207, .27); }
+.sub-p .sub-q { font: 700 23px/30px var(--maq); letter-spacing: 3px; color: var(--rojo2); }
+
+/* ── la tarjeta crema de las paradas ── */
+.tarjeta { position: absolute; box-sizing: border-box; background: rgba(239, 229, 207, .985); color: var(--tinta);
+  border: 3px solid var(--borde); border-radius: 14px; box-shadow: 0 10px 28px rgba(0, 0, 0, .55); padding: 30px 56px 38px; }
+.tj-tit { font: 900 40px/1.1 var(--tit); letter-spacing: 4px; color: var(--rojo); margin-bottom: 18px; }
+.tj-txt { font: 400 38px/52px var(--maq); }
+.tj-txt small, .tj-nota { display: block; font: italic 400 26px/34px var(--maq); color: var(--nota); margin-top: 12px; }
+
+/* ── los botones (rectángulos de esquinas suaves, una sola escala) ── */
+.mbtn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; height: 64px; box-sizing: border-box; padding: 0 28px;
+  border-radius: 10px; font: 700 26px/1 var(--maq); letter-spacing: .06em; cursor: pointer; white-space: nowrap; outline: none; }
+.mbtn-prin { background: var(--crema); color: var(--tinta); border: 2px solid var(--borde); box-shadow: 0 6px 18px rgba(0, 0, 0, .45); }
+.mbtn-prin:hover { background: rgb(250, 243, 226); }
+.mbtn-prin:active { transform: translateY(2px); }
+.mbtn-sec { background: rgba(18, 15, 12, .82); color: var(--crema); border: 2px solid rgba(205, 190, 160, .85); }
+.mbtn-sec:hover { background: rgba(40, 33, 26, .9); }
+.mbtn-sec:active { transform: translateY(2px); }
+.mbtn[disabled] { opacity: .45; cursor: default; }
+.mbtn-ic { display: inline-flex; }
+.mbtn-ic svg { display: block; }
+.mbtn-seguir { position: absolute; right: 64px; bottom: 64px; z-index: 20; height: 72px; padding: 0 30px 0 34px; font-size: 28px; }
+.mbtn-seguir .mbtn-ic { order: 2; }
+.figura { position: absolute; pointer-events: none; user-select: none; }
+
+/* ── la botonera del magnetófono (botonera.py: X0 36, Y0 30; teclas 58×50; canto 6) ── */
+#botonera { position: absolute; left: 36px; top: 30px; z-index: 30; width: 680px; height: 92px; pointer-events: none; }
+#botonera .bot-panel { position: absolute; left: 0; top: 0; width: 350px; height: 76px; box-sizing: border-box; border-radius: 11px;
+  background: rgba(18, 15, 12, .87); border: 2px solid var(--lino); pointer-events: auto; }
+#botonera .bot-tecla { position: absolute; top: 8px; width: 58px; height: 50px; padding: 0; border: 0; border-radius: 6px; background: var(--marfil);
+  box-shadow: 0 6px 0 var(--canto); color: var(--tinta2); cursor: pointer; outline: none; }
+#botonera .bot-tecla:nth-child(1) { left: 8px; } #botonera .bot-tecla:nth-child(2) { left: 74px; }
+#botonera .bot-tecla:nth-child(3) { left: 140px; } #botonera .bot-tecla:nth-child(4) { left: 206px; } #botonera .bot-tecla:nth-child(5) { left: 280px; }
+#botonera .bot-cara { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+#botonera .bot-rew svg, #botonera .bot-ff svg { width: 26px; height: 21px; }
+#botonera .bot-play svg { width: 21px; height: 22px; } #botonera .bot-pausa svg { width: 20px; height: 22px; } #botonera .bot-rec svg { width: 20px; height: 20px; }
+#botonera .bot-rec { color: rgb(176, 60, 50); }
+#botonera .bot-tecla.on, #botonera .bot-tecla.baja { transform: translateY(6px); box-shadow: 0 0 0 var(--canto); background: var(--marfil2); }
+#botonera .bot-play.on { color: var(--verde2); } #botonera .bot-pausa.on, #botonera .bot-rew.on, #botonera .bot-ff.on { color: var(--ambar); }
+#botonera .bot-rec.on { color: rgb(206, 48, 38); }
+#botonera .bot-tecla.apagada { opacity: .55; cursor: default; }
+#botonera .bot-rotulo { position: absolute; left: 362px; top: 20px; height: 36px; box-sizing: border-box; padding: 0 12px; display: none; align-items: center;
+  border-radius: 6px; background: rgba(18, 15, 12, .82); border: 1px solid rgba(205, 190, 160, .55); color: var(--crema); font: 700 21px/1 var(--maq); letter-spacing: 2px; }
+#botonera .bot-rotulo.ve { display: flex; }
+#botonera.bot-video .bot-panel { opacity: 0; }
+#botonera.bot-video .bot-rotulo { display: none; }
+#botonera.bot-video .bot-panel:active { opacity: 1; }
+#botonera.bot-oculta { display: none; }
+
+/* ── los mandos de arriba a la derecha (cuadrados 1×1, solo icono; el texto, al pasar el ratón) ── */
+#mandos { position: absolute; right: 36px; top: 34px; z-index: 30; display: flex; gap: 10px; }
+#mandos .mnd { width: 64px; height: 64px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 10px; box-sizing: border-box;
+  background: rgba(18, 15, 12, .74); border: 2px solid rgba(205, 190, 160, .85); color: var(--crema); cursor: pointer; outline: none; }
+#mandos .mnd:hover { background: rgba(40, 33, 26, .9); }
+#mandos .mnd svg { width: 28px; height: 28px; display: block; }
+#mandos .mnd.txt { width: auto; padding: 0 14px; font: 700 20px/1 var(--maq); letter-spacing: 1px; }
+#mandos [hidden] { display: none !important; }
+
+/* ── el repaso (tarjeta_quiz de las animáticas) ── */
+.quiz { position: absolute; box-sizing: border-box; background: rgba(239, 229, 207, .985); color: var(--tinta); border: 3px solid var(--borde);
+  border-radius: 14px; box-shadow: 0 10px 28px rgba(0, 0, 0, .55); padding: 26px 50px 34px; }
+.qz-tit { font: 900 32px/1.1 var(--tit); letter-spacing: 4px; color: var(--rojo); }
+.qz-preg { font: 700 46px/1.25 var(--maq); margin: 20px 0 26px; white-space: nowrap; overflow: hidden; }
+.qz-ops { display: flex; flex-direction: column; gap: 22px; }
+.qz-op { display: flex; align-items: flex-start; gap: 22px; width: 100%; box-sizing: border-box; text-align: left; padding: 14px 70px 16px 16px; position: relative;
+  background: var(--crema2); border: 2px solid var(--borde2); border-radius: 10px; color: var(--tinta); font: 400 33px/42px var(--maq); cursor: pointer; outline: none; }
+.qz-op:hover { background: rgb(252, 248, 238); }
+.qz-op.quieta { cursor: default; }
+.qz-letra { flex: 0 0 auto; width: 38px; height: 38px; margin-top: 2px; border-radius: 50%; border: 3px solid var(--borde); display: flex; align-items: center; justify-content: center;
+  font: 700 26px/1 var(--maq); box-sizing: border-box; }
+.qz-txt { flex: 1 1 auto; min-width: 0; }
+.qz-op.bien { background: rgb(220, 238, 214); border: 4px solid var(--verde); padding: 12px 68px 14px 14px; }
+.qz-op.bien .qz-letra { border-color: var(--verde); }
+.qz-op.mal { background: rgb(246, 219, 210); border: 4px solid var(--rojo); padding: 12px 68px 14px 14px; cursor: default; }
+.qz-op.mal .qz-letra { border-color: var(--rojo); }
+.qz-marca { position: absolute; right: 20px; top: 50%; width: 36px; height: 36px; margin-top: -18px; }
+.qz-op.bien .qz-marca { background: no-repeat center/contain url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><path d='M4 19l9 9L33 8' fill='none' stroke='rgb(62,128,72)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/></svg>"); }
+.qz-op.mal .qz-marca { background: no-repeat center/contain url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><path d='M7 7l22 22M29 7L7 29' fill='none' stroke='rgb(200,58,44)' stroke-width='6' stroke-linecap='round'/></svg>"); }
