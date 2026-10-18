@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <!-- Magnetófono · París, 1951 · VERSIÓN INTERACTIVA EN PRUEBA (Claude para Iago, 18-oct-2026). Página NUEVA: no cambia index.html
      (el portal antiguo del magnetófono) ni nada más del sitio. Todo lo suyo está en cinta/ (LEEME.txt). Quitarla: borrar
-     prueba.html y la carpeta cinta/. -->
+     prueba.html y la carpeta cinta/. Motor v3 (18-oct, noche): un vídeo por tramo seguido, con su sonido dentro (cinta/r/, r3/). -->
 <script>
 /* LAS BOBINAS SE ABREN EN CLASE (como los días de La cabaña y los capítulos de Atonalidad). El portal de gp.lmathome.es (la
    medalla y los avisos «Magnetófono · Bobina N» de la campana) abre esta página con «#cu=<cuenta>&dias=1.2» (y «&dia=2» desde el
@@ -112,7 +112,7 @@ window.LM_VOL_CONFIG = function () {
 #pPanel .pPie { margin-top: 26px; font: 400 16px/1.3 var(--maq); color: rgba(205, 190, 160, .7); letter-spacing: 1px; white-space: nowrap; }
 .mag-alumno #pPanel .pPrueba { display: none; }
 #portada:not([hidden]) ~ #mandos #bSalir, #mandos:not(.enHistoria) #bSalir { display: none; }
-/* los mandos (voluntarios, 1080/720, pantalla completa) también encima de la portada */
+/* los mandos (voluntarios, 60/30, pantalla completa) también encima de la portada */
 #mandos { z-index: 45; }
 /* el botón de los voluntarios (lo pone lm-voluntarios.js): cuadrado, solo el icono (el texto va en su title) */
 #mandos #bVoluntarios > span { display: none; }
@@ -164,6 +164,7 @@ window.LM_VOL_CONFIG = function () {
 <script>window.MAG = { base: 'cinta/' };</script>
 <script src="cinta/js/comun.js"></script>
 <script src="cinta/js/guion.js"></script>
+<script src="cinta/js/runs.js"></script><!-- (motor v3) el vídeo de cada tramo seguido, con su sonido dentro -->
 <script>
 /* las estaciones de cada bobina (si falta alguna, la historia sigue sin ella) y, al final, el motor */
 (function () {
