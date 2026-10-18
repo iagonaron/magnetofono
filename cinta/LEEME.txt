@@ -1,14 +1,18 @@
 MAGNETÓFONO · PARÍS, 1951 — versión interactiva (página de prueba)
-2.º de Grado Profesional · Unidad 4 · LM at home · Claude para Iago, 18-oct-2026 (tarde: con las notas N2–N50 y V3 de la mañana)
+2.º de Grado Profesional · Unidad 4 · LM at home · Claude para Iago, 18-oct-2026 (noche: MOTOR v3, como La cabaña; antes, las notas N2–N50 y V3)
 
 QUÉ ES
   prueba.html + esta carpeta cinta/. Las animáticas (prólogo y bobinas 1, 2 y 3) partidas en TRAMOS de vídeo, y entre tramo y
-  tramo las ESTACIONES interactivas (donde el vídeo tenía «PARADA · AHORA TÚ» o un repaso). Una portada con las tres bobinas;
-  antes de empezar cada bobina se carga lo justo (sus estaciones y los primeros ~20 MB de vídeo: «Cargando la bobina N · 43 %»)
-  y el resto se va cargando por detrás, siempre por delante de lo que se ve; luego todo va sin esperas ni negros.
-  El SONIDO de cada tramo seguido (los tramos que van uno tras otro sin estación en medio) es UNA pista continua (p/): los
-  vídeos van mudos y la siguen, así que la música no se corta en los cambios de plano ni de locutor (N4, N24). Después de
-  cada libreta, su música y su ambiente siguen sonando en bucle hasta «Seguir con la historia» (N12).
+  tramo las ESTACIONES interactivas (donde el vídeo tenía «PARADA · AHORA TÚ» o un repaso). Una portada con las tres bobinas.
+  MOTOR v3 (18-oct, noche: «va a tirones»; igual que La cabaña, que va fina en la pantalla del aula):
+  · cada TRAMO SEGUIDO (los tramos que van uno tras otro sin estación en medio) es UN solo vídeo con su sonido DENTRO
+    (r/: 1080p a 60 fotogramas; r3/: la versión ligera, 720p a 30). El navegador lleva la imagen y el sonido juntos: la
+    música no se corta en los cambios de plano ni de locutor (N4, N24) y ya no hay vídeos mudos persiguiendo a una pista.
+  · antes de «Empezar la bobina N» se carga TODA la bobina en la memoria («Cargando la bobina N · 43 % · 120 de 280 MB»);
+    luego nada espera a la red.
+  · los 60 fotogramas salen de las animáticas (30): entre cada dos, uno intermedio calculado SOLO donde hay movimiento
+    (paneos, zooms, bobinas); en los cortes, carteles y textos, el fotograma de antes tal cual: todo cambia de golpe, a su hora.
+  Después de cada libreta, su música y su ambiente siguen sonando en bucle hasta «Seguir con la historia» (N12).
   La página es «noindex» y no está enlazada desde ningún sitio: solo se llega con la dirección.
 
 QUITARLA
@@ -27,8 +31,10 @@ LOS MANDOS
             se la salta el profe. En una libreta, ▶ o ▶▶ siguen con la historia.
     ●       solo donde se graba: con el micro, MANTENIÉNDOLA pulsada (al soltar, para; menos de un minuto) (N17, N33); en los
             sitios del mapa de París, se queda hundida sola lo que dura cada grabación (N26); en «Tu pieza», con 3, 2, 1 (N40).
-            El permiso del micrófono se pide una vez, al empezar la bobina.
-  Arriba a la derecha: 1080/720 (si existe cinta/v7/), pantalla completa y «Salir» (se guarda por dónde ibas: en la portada,
+            El permiso del micrófono se pide al PULSAR LA BOBINA en la portada (mientras se carga); el micro solo se abre en
+            las estaciones que graban (b1_grabar, b3_clase) y se cierra al salir de ellas.
+  Arriba a la derecha: 60/30 (30 = la versión ligera de r3/, por si un ordenador va justo; vale desde la próxima bobina que se
+  cargue), pantalla completa y «Salir» (se guarda por dónde ibas: en la portada,
   esa bobina dice «Continuar»). Mientras se reproduce se esconden, para no tapar los carteles del vídeo (N6).
   Los VOLUNTARIOS (V3): ya no hay botón. Con la cuenta Protester y en hora de clase, al «Empezar la bobina N» (tras el permiso
   del micro) sale en el medio «Seleccionar voluntario», con el grupo de esa hora; la bobina empieza al cerrarlo (o con «Ahora
@@ -50,13 +56,15 @@ LA BOBINA 3
 
 LO QUE HAY AQUÍ
   js/comun.js     lo común (escenario, sonido, subtítulos, tarjetas, botones, botonera, micro, datos, precarga)
-  js/guion.js     el guion: los pasos de cada bobina, las pistas y sus hitos (generado; no se edita a mano)
-  js/motor.js     el motor: portada, carga, tramos con su pista, estaciones, botonera, salir y continuar, la emisión, los ruidos
+  js/guion.js     el guion: los pasos de cada bobina, sus partes (ahora, marcas dentro del vídeo de su tramo seguido) y los hitos
+  js/runs.js      (v3) el vídeo de cada tramo seguido: r/ y r3/, sus bytes y, si va partido, sus trozos (generado; no se edita)
+  js/motor.js     el motor: portada, carga, un vídeo por tramo seguido, estaciones, botonera, salir y continuar, la emisión, los ruidos
   js/b1.js, b2.js, b3.js, b3pieza.js, sonidos_paris.js   las estaciones de cada bobina
-  v/              los tramos en 1080p (H.264, 30 fps, ≤ 9 MB por fichero; los largos, en partes _a, _b, _c… que se encadenan
-                  solas, cortadas siempre en un cambio de plano o de texto)
-  v7/             (si está) los mismos tramos en 720p, con las mismas partes
-  p/              las pistas de sonido de los tramos seguidos (AAC 160k) y las colas de las libretas (<pista>_cola.m4a)
+  r/              (v3) un vídeo por tramo seguido, 1080p a 60 fotogramas (H.264 high 4.2) con su sonido dentro (AAC 160k),
+                  keyframes en cada hito (◀◀ ▶▶ al instante). Los de más de 9,5 MB van en trozos <nombre>.mp4.p00, .p01… (para
+                  poder subirlos a GitHub desde el navegador, de 10 en 10 MB): la página los une sola.
+  r3/             (v3) lo mismo en la versión ligera: 720p a 30 fotogramas
+  p/              las colas de las libretas (<pista>_cola.m4a: suenan en bucle tras la libreta)
   i/, a/          imágenes y sonidos de las estaciones; icono/ los iconos; estilo.css el aspecto
   banco.html      el banco de pruebas: abre UNA estación suelta (banco.html?m=b2&e=b2_describe&auto=1)
   manifest.json   todos los ficheros con sus bytes
@@ -68,3 +76,7 @@ DE DÓNDE SALE
   Re-renderizados limpios: la emisión y la pegatina de la bobina 3 (sin la pieza ni el título de ejemplo), el sonido de la
   mesa de montaje (sin los cuatro ruidos de ejemplo) y los sitios del mapa de la bobina 2 (mercado, café, muelles: sin el
   contador «EN LA BOBINA n/8» del orden fijo de la animática).
+
+VOLVER AL MOTOR v2 (el de las pistas p/ y los vídeos mudos de v/, v7/)
+  Los ficheros de la v2 (js/motor.js, js/comun.js, prueba.html sin runs.js) están en el historial de GitHub (el commit de antes
+  de la v3) y en la copia de Claude. Para volver: poner esos tres ficheros y las carpetas v/, v7/ y p/ completas (están en el historial de GitHub, en el commit anterior a la v3).
