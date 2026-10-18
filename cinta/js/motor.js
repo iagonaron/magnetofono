@@ -769,7 +769,7 @@
     const emp = MAG.ui.boton(desde ? 'Continuar la bobina ' + n : 'Empezar la bobina ' + n, { clase: 'mbtn-prin', icono: MAG.ICO.play });
     bot.insertBefore(emp, volver);
     const arranca = () => {
-      window.removeEventListener('keydown', tecla, true); vista.hidden = true; $('#pBobinas').hidden = false;
+      window.removeEventListener('keydown', tecla, true); emp.disabled = true;
       // con el toque: la pista queda «desbloqueada» (Safari) y se pide el micro (una vez, para toda la bobina)
       try {
         conectaPista(); const R0 = est.pasos[desde || 0] && runDe(est.pasos[desde || 0].run);
@@ -781,7 +781,10 @@
       const pm = micro ? MAG.mic.abre() : null;
       // (18-oct, V3 de Iago) con la cuenta Protester y en hora de clase, tras el micro, «Seleccionar voluntario» en el medio;
       // la bobina empieza al cerrarlo (o con «Ahora no»). Sin seleccionador (alumnos, o fuera de hora), empieza ya.
-      let ya = false; const sigue = () => { if (ya) return; ya = true; corre(n, desde); };
+      // (18-oct, tarde) mientras se espera el permiso del micro (y, en hora de clase, el seleccionador), sigue a la vista el panel
+      // de carga con lo que hay que hacer (antes se volvía a ver la portada y parecía que no pasaba nada)
+      let ya = false; const sigue = () => { if (ya || anulado) return; ya = true; vista.hidden = true; $('#pBobinas').hidden = false; corre(n, desde); };
+      if (pm) { tx.textContent = 'Dale permiso al micrófono (arriba, junto a la dirección de la página) y empieza la bobina ' + n + '.'; pm.then(() => { if (!ya && !anulado) tx.textContent = 'La bobina ' + n + ' está lista.'; }, () => {}); }
       try { if (window.LMVoluntarios && typeof window.LMVoluntarios.ofrece === 'function') { window.LMVoluntarios.ofrece({ tras: pm, dia: n }).then(sigue, sigue); return; } } catch (e) {}
       sigue();
     };
