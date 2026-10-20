@@ -137,7 +137,7 @@
      fotograma del tramo siguiente, sin subtítulo: b1_palanca_abierta, sacado del propio renderizador). */
   MAG.registra('b1_palanca', {
     titulo: 'Abrir la caja',
-    recursos: ['i/b1_palanca_abierta.jpg', 'a/b1_palanca_cruje.mp3', 'a/b1_palanca_clavos.mp3', 'a/b1_palanca_virutas.mp3'],
+    recursos: ['i/b1_palanca_abierta.jpg', 'a/b1_palanca_cruje.mp3', 'a/b1_palanca_clavos.mp3', 'a/b1_palanca_virutas.mp3', 'a/b1_caja_abre.mp3'],
     async monta(ctx) {
       const X0 = 1040, Y0 = 120, W = 880, H = 620, cv = lienzo(ctx, X0, Y0, W, H, 1), g = cv.getContext('2d');
       cv.style.touchAction = 'none';
@@ -193,6 +193,7 @@
       function abre() {
         abierta = true; agarra = false;
         ctx.suena('a/b1_palanca_clavos.mp3', { db: 0 }); setTimeout(() => { if (ctx.vivo()) ctx.suena('a/b1_palanca_virutas.mp3', { db: -2 }); }, 240);
+        ctx.suena('a/b1_caja_abre.mp3', { db: -1 });                 // (20-oct, Iago) la tapa de la caja que se abre (Splice)
         ctx.fondo('i/b1_palanca_abierta.jpg'); cv.style.display = 'none'; tj.style.display = 'none'; aviso.style.display = 'none';
         setTimeout(() => terminar(), 1300);
       }
@@ -255,7 +256,7 @@
   };
   MAG.registra('b1_enhebrar', {
     titulo: 'Enhebrar la cinta',
-    recursos: ['i/b1_enhebrar_ojo.png', 'a/b1_clic.mp3', 'a/b1_motor.mp3', 'a/b1_roce.mp3'],
+    recursos: ['i/b1_enhebrar_ojo.png', 'a/b1_clic.mp3', 'a/b1_motor.mp3', 'a/b1_roce.mp3', 'a/b1_tintineo.mp3'],
     async monta(ctx) {
       const ojo = img(ctx, 'i/b1_enhebrar_ojo.png', 1203, 810, { z: 1 });          // el ojo mágico, apagado hasta que la cinta está puesta
       const EX = 560, EY = 320, cv = lienzo(ctx, EX, EY, 1020, 650, 2), g = cv.getContext('2d'); cv.style.touchAction = 'none';   // solo la zona de la cinta y del ojo
@@ -264,6 +265,12 @@
       let hechos = [], arrastra = false, P = null, aviso = null, avisoHasta = 0, corre = 0, terminado = false, roce = null;
       let terminar; const fin = new Promise(r => { terminar = r; });
       const siguiente = () => ENH.puntos[hechos.length];
+      // (20-oct-2026, Iago: «hay que indicar más el lugar en el que se empieza a enhebrar… un tintineo») mientras no se ha cogido
+      // la punta: un destello que late en la salida de la cinta y un tintineo que se repite unas veces; se apaga al cogerla.
+      let pista = true, nTin = 0; const tPista = performance.now();
+      const tintinea = () => { if (!pista || !ctx.vivo() || nTin >= 5) return; nTin++; ctx.suena('a/b1_tintineo.mp3', { db: -9 }); setTimeout(tintinea, 3400); };
+      setTimeout(tintinea, 700);
+      const apagaPista = () => { pista = false; };
       function camino(conPuntero) {
         const c = [ENH.ini]; hechos.forEach(i => c.push(ENH.puntos[i]));
         if (conPuntero && P) c.push(P);
@@ -281,6 +288,21 @@
             g.save(); g.setLineDash([3, 26]); g.lineDashOffset = -((t - corre) / 1000) * 260; g.strokeStyle = 'rgba(255,225,190,0.75)'; g.lineWidth = 4;
             g.beginPath(); c.forEach((p, i) => { if (i) g.lineTo(p.x, p.y); else g.moveTo(p.x, p.y); }); g.stroke(); g.restore();
           }
+        }
+        if (pista && !arrastra && !hechos.length && !terminado) {      // el destello que indica por dónde se empieza
+          const x = ENH.ini.x, y = ENH.ini.y, tt = (t - tPista) / 1000, u = (tt % 1.4) / 1.4;
+          const gr = g.createRadialGradient(x, y, 4, x, y, 96); gr.addColorStop(0, 'rgba(255,226,140,0.62)'); gr.addColorStop(0.5, 'rgba(255,210,110,0.22)'); gr.addColorStop(1, 'rgba(255,200,100,0)');
+          g.fillStyle = gr; g.beginPath(); g.arc(x, y, 96, 0, 7); g.fill();
+          for (const d of [0, 0.5]) {                                    // dos ondas que salen de la punta
+            const v = (u + d) % 1; g.strokeStyle = 'rgba(255,230,160,' + (0.95 * (1 - v)).toFixed(3) + ')'; g.lineWidth = 4;
+            g.beginPath(); g.arc(x, y, 30 + 62 * v, 0, 7); g.stroke();
+          }
+          const br = 0.5 + 0.5 * Math.sin(tt * 5.0);
+          [[34, -36, 1], [-30, -26, 0.6], [26, 30, 0.5]].forEach(([dx, dy, k], j) => {   // tres chispas que titilan
+            const b2 = 0.5 + 0.5 * Math.sin(tt * 5.0 + j * 2.1), R = (12 + 12 * b2) * k;
+            g.save(); g.translate(x + dx, y + dy); g.rotate(tt * 0.8 + j); g.fillStyle = 'rgba(255,250,228,' + (0.5 + 0.5 * b2).toFixed(3) + ')';
+            g.beginPath(); for (let q = 0; q < 8; q++) { const a = q * Math.PI / 4, r = q % 2 ? R * 0.2 : R; g.lineTo(Math.cos(a) * r, Math.sin(a) * r); } g.closePath(); g.fill(); g.restore();
+          });
         }
         // la punta de la cinta (donde se coge)
         const pt = arrastra && P ? P : (hechos.length ? ENH.puntos[hechos[hechos.length - 1]] : ENH.ini);
@@ -300,12 +322,12 @@
       }
       let sucio = true; const marca = () => { sucio = true; };
       let tUlt = 0;
-      ctx.cada(t => { if (sucio || ((corre || (aviso && t < avisoHasta + 50)) && t - tUlt > 33)) { pinta(t); sucio = false; tUlt = t; } });
+      ctx.cada(t => { if (sucio || ((corre || pista || (aviso && t < avisoHasta + 50)) && t - tUlt > 33)) { pinta(t); sucio = false; tUlt = t; } });
       ctx.on(cv, 'pointerdown', ev => {
         if (terminado) return; const p = MAG.punto(ev);
         const punta = hechos.length ? ENH.puntos[hechos[hechos.length - 1]] : ENH.ini;
         if (D2(p, punta) < 60 || (hechos.length && D2(p, punta) < 80)) {
-          arrastra = true; P = p; if (cv.setPointerCapture) { try { cv.setPointerCapture(ev.pointerId); } catch (e) {} }
+          arrastra = true; P = p; apagaPista(); if (cv.setPointerCapture) { try { cv.setPointerCapture(ev.pointerId); } catch (e) {} }
           roce = ctx.suena('a/b1_roce.mp3', { db: -10, bucle: true, entra: 0.15 }); ev.preventDefault(); marca();
         }
       });
@@ -329,12 +351,12 @@
       ctx.on(window, 'pointerup', () => { if (!arrastra) return; arrastra = false; P = null; if (roce) { roce.parar(0.1); roce = null; } marca(); });
       ctx.on(window, 'keydown', ev => {                         // con el teclado: → (o Espacio, o Intro) engancha el punto siguiente
         if (terminado || arrastra || ev.repeat || !['ArrowRight', ' ', 'Enter'].includes(ev.key)) return;
-        ev.preventDefault(); const s = siguiente(); if (!s) return;
+        ev.preventDefault(); const s = siguiente(); if (!s) return; apagaPista();
         hechos.push(ENH.puntos.indexOf(s)); ctx.suena('a/b1_clic.mp3', { db: s.cab ? -2 : -6 }); marca();
         if (s.fin) acaba();
       });
       function acaba() {
-        terminado = true; arrastra = false; P = null; if (roce) { roce.parar(0.1); roce = null; }
+        terminado = true; pista = false; arrastra = false; P = null; if (roce) { roce.parar(0.1); roce = null; }
         tj.style.display = 'none'; ojo.style.display = 'none';
         ctx.suena('a/b1_clic.mp3', { db: 0 }); ctx.suena('a/b1_motor.mp3', { db: -4 });
         corre = performance.now(); marca();

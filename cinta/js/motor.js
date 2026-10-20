@@ -198,7 +198,7 @@
       run.acabar = acaba;
       const reloj = () => (run.el ? run.el.currentTime : 0);
       const parteEn = T => { let k = 0; for (let j = 0; j < P.length; j++) if (P[j].rt0 <= T + 1e-4) k = j; return k; };
-      const anota = () => { const q = P[run.k]; if (q && q.i != null) { est.paso = q.i; MAG.guarda('progreso', { bobina: est.bobina, paso: est.paso, v: G.version }); } };
+      const anota = () => { const q = P[run.k]; if (q && q.i != null) { est.paso = q.i; guardaProg(est.bobina, est.paso); } };
       /* la parte (la marca) por la que va: lo que se apunta y las ventanas de la bobina 3 */
       function enParte(k, forzar) {
         if (k === run.k && !forzar) return;
@@ -518,7 +518,7 @@
     }
     while (est.paso < est.pasos.length && !est.cancelado) {
       const p = est.pasos[est.paso];
-      MAG.guarda('progreso', { bobina: n, paso: est.paso, v: G.version });
+      guardaProg(n, est.paso);
       if (p.t === 'v') {
         // la pieza del alumno se mezcla (OfflineAudioContext) antes del tramo de la emisión, para que esté a tiempo
         if (!est.piezaPromesa && partesDeRun(p.run).some(q => q.pieza)) {
@@ -670,11 +670,11 @@
   const ICO_CANDADO = '<svg viewBox="0 0 24 24" width="20" height="20"><rect x="5" y="10.5" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
   function pintaBobinas() {
     const caja = $('#pBobinas'); caja.innerHTML = '';
-    const prog = MAG.lee('progreso', null), hechas = MAG.lee('hechas', []);
+    const progs = progresos(), hechas = MAG.lee('hechas', []);
     [1, 2, 3].forEach(n => {
       const B = G.bobinas[n]; if (!B) return;
       const abierta = !window.MagHitos || window.MagHitos.abierto(n);
-      const sigue = prog && prog.bobina === n && prog.paso > 0 && prog.v === G.version;
+      const prog = progs[n], sigue = !!(prog && prog.paso > 0 && prog.v === G.version);
       let estado = abierta ? (sigue ? 'Continuar' : (hechas.indexOf(n) >= 0 ? 'Volver a verla' : 'Empezar')) : 'Se abre en clase';
       const b = MAG.el('button', { class: 'pBob' + (abierta ? '' : ' cerrada'), type: 'button' }, [
         MAG.el('span', { class: 'pBob-ic', html: ICO_BOB }),
@@ -687,6 +687,16 @@
   /* ¿esta bobina graba con el micrófono? (las estaciones con «micro: true»: b1_grabar, b3_clase) */
   const usaMicro = n => (G.bobinas[n].pasos || []).some(p => p.t === 'e' && MAG.est[p.id] && MAG.est[p.id].micro);
   const MB = b => Math.round(b / 1e6);
+  // (20-oct-2026, Iago) el progreso se guarda POR BOBINA: al volver a cualquiera de las tres, «Continuar» o «Empezar de nuevo».
+  // «progreso» (la última) se sigue escribiendo igual; lo de antes de este cambio se recoge la primera vez.
+  function progresos() {
+    const m = MAG.lee('progresos', null) || {}, v = MAG.lee('progreso', null);
+    if (v && v.bobina && !m[v.bobina] && !MAG.lee('progresosOK', false)) { m[v.bobina] = { paso: v.paso, v: v.v }; MAG.guarda('progresos', m); }
+    MAG.guarda('progresosOK', true);
+    return m;
+  }
+  function guardaProg(n, paso) { const m = progresos(); m[n] = { paso, v: G.version }; MAG.guarda('progresos', m); MAG.guarda('progreso', { bobina: n, paso, v: G.version }); }
+  function borraProg(n) { const m = progresos(); delete m[n]; MAG.guarda('progresos', m); const v = MAG.lee('progreso', null); if (v && v.bobina === n) MAG.guarda('progreso', null); }
   async function elige(n, desde) {
     // (v3, nota de Iago) el permiso del micrófono, YA, con el toque en la bobina (y se suelta enseguida); mientras, se carga
     est.pm = usaMicro(n) ? MAG.mic.permiso() : null;
@@ -696,8 +706,13 @@
     const tx = vista.querySelector('.pc-tx'), barra = vista.querySelector('.pc-barra i'), bot = vista.querySelector('.pc-bot');
     let ultTx = 'Cargando la bobina ' + n + ' · 0 %';
     const pinta = () => { tx.textContent = (micPend ? 'Dale permiso al micrófono (arriba, junto a la dirección) mientras se carga la bobina ' + n + '. ' : '') + ultTx; };
-    bot.innerHTML = ''; pinta(); barra.style.width = '0%';
+    bot.innerHTML = ''; bot.classList.remove('tres'); pinta(); barra.style.width = '0%';
     if (est.pm) est.pm.then(() => { micPend = false; pinta(); }, () => { micPend = false; pinta(); });
+    // (20-oct-2026, Iago) el sorteo del voluntario aprovecha la PANTALLA DE CARGA: con la cuenta Protester y en hora de clase,
+    // «Seleccionar voluntario» sale ya mientras se carga (tras contestar al permiso del micro, si se pidió). Alumnos, en casa
+    // o fuera de hora: no sale nada y la carga es la de siempre. La bobina no empieza hasta que se ha cerrado.
+    let sorteo = Promise.resolve(false);
+    try { if (window.LMVoluntarios && typeof window.LMVoluntarios.ofrece === 'function') sorteo = Promise.resolve(window.LMVoluntarios.ofrece({ tras: est.pm || null, dia: n })).catch(() => false); } catch (e) {}
     const volver = MAG.ui.boton('', { clase: 'mbtn-sec pc-volver', icono: '<svg viewBox="0 0 24 24" width="22" height="22"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>', titulo: 'Volver' });
     let anulado = false, tecla = null;
     volver.addEventListener('click', () => { anulado = true; if (tecla) window.removeEventListener('keydown', tecla, true); vista.hidden = true; $('#pBobinas').hidden = false; est.modo = 'portada'; });
@@ -714,13 +729,21 @@
     }, pesos, trozos);
     if (anulado) return;
     if (fallos.length) console.warn('[MAG] no se pudo cargar', fallos);
-    ultTx = (desde ? 'La bobina ' + n + ' está lista: sigue donde la dejaste.' : 'La bobina ' + n + ' está lista.') + (fallos.length ? ' (Falta algún archivo: puede saltarse algo.)' : '');
+    ultTx = (desde ? 'La bobina ' + n + ' está lista: ¿sigues donde la dejaste o empiezas de nuevo?' : 'La bobina ' + n + ' está lista.') + (fallos.length ? ' (Falta algún archivo: puede saltarse algo.)' : '');
     pinta();
     barra.style.width = '100%';
-    const emp = MAG.ui.boton(desde ? 'Continuar la bobina ' + n : 'Empezar la bobina ' + n, { clase: 'mbtn-prin', icono: MAG.ICO.play });
+    // (20-oct-2026, Iago) si esta bobina tiene algo hecho: «Continuar» (donde se dejó) o «Empezar de nuevo» (desde el principio)
+    const emp = MAG.ui.boton(desde ? 'Continuar' : 'Empezar la bobina ' + n, { clase: 'mbtn-prin', icono: MAG.ICO.play });
     bot.insertBefore(emp, volver);
+    let deNuevo = null;
+    if (desde) {
+      deNuevo = MAG.ui.boton('Empezar de nuevo', { clase: 'mbtn-sec', icono: '<svg viewBox="0 0 24 24" width="22" height="22"><path d="M5 12a7 7 0 1 0 2.05-4.95M5 4.5v4h4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' });
+      bot.insertBefore(deNuevo, volver);
+      bot.classList.add('tres');
+      deNuevo.addEventListener('click', () => { desde = 0; borraProg(n); arranca(); });
+    }
     const arranca = () => {
-      window.removeEventListener('keydown', tecla, true); emp.disabled = true;
+      window.removeEventListener('keydown', tecla, true); emp.disabled = true; if (deNuevo) deNuevo.disabled = true;
       // con el toque: los dos vídeos quedan «desbloqueados» para sonar (Safari) y conectados a Web Audio
       try {
         const p1 = est.pasos.slice(desde || 0).find(q => q.t === 'v'), X0 = p1 && vidDe(n, p1.run);
@@ -736,9 +759,9 @@
       } catch (e) {}
       // (18-oct, V3 de Iago) con la cuenta Protester y en hora de clase, «Seleccionar voluntario» en el medio (tras el permiso del
       // micro, si se pidió); la bobina empieza al cerrarlo (o con «Ahora no»). Sin seleccionador (alumnos, o fuera de hora), empieza ya.
+      // (20-oct) el sorteo ya salió durante la carga: si sigue abierto, la bobina empieza al cerrarlo
       let ya = false; const sigue = () => { if (ya || anulado) return; ya = true; vista.hidden = true; $('#pBobinas').hidden = false; corre(n, desde); };
-      try { if (window.LMVoluntarios && typeof window.LMVoluntarios.ofrece === 'function') { window.LMVoluntarios.ofrece({ tras: est.pm || null, dia: n }).then(sigue, sigue); return; } } catch (e) {}
-      sigue();
+      sorteo.then(sigue, sigue);
     };
     tecla = ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); arranca(); } };
     window.addEventListener('keydown', tecla, true);
@@ -746,7 +769,7 @@
   }
   function finBobina(n) {
     const hechas = MAG.lee('hechas', []); if (hechas.indexOf(n) < 0) { hechas.push(n); MAG.guarda('hechas', hechas); }
-    MAG.guarda('progreso', null);
+    borraProg(n);
     paraColaVid(); MAG.mic.suelta();
     est.modo = 'fin'; MAG.botonera.enclava(null); MAG.botonera.reposo('FIN'); MAG.botonera.usables([]);
     const c = $('#finBobina'); c.hidden = false;
