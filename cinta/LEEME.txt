@@ -15,6 +15,24 @@ QUÉ ES
   Después de cada libreta, su música y su ambiente siguen sonando en bucle hasta «Seguir con la historia» (N12).
   La página es «noindex» y no está enlazada desde ningún sitio: solo se llega con la dirección.
 
+CAMBIOS DEL 20-OCT-2026 (C6 · Magnetófono, correcciones de Iago)
+  · Vídeos rehechos (r/ y r3/), con los mismos tiempos y keyframes (los hitos y los guardados de los alumnos siguen valiendo):
+    p_b1_00 fuera el plano sobrante antes de «París, otoño de 1951»; la primera Odile con fondo sin cintas (lámina de ChatGPT:
+            tocadiscos y tornos de disco), también en el recuerdo en sepia; «empalmamos» → «empatamos».
+    p_b1_04 tras la palanca, la caja abierta (la imagen con que acaba la estación) en vez de cerrada; ambiente continuo del estudio
+            (sala de París + válvulas, Splice) para que no se quede en silencio en «¿Y dónde está la aguja?».
+    p_b2_01 panadería: calle por la mañana, timbre de bici y pan (Splice).
+    p_b2_02, p_b2_04 cartel «Chocolat Mirabelle» (ChatGPT) en la ventanilla quieta del bus, de día y al atardecer; motor del bus por
+            dentro y el periódico del señor (Splice). El panel de los tres sonidos, sin ruido de bus.
+    p_b3_04, p_b3_05 el fonógeno: de cerca, las dos últimas teclas rectas; junto al magnetófono, el teclado de ChatGPT.
+    p_b3_08 la emisión: periódico en el salón, ambiente de café, el Sena en la barcaza, el horno y el pan (Splice).
+  · Estaciones: b1_enhebrar, destello y tintineo (a/b1_tintineo.mp3) en la punta de la cinta hasta cogerla; b1_palanca, el crujido
+    de la tapa (a/b1_caja_abre.mp3); i/b3_fonogeno_fondo.jpg e i/b3p_fondo.jpg con las teclas arregladas; a/b2_p_cafe_2.mp3
+    (el periódico) nuevo.
+  · Motor: el progreso se guarda POR BOBINA (lm_mag_progresos): al volver a una empezada, tras cargar, «Continuar» o «Empezar de
+    nuevo». El sorteo del voluntario (Protester y en hora de clase) sale YA durante la carga; la bobina empieza al cerrarlo.
+  · Deshacer: volver a poner los ficheros del commit 19c429a (el de antes) o mirar _COORDINACION-IA.md en la raíz del repo.
+
 QUITARLA
   Borrar prueba.html y la carpeta cinta/. No toca nada más del portal (sus datos van en el navegador con el prefijo lm_mag_).
 
