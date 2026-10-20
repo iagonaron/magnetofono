@@ -108,7 +108,8 @@ window.LM_VOL_CONFIG = function () {
 #pCarga .pc-barra { height: 4px; margin: 22px 0 28px; background: rgba(205, 190, 160, .25); border-radius: 2px; overflow: hidden; }
 #pCarga .pc-barra i { display: block; height: 100%; width: 0; background: var(--crema); }
 #pCarga .pc-bot { display: flex; gap: 14px; }
-#pCarga .pc-volver { width: 64px; padding: 0; }
+#pCarga .pc-volver { width: 64px; padding: 0; flex: 0 0 64px; }
+#pCarga .pc-bot.tres .mbtn:not(.pc-volver) { font-size: 20px; letter-spacing: .02em; padding: 0 16px; gap: 9px; }   /* (20-oct) «Continuar» y «Empezar de nuevo» */
 #pPanel .pPie { margin-top: 26px; font: 400 16px/1.3 var(--maq); color: rgba(205, 190, 160, .7); letter-spacing: 1px; white-space: nowrap; }
 .mag-alumno #pPanel .pPrueba { display: none; }
 #portada:not([hidden]) ~ #mandos #bSalir, #mandos:not(.enHistoria) #bSalir { display: none; }
