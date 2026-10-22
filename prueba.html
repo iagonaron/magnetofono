@@ -49,6 +49,8 @@
 window.LM_VOL_CONFIG = function () {
   return {
     portal: 'magnetofono', tema: 'cinta',
+    // (22-oct-2026, v5) una animación por bobina: la 1, la cinta; la 2, el metro de París; la 3, la máquina de escribir
+    temaDe: function (op) { var n = op && +op.dia; return n === 2 ? 'caza' : n === 3 ? 'maquina' : 'cinta'; },
     boton: { padre: '#mandos', antes: '#bCalidad', clase: 'mnd', id: 'bVoluntarios' },
     sonidos: { rebobina: 'cinta/a/vol_rebobina.mp3', frena: 'cinta/a/vol_frena.mp3', tecla: 'cinta/a/vol_tecla.mp3' },
     alAbrir: function () { try { if (window.MAG && MAG.pausaHistoria) MAG.pausaHistoria(); } catch (x) {} }

@@ -8,6 +8,12 @@ APPs/LMATHOME GP (github lmpro)/BLUES (propuestas)/CONVERSACIONES/C6-MAGNETOFONO
 Lo de antes del 20-oct (subidas del 18-oct, motor v2 y v3) está apuntado en el _COORDINACION-IA.md de lmpro.
 
 ## Registro (lo más reciente arriba · hora de Galicia)
+- 22-oct 21:58 · Fichas y rediseño (la conversación de los voluntarios; con el ok de Iago para subir lo terminado) · HECHO ·
+  solo prueba.html, en un solo commit con esta línea: en LM_VOL_CONFIG, `temaDe` para el seleccionador de voluntarios v5
+  (lmpro/voluntarios, subido justo antes): la bobina 1 sigue con la cinta; la 2, el plano del metro de París de 1948 («caza»);
+  la 3, la máquina de escribir del Club d'Essai («maquina»). Usa la bobina que cinta/js/motor.js ya pasa en ofrece({ dia: n });
+  cinta/ y lo demás, sin tocar. Con el módulo v4 todo sigue como antes. DESHACER: volver a subir el prueba.html de 28f8081
+  (copia en Dropbox: APPs/_PARA BORRAR/22-oct-2026-voluntarios-v4/magnetofono-prueba.html).
 - 20-oct 14:53–15:10 · C6 · Magnetófono · HECHO · correcciones de Iago del 20-oct en la página de prueba (solo Protester).
   Commits a37a3fa (EN CURSO) … c062c87 (prueba.html), y este. Subido:
   cinta/r/ y cinta/r3/ de p_b1_00, p_b1_04, p_b2_01, p_b2_02, p_b2_04, p_b3_04, p_b3_05 y p_b3_08 (vídeos rehechos, mismos
