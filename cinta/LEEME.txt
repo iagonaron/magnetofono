@@ -15,6 +15,16 @@ QUÉ ES
   Después de cada libreta, su música y su ambiente siguen sonando en bucle hasta «Seguir con la historia» (N12).
   La página es «noindex» y no está enlazada desde ningún sitio: solo se llega con la dirección.
 
+CAMBIOS DEL 5-NOV-2026 (conversación «Blues · coordinadora», retoques de Iago tras probar la bobina 1)
+  · La botonera de arriba a la izquierda REACCIONA A LA HISTORIA: cuando en el vídeo el narrador «pulsa» ◀◀ (se va al pasado),
+    ‖ (PAUSA) o ▶▶ («adelantemos…»), la de la página se pulsa igual, con su rótulo. Cuándo: cinta/js/horneada.js (medido en los
+    fotogramas: la tecla naranja de la botonera dibujada). Si se pausa a mano, manda la pausa; ▶ sigue. Quitarlo: borrar
+    horneada.js y su <script> en prueba.html.
+  · La pantalla completa, siempre a mano (también mientras corre el vídeo, más discreta): estilo.css, #mandos.escondidos #bPantalla.
+  · Las bobinas: sin cuenta de alumno guardada y sin ser el profe, solo la bobina 1 (antes, quien abría la dirección a pelo lo
+    tenía todo). El profe (Protester, #c=) sigue con todo abierto; el ordenador de clase, si se entra por la medalla. Como el Blues.
+    Deshacer: en prueba.html, «: [1]» → «: null».
+
 CAMBIOS DEL 20-OCT-2026 (C6 · Magnetófono, correcciones de Iago)
   · Vídeos rehechos (r/ y r3/), con los mismos tiempos y keyframes (los hitos y los guardados de los alumnos siguen valiendo):
     p_b1_00 fuera el plano sobrante antes de «París, otoño de 1951»; la primera Odile con fondo sin cintas (lámina de ChatGPT:

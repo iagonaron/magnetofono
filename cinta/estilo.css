@@ -118,6 +118,8 @@ body { font-family: var(--maq); color: var(--crema); -webkit-font-smoothing: ant
 #mandos [hidden] { display: none !important; }
 /* (18-oct, N6) mientras corre el vídeo, los mandos se esconden (de golpe) para no tapar los carteles; vuelven al mover el ratón */
 #mandos.escondidos { visibility: hidden; }
+/* (5-nov-2026, Iago) la PANTALLA COMPLETA, siempre a mano: también mientras corre el vídeo (más discreta). Para quitarlo: borrar esta línea */
+#mandos.escondidos #bPantalla { visibility: visible; opacity: .55; }
 
 /* ── el repaso (tarjeta_quiz de las animáticas) ── */
 .quiz { position: absolute; box-sizing: border-box; background: rgba(239, 229, 207, .985); color: var(--tinta); border: 3px solid var(--borde);
