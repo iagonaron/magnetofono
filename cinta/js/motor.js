@@ -183,7 +183,10 @@
     return new Promise(resuelve => {
       const R = o.R, P = o.partes, X = o.X;
       const fin = P.length ? P[P.length - 1].rt0 + P[P.length - 1].dur : 0;
-      const run = { R, P, X, fin, k: -1, el: null, pausada: false, salto: false, objetivo: null, dir: 0, vivo: true, lugar: !!o.lugar, ov: null };
+      const run = { R, P, X, fin, k: -1, el: null, pausada: false, salto: false, objetivo: null, dir: 0, vivo: true, lugar: !!o.lugar, ov: null, hk: undefined };
+      // (5-nov-2026, Iago) la botonera reacciona a la historia: la tecla que el narrador pulsa en el vídeo (cinta/js/horneada.js)
+      const HB = (MAG.HORNEADA || {})[String((X && X.f) || '').replace(/^.*\//, '').replace(/\.mp4$/, '')] || null;
+      const horneada = T => { if (!HB) return null; for (let j = 0; j < HB.length; j++) if (T >= HB[j][0] && T < HB[j][1]) return HB[j][2]; return null; };
       est.run = run;
       if (R && R.cola) run.colaBuf = trae(R.cola.f).then(() => MAG.decodifica(R.cola.f)).catch(() => null);
       let acabado = false;
@@ -211,7 +214,7 @@
         const otro = elOtro(run.el); if (!otro.paused && otro !== est.colaVid) { try { otro.pause(); } catch (e) {} }
         run.el.play().catch(e => { if (e && e.name === 'NotAllowedError') { console.warn('[MAG] play', e); muestraPlayManual(); } });
         if (run.ov) run.ov.sonar();
-        MAG.botonera.enclava('play'); MAG.botonera.rotulo(''); mandos();
+        MAG.botonera.enclava('play'); MAG.botonera.rotulo(''); run.hk = undefined; mandos();
       }
       function calla() {
         if (run.el) { try { run.el.pause(); } catch (e) {} }
@@ -275,6 +278,7 @@
         if (T >= fin - 0.025 || run.el.ended) { alFinal(false); return; }
         const k = parteEn(T); if (k !== run.k) enParte(k);
         if (run.ov) run.ov.mira(T - P[run.k].rt0);
+        if (HB) { const hk = horneada(T); if (hk !== run.hk) { run.hk = hk; MAG.botonera.enclava(hk || 'play'); MAG.botonera.rotulo(''); } }
       }
 
       // arranque
