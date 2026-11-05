@@ -180,6 +180,20 @@ window.LM_VOL_CONFIG = function () {
   sig();
 })();
 </script>
+<script>/* (5-nov-2026, Iago) «en grado profesional, que mi notificación venga con la textura del propio portal»: el Magnetófono le dice al
+   latido en qué bobina está (data-lm-ejercicio en <html>: «bobina-N», «bobina-N-carga» mientras se carga, «portada» fuera), y la campana
+   del Diario pinta cada rato con la textura de su bobina (hitos/magnetofono-N). Solo lee MAG.motor; no cambia nada. Quitarlo: borrar este bloque. */
+(function () {
+  function marca() {
+    try {
+      var M = window.MAG && window.MAG.motor, v = 'portada';
+      if (M && M.modo !== 'portada' && +M.bobina > 0) v = 'bobina-' + (+M.bobina) + (M.modo === 'cargando' ? '-carga' : '');
+      if (document.documentElement.getAttribute('data-lm-ejercicio') !== v) document.documentElement.setAttribute('data-lm-ejercicio', v);
+    } catch (e) {}
+  }
+  marca(); setInterval(marca, 1500);
+})();
+</script>
 <script src="https://ge.lmathome.es/piel/latido.js?v=1" defer></script><!-- el latido del trabajo por libre (la campana del Diario). Quitarlo: borrar esta línea -->
 </body>
 </html>
