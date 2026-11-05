@@ -8,6 +8,11 @@ APPs/LMATHOME GP (github lmpro)/BLUES (propuestas)/CONVERSACIONES/C6-MAGNETOFONO
 Lo de antes del 20-oct (subidas del 18-oct, motor v2 y v3) está apuntado en el _COORDINACION-IA.md de lmpro.
 
 ## Registro (lo más reciente arriba · hora de Galicia)
+- 5-nov 18:25 · Blues · coordinadora (retoques de Iago del 5-nov) · HECHO · en tres commits seguidos (cinta/js, cinta y, el último con esta línea, la raíz): prueba.html (el <script>
+  de cinta/js/horneada.js y, en MagHitos, sin cuenta de alumno guardada y sin ser el profe, solo la bobina 1, como el Blues),
+  cinta/js/horneada.js (NUEVO: cuándo pulsa el narrador ◀◀ / ‖ / ▶▶ en cada vídeo), cinta/js/motor.js (corrida: la botonera
+  pulsa esa tecla a su hora; la pausa a mano manda), cinta/estilo.css (la pantalla completa no se esconde) y cinta/LEEME.txt.
+  Vídeos, sin tocar. DESHACER: volver a subir esos ficheros de c9a3689 (copia en Dropbox: APPs/_PARA BORRAR/5-nov-2026-magnetofono-botonera/).
 - 22-oct 21:58 · Fichas y rediseño (la conversación de los voluntarios; con el ok de Iago para subir lo terminado) · HECHO ·
   solo prueba.html, en un solo commit con esta línea: en LM_VOL_CONFIG, `temaDe` para el seleccionador de voluntarios v5
   (lmpro/voluntarios, subido justo antes): la bobina 1 sigue con la cinta; la 2, el plano del metro de París de 1948 («caza»);

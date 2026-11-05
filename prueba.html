@@ -31,7 +31,12 @@
       history.replaceState(history.state, '', location.pathname + location.search + (resto ? '#' + resto : ''));
     }
   } catch (e) {}
-  var ab = (st && Array.isArray(st.dias) && st.dias.length) ? st.dias.map(Number) : null;   // null = todo abierto
+  /* (5-nov-2026, Iago: «no quiero que los alumnos que solo tengan desbloqueada la bobina 1 puedan en su casa ir directamente a la
+     bobina 2») sin cuenta de alumno guardada y sin ser el profe, ya NO está todo abierto: solo la bobina 1 (antes, quien abría la
+     dirección a pelo lo tenía todo). El profe sigue con todo abierto: entra por Protester (#c=) y este navegador lo recuerda
+     (lm_mag_profe). Como el Blues. Deshacer: volver a «: null» al final de la línea de abajo. */
+  var profe = false; try { profe = localStorage.getItem('lm_mag_profe') === 'true'; } catch (e) {}
+  var ab = profe ? null : (st && Array.isArray(st.dias) && st.dias.length) ? st.dias.map(Number) : [1];   // null = todo abierto
   window.MagHitos = {
     activo: function () { return !!ab; },
     abierto: function (n) { n = +n; return !ab || ab.indexOf(n) >= 0; },
@@ -168,6 +173,7 @@ window.LM_VOL_CONFIG = function () {
 <script src="cinta/js/comun.js"></script>
 <script src="cinta/js/guion.js"></script>
 <script src="cinta/js/runs.js"></script><!-- (motor v3) el vídeo de cada tramo seguido, con su sonido dentro -->
+<script src="cinta/js/horneada.js"></script><!-- (5-nov-2026) la botonera reacciona a la historia -->
 <script>
 /* las estaciones de cada bobina (si falta alguna, la historia sigue sin ella) y, al final, el motor */
 (function () {
