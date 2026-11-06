@@ -1,4 +1,4 @@
-/* Magnetófono · versión interactiva · LOS SUBTÍTULOS DE LOS VÍDEOS (generado el 6-nov-2026 por subs3/exporta.py: no lo edites a mano).
+/* Magnetófono · versión interactiva · LOS SUBTÍTULOS DE LOS VÍDEOS (generado el 6-nov-2026 por subs3/exporta.py; 6-nov noche: +17 que faltaban; no lo edites a mano).
    Leídos de los propios vídeos (OCR y comprobados dibujándolos encima, al píxel). Por tramo: [t0, t1, quién, texto, x, y, fondo, (más)]:
    segundos del vídeo (del primer fotograma con el cuadro al siguiente al último), esquina del cuadro en 1920×1080, su color de fondo y,
    si el cuadro del vídeo es algo más grande, cuánto más [izq., dcha., arriba, abajo] (el de la página se agranda eso para taparlo). */
@@ -6,7 +6,9 @@ window.MAG = window.MAG || {};
 MAG.SUBS = {
  "p_b1_00": [
   [4.3667, 8.3667, "NARRADOR", "A Coruña. Hoy. Un día normal en el conservatorio…", 269, 879, "#3f352c", [1, 3, 3, 5]],
+  [8.3667, 9.9333, "NARRADOR", "…o eso crees tú.", 705, 879, "#3e332c", [1, 3, 3, 1]],
   [11.1667, 20.1, "NARRADOR", "Cruzas el vestíbulo como cada semana: escalas por\naquí, un clarinete peleándose con el mismo compás\npor allá… Nada nuevo.", 269, 763, "#2e2620", [1, 4, 3, 1]],
+  [20.1, 23.3333, "NARRADOR", "Hasta que, al fondo, ves algo raro.", 454, 879, "#302b29", [1, 3, 3, 1]],
   [24.3, 29.25, "NARRADOR", "Una puerta entreabierta. La del cuarto al que nadie\nentra nunca.", 243, 821, "#27190c", [1, 3, 3, 1]],
   [29.2667, 33.0667, "TÚ", "Qué raro… esta puerta siempre está cerrada.", 347, 875, "#e4d8c1"],
   [33.0667, 38.4667, "NARRADOR", "Lo correcto sería seguir andando. Así que,\nevidentemente… entras.", 362, 821, "#26180c", [1, 3, 3, 1]],
@@ -22,6 +24,7 @@ MAG.SUBS = {
   [83.9667, 86.8667, "TÚ", "¿Un concierto… de ruidos?", 584, 875, "#e1d7c1"],
   [87.3333, 93.6333, "NARRADOR", "Al lado, un magnetófono de maleta. Y ya que estás…\nbobina, cinta por los cabezales…", 256, 821, "#15100b", [1, 3, 5, 1]],
   [93.6333, 95.8, "TÚ", "A ver qué tiene la primera…", 558, 875, "#e1d7c1"],
+  [95.8, 96.6667, "NARRADOR", "…y play.", 810, 878, "#25120a", [1, 3, 3, 3]],
   [106.4, 115.8333, "ODILE", "¡Eh! ¡Aprendiz! ¡Por fin llegas! El director\nquiere un concierto radiofónico nuevo para\ndentro de dos noches, así que tenemos que\nponerte al día.", 333, 703, "#24170f"],
   [116.5333, 122.2333, "NARRADOR", "¡Un momento! ¡Para, para, para! Te veo un poco\nperdido. Normal. Un poco de contexto.", 309, 821, "#1a110d", [1, 3, 3, 1]],
   [123.9667, 130.1333, "NARRADOR", "París, otoño de 1951. Hace seis años que terminó la\nguerra.", 243, 827, "#231d1a", [1, 3, 3, 1]],
@@ -53,7 +56,8 @@ MAG.SUBS = {
  "p_b1_03": [
   [2.2, 8.9333, "NARRADOR", "Durante la ocupación alemana, el estudio\nexperimental de esta radio, el que fundó Schaeffer,\nfue un centro de la Resistencia,", 243, 769, "#28211b", [1, 3, 3, 1]],
   [8.9333, 19.1667, "NARRADOR", "y en agosto de 1944 de allí salieron las primeras\nemisiones del París liberado. Siete años después,\nllama a la puerta un ingeniero alemán.", 269, 769, "#291d12", [1, 3, 3, 1]],
-  [21.5333, 28.6667, "HERR KESSLER", "Guten Tag. ¿El estudio de Madame Odile? Les\ntraigo esto de Alemania. Cuidado: es delicado.", 537, 825, "#322318"]
+  [21.5333, 28.6667, "HERR KESSLER", "Guten Tag. ¿El estudio de Madame Odile? Les\ntraigo esto de Alemania. Cuidado: es delicado.", 537, 825, "#322318"],
+  [28.6667, 29.5667, "ODILE", "Pase.", 1078, 883, "#38291f"]
  ],
  "p_b1_04": [
   [2.2333, 9.6667, "NARRADOR", "Entre las virutas, una máquina que no has visto\nnunca: dos bobinas, botones… y una luz verde.", 296, 827, "#322015", [1, 3, 3, 1]],
@@ -76,7 +80,10 @@ MAG.SUBS = {
   [22.2333, 24.3, "HERR KESSLER", "El cabezal es un electroimán:", 531, 883, "#1d140d"],
   [24.3, 28.5333, "HERR KESSLER", "un anillo de hierro con una bobina de cable y\nuna ranura finísima.", 320, 825, "#1e150d"],
   [28.5333, 31.0333, "TÚ", "Entonces, cuando hablo…", 611, 881, "#e5dbc5"],
+  [31.0333, 35.3, "HERR KESSLER", "El micrófono convierte su voz en una corriente\nque sube y baja como la onda.", 307, 825, "#1e140d", [7, 0, 0, 0]],
+  [35.3, 38.1667, "HERR KESSLER", "Esa corriente pasa por la bobina y, en la\nranura,", 373, 825, "#1d140d"],
   [38.1667, 42.9, "HERR KESSLER", "el imán se hace más fuerte, más débil, cambia de\nsentido… al ritmo de su voz.", 281, 825, "#1e150d"],
+  [42.9, 47.5667, "HERR KESSLER", "Cada partícula que pasa se queda apuntando como\nestaba el imán en ese instante.", 294, 825, "#1e150d", [0, 0, 0, 4]],
   [47.5667, 52.0, "TÚ", "En el fonógrafo, el surco se veía. Aquí es que no se\nve nada…", 228, 823, "#e5dbc5"],
   [52.0, 55.6, "HERR KESSLER", "Porque aquí la onda no se talla: se queda\nescrita en imanes.", 373, 825, "#1d140d"],
   [55.6, 58.5333, "HERR KESSLER", "Por eso la cinta casi no se gasta al oírla.", 347, 883, "#1d140d"],
@@ -84,18 +91,24 @@ MAG.SUBS = {
  ],
  "p_b1_06": [
   [0.4333, 7.7, "TÚ", "Mi voz se ha quedado escrita en la cinta. Invisible,\nsí… pero escrita, al fin y al cabo.", 228, 823, "#e5dbc5"],
+  [7.7, 10.6667, "HERR KESSLER", "Para escuchar, la cinta pasa por otro cabezal\nigual.", 320, 825, "#1d140d"],
   [10.6667, 13.6, "HERR KESSLER", "Ahora son las partículas las que mueven el imán\ndel anillo,", 294, 825, "#1d140d"],
+  [13.6, 16.9667, "HERR KESSLER", "y eso crea en la bobina una corriente con la\nforma de su voz.", 333, 825, "#1d140d"],
   [16.9667, 20.1, "HERR KESSLER", "Se amplifica, llega al altavoz… y se oye.", 373, 883, "#1d140d"]
  ],
  "p_b1_07": [
   [0.4333, 5.2833, "TÚ", "El fonógrafo sonaba como lejano, como si estuviese\ndentro de una lata.", 254, 823, "#e5dbc5"],
   [5.3, 8.8, "TÚ", "Esto suena como si estuviese aquí, más cerca.", 320, 881, "#e5dbc5"],
+  [8.8, 11.7667, "HERR KESSLER", "Graves y agudos de verdad, y casi sin ruido.", 333, 883, "#1d140d", [0, 0, 5, 0]],
   [11.7667, 17.8667, "HERR KESSLER", "Y caben más cosas: en un cilindro de cera, unos\ndos minutos; en esta bobina, más de veinte.", 294, 825, "#1e150d"],
   [17.8667, 21.6, "TÚ", "¿Y el primer cabezal? ¿El de borrar que decías?", 294, 881, "#e5dbc5"],
   [21.6, 26.0667, "HERR KESSLER", "Desordena las partículas. La cinta queda en\nblanco y se puede volver a usar.", 347, 825, "#1e140d"]
  ],
  "p_b1_08": [
+  [0.4333, 3.3333, "HERR KESSLER", "Se puede oír cien veces y casi no se gasta.", 347, 883, "#1d140d"],
+  [3.3333, 8.0, "HERR KESSLER", "Se guarda en su caja y se lleva en la maleta,\nsin miedo a que se rompa como la cera.", 320, 825, "#1e150d"],
   [8.0, 12.6333, "HERR KESSLER", "Y lo mejor: se copia de cinta a cinta, sin\nvolver a tocar nada.", 360, 825, "#1d140d"],
+  [12.6333, 17.7, "HERR KESSLER", "Bueno, me voy. Cuídenmela. Y nada de cortar ni\nmanipular la cinta, ¿eh?", 307, 825, "#1e140d"],
   [17.7, 20.4667, "ODILE", "No, no, no…", 769, 883, "#1d140d"],
   [20.4667, 25.7333, "NARRADOR", "Ahora, ordénalo: lo del fonógrafo a un lado y lo del\nmagnetófono al otro.", 230, 827, "#2a2019", [1, 3, 3, 1]]
  ],
@@ -112,7 +125,10 @@ MAG.SUBS = {
  ],
  "p_b2_02": [
   [0.0, 7.3333, "NARRADOR", "Lo has visto: tu voz se convierte en corriente; en\nla ranura del cabezal, el imán sube y baja con la\nonda,", 256, 769, "#100e09", [1, 3, 3, 1]],
+  [7.3333, 11.2333, "NARRADOR", "y las partículas de la cinta se quedan orientadas\ncomo estaba el imán.", 269, 827, "#0e0c08", [1, 3, 3, 1]],
   [11.2333, 16.9333, "NARRADOR", "Al reproducir, al revés: las partículas, al pasar,\ncrean la corriente.", 256, 827, "#0e0c08", [1, 3, 3, 1]],
+  [16.9333, 20.5333, "NARRADOR", "Y para borrar, el primer cabezal las vuelve a\ndesordenar.", 322, 827, "#0e0c08", [1, 3, 3, 1]],
+  [20.5333, 24.5333, "NARRADOR", "La cinta queda en blanco, lista para grabar otra\nvez.", 283, 827, "#0e0c08", [1, 3, 3, 1]],
   [26.7333, 28.1, "ODILE", "Bien. Vamos.", 756, 883, "#2f1e14"],
   [30.9, 34.6, "TÚ", "Esas marcas en la piedra… ¿son de balas?", 386, 881, "#e7ddc7"],
   [34.6, 36.4667, "ODILE", "De agosto del 44.", 690, 883, "#362a21"],
@@ -205,6 +221,7 @@ MAG.SUBS = {
   [9.0, 18.1, "LUCIEN", "Y para tu estudio, otra novedad: un magnetófono de\ntres pistas. Tres grabaciones distintas en la misma\ncinta, sonando a la vez.", 241, 767, "#281b11"],
   [18.1, 22.8667, "ODILE", "Tres pistas y doce sonidos: los ocho de París y los\ncuatro de tu clase.", 241, 825, "#2b1b11"],
   [22.8667, 28.3, "ODILE", "Haremos cuatro frases de tres sonidos: en cada\npista, uno distinto, sonando a la vez.", 307, 825, "#2b1b11"],
+  [28.3, 31.8667, "ODILE", "Las cuatro frases, una detrás de otra, serán tu\npieza.", 294, 825, "#2b1b11"],
   [31.8667, 38.1333, "ODILE", "Si te atascas, tira el dado: a veces la cinta tiene\nmejores ideas que nosotros. Y ponle título.", 241, 825, "#2b1b11"]
  ],
  "p_b3_06": [

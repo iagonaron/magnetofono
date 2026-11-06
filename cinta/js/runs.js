@@ -6,7 +6,7 @@ MAG.RUNS = {
  "1": {
   "p_b1_00": {
    "f": "r/p_b1_00.mp4",
-   "b": 81526823,
+   "b": 80913892,
    "t": [
     "r/p_b1_00.mp4.p00",
     "r/p_b1_00.mp4.p01",
@@ -21,7 +21,7 @@ MAG.RUNS = {
    "fin": 245.3668,
    "dur": 245.3668,
    "f3": "r3/p_b1_00.mp4",
-   "b3": 52921692,
+   "b3": 52457736,
    "t3": [
     "r3/p_b1_00.mp4.p00",
     "r3/p_b1_00.mp4.p01",
@@ -365,4 +365,4 @@ MAG.RUNS = {
  }
 };
 MAG.RUNS30 = true;
-MAG.RUNS_V = '20261106b'; /* la versión de los vídeos: cámbiala cada vez que se rehagan (comun.js la pone en la URL para no usar trozos viejos de la caché). 6-nov tarde: «b», la primera Odile otra vez (p_b1_00) */
+MAG.RUNS_V = '20261106c'; /* la versión de los vídeos: cámbiala cada vez que se rehagan (comun.js la pone en la URL para no usar trozos viejos de la caché). 6-nov: «b» y «c» (noche), la primera Odile otra vez (p_b1_00) */
