@@ -8,10 +8,15 @@ APPs/LMATHOME GP (github lmpro)/BLUES (propuestas)/CONVERSACIONES/C6-MAGNETOFONO
 Lo de antes del 20-oct (subidas del 18-oct, motor v2 y v3) está apuntado en el _COORDINACION-IA.md de lmpro.
 
 ## Registro (lo más reciente arriba · hora de Galicia)
-- 6-nov 09:37 · Blues · coordinadora (retoques de Iago del 5-nov, puntos 1 y 4, en las tres bobinas) · EN CURSO · cinta/r/ y cinta/r3/ de los
-  28 tramos (sonido: el ambiente a −6 dB con la voz separada, UVR MDX-Net Voc_FT; mismo vídeo, mismos tiempos y keyframes) y, en
-  p_b1_00, la primera Odile con el fondo ENTERO nuevo (la mediana limpia de sus fondos, con la homografía suave: sin grano ni
-  saltitos); cinta/js/runs.js (bytes). Nada más. DESHACER: los ficheros de 9ed6f2a (historial de GitHub).
+- 6-nov 09:37–10:20 · Blues · coordinadora (retoques de Iago del 5-nov, puntos 1 y 4, en las tres bobinas) · HECHO · cinta/r/ y
+  cinta/r3/ de los 28 tramos (sonido: el ambiente a −6 dB con la voz separada, UVR MDX-Net Voc_FT; mismo vídeo, mismos tiempos y
+  keyframes) y, en p_b1_00, la primera Odile con el fondo ENTERO nuevo (la mediana limpia de sus fondos, con la homografía suave:
+  sin grano ni saltitos). Commits e65646b … 7f52764 (los 94 ficheros, comprobados uno a uno contra los de aquí) y f864d28:
+  cinta/js/runs.js (bytes y trozos; NUEVO MAG.RUNS_V = '20261106') y cinta/js/comun.js (los vídeos r/ y r3/ se piden con
+  ?v=MAG.RUNS_V: se traen con cache 'force-cache' y, al rehacerlos con el mismo nombre, el navegador mezclaba trozos viejos y
+  nuevos. Si se vuelven a rehacer vídeos, CAMBIAD MAG.RUNS_V). Probado: la bobina 1 carga y se ve a 60 y a 30. Quedan en cinta/r/
+  trozos viejos que runs.js ya no nombra (p. ej. p_b1_00.mp4.p09): no estorban. DESHACER: volver a subir cinta/r/, cinta/r3/ y
+  cinta/js/runs.js de 9ed6f2a (y comun.js de 9ed6f2a si se quiere quitar el ?v=, que no hace daño).
 - 5-nov 18:25 · Blues · coordinadora (retoques de Iago del 5-nov) · HECHO · en tres commits seguidos (cinta/js, cinta y, el último con esta línea, la raíz): prueba.html (el <script>
   de cinta/js/horneada.js y, en MagHitos, sin cuenta de alumno guardada y sin ser el profe, solo la bobina 1, como el Blues),
   cinta/js/horneada.js (NUEVO: cuándo pulsa el narrador ◀◀ / ‖ / ▶▶ en cada vídeo), cinta/js/motor.js (corrida: la botonera
