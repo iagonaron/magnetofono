@@ -8,6 +8,10 @@ APPs/LMATHOME GP (github lmpro)/BLUES (propuestas)/CONVERSACIONES/C6-MAGNETOFONO
 Lo de antes del 20-oct (subidas del 18-oct, motor v2 y v3) está apuntado en el _COORDINACION-IA.md de lmpro.
 
 ## Registro (lo más reciente arriba · hora de Galicia)
+- 6-nov 09:37 · Blues · coordinadora (retoques de Iago del 5-nov, puntos 1 y 4, en las tres bobinas) · EN CURSO · cinta/r/ y cinta/r3/ de los
+  28 tramos (sonido: el ambiente a −6 dB con la voz separada, UVR MDX-Net Voc_FT; mismo vídeo, mismos tiempos y keyframes) y, en
+  p_b1_00, la primera Odile con el fondo ENTERO nuevo (la mediana limpia de sus fondos, con la homografía suave: sin grano ni
+  saltitos); cinta/js/runs.js (bytes). Nada más. DESHACER: los ficheros de 9ed6f2a (historial de GitHub).
 - 5-nov 18:25 · Blues · coordinadora (retoques de Iago del 5-nov) · HECHO · en tres commits seguidos (cinta/js, cinta y, el último con esta línea, la raíz): prueba.html (el <script>
   de cinta/js/horneada.js y, en MagHitos, sin cuenta de alumno guardada y sin ser el profe, solo la bobina 1, como el Blues),
   cinta/js/horneada.js (NUEVO: cuándo pulsa el narrador ◀◀ / ‖ / ▶▶ en cada vídeo), cinta/js/motor.js (corrida: la botonera
