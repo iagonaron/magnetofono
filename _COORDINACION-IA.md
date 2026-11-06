@@ -8,9 +8,14 @@ APPs/LMATHOME GP (github lmpro)/BLUES (propuestas)/CONVERSACIONES/C6-MAGNETOFONO
 Lo de antes del 20-oct (subidas del 18-oct, motor v2 y v3) está apuntado en el _COORDINACION-IA.md de lmpro.
 
 ## Registro (lo más reciente arriba · hora de Galicia)
-- 6-nov 12:12 · Blues · coordinadora (retoques de Iago del 5-nov, punto 3: los textos nítidos) · EN CURSO · cinta/js/subs.js (NUEVO: los 170
-  subtítulos de diálogo de los 28 tramos, leídos de los vídeos: texto, tiempos y sitio), cinta/js/subtitulos.js (NUEVO: la página pinta
-  encima de cada uno el mismo cuadro .sub, nítido; no toca el motor) y prueba.html (sus dos <script>). Vídeos y motor, sin tocar.
+- 6-nov 12:12–12:30 · Blues · coordinadora (retoques de Iago del 5-nov, punto 3: los textos nítidos) · HECHO · 32a92b6 (EN CURSO), 7ed1e37
+  (cinta/js/subs.js NUEVO: los 170 subtítulos de diálogo de los 28 tramos, leídos de los propios vídeos con OCR, comprobados
+  dibujándolos encima al píxel y revisados a ojo; cinta/js/subtitulos.js NUEVO: mira qué vídeo se ve y por qué fotograma va
+  —requestVideoFrameCallback— y pinta encima el mismo cuadro .sub de estilo.css, nítido y con fondo opaco; capa #subsVid entre los
+  vídeos y #fondo; con la cinta corriendo, el mismo desenfoque que el vídeo) y, con esta línea, prueba.html (sus dos <script>).
+  Los cartelitos con flecha siguen en el vídeo. Vídeos, motor y estilos, sin tocar. Herramientas: Dropbox, MAGNETÓFONO (propuestas)/
+  herramientas-subtitulos-6-nov-2026.tar.gz. DESHACER: volver a subir el prueba.html de f6be5e6 (quita los dos <script>; los dos .js
+  pueden quedarse, nadie los carga). Si se rehace un vídeo, sus subtítulos de subs.js dejan de valer: quitad ese tramo de MAG.SUBS.
 - 6-nov 09:37–10:20 · Blues · coordinadora (retoques de Iago del 5-nov, puntos 1 y 4, en las tres bobinas) · HECHO · cinta/r/ y
   cinta/r3/ de los 28 tramos (sonido: el ambiente a −6 dB con la voz separada, UVR MDX-Net Voc_FT; mismo vídeo, mismos tiempos y
   keyframes) y, en p_b1_00, la primera Odile con el fondo ENTERO nuevo (la mediana limpia de sus fondos, con la homografía suave:
