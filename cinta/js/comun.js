@@ -94,10 +94,13 @@
   /* MAG.R[ruta] = { url (blob:), buf (AudioBuffer si es sonido), img (si es imagen), bytes } */
   MAG.R = MAG.R || {};
   const ES_AUDIO = /\.(mp3|m4a|aac|ogg|wav|opus)$/i, ES_IMG = /\.(jpe?g|png|webp|gif|svg)$/i;
-  MAG.url = ruta => (MAG.R[ruta] && MAG.R[ruta].url) || (MAG.base + ruta);
+  /* (6-nov-2026) los vídeos de los tramos (r/, r3/) se piden con ?v=MAG.RUNS_V (cinta/js/runs.js): se traen con 'force-cache'
+     y, si se rehacen sin cambiar de nombre, el navegador seguiría usando los trozos viejos (y los mezclaría con los nuevos) */
+  const dir = ruta => MAG.base + ruta + ((MAG.RUNS_V && /^r3?\//.test(ruta)) ? '?v=' + MAG.RUNS_V : '');
+  MAG.url = ruta => (MAG.R[ruta] && MAG.R[ruta].url) || dir(ruta);
   async function trae(ruta, alAvance) {
     if (MAG.R[ruta] && MAG.R[ruta].listo) return MAG.R[ruta];
-    const r = await fetch(MAG.base + ruta, { cache: 'force-cache' });
+    const r = await fetch(dir(ruta), { cache: 'force-cache' });
     if (!r.ok) throw new Error('No se encuentra ' + ruta + ' (' + r.status + ')');
     const total = +r.headers.get('content-length') || 0;
     let blob;
@@ -125,7 +128,7 @@
     if (!trozos || !trozos.length) return trae(ruta, alAvance);
     const partes = []; let n = 0;
     for (const t of trozos) {
-      const r = await fetch(MAG.base + t, { cache: 'force-cache' });
+      const r = await fetch(dir(t), { cache: 'force-cache' });
       if (!r.ok) throw new Error('No se encuentra ' + t + ' (' + r.status + ')');
       if (r.body && r.body.getReader) {
         const rd = r.body.getReader();
