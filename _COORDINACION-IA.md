@@ -8,6 +8,7 @@ APPs/LMATHOME GP (github lmpro)/BLUES (propuestas)/CONVERSACIONES/C6-MAGNETOFONO
 Lo de antes del 20-oct (subidas del 18-oct, motor v2 y v3) está apuntado en el _COORDINACION-IA.md de lmpro.
 
 ## Registro (lo más reciente arriba · hora de Galicia)
+- 6-nov 13:25 · Blues · coordinadora (retoques de Iago del 6-nov) · EN CURSO · la primera Odile (p_b1_00, 105,7–124 s) con el fondo rehecho otra vez (sin restos de letras ni manchitas que aparecen y desaparecen): cinta/r/p_b1_00.* y cinta/r3/p_b1_00.*, cinta/js/runs.js (sus trozos y RUNS_V nuevo); y prueba.html (MagHitos: el profe también por lm_vol_cuenta).
 - 6-nov 12:12–12:30 · Blues · coordinadora (retoques de Iago del 5-nov, punto 3: los textos nítidos) · HECHO · 32a92b6 (EN CURSO), 7ed1e37
   (cinta/js/subs.js NUEVO: los 170 subtítulos de diálogo de los 28 tramos, leídos de los propios vídeos con OCR, comprobados
   dibujándolos encima al píxel y revisados a ojo; cinta/js/subtitulos.js NUEVO: mira qué vídeo se ve y por qué fotograma va
