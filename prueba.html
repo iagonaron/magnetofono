@@ -36,6 +36,9 @@
      dirección a pelo lo tenía todo). El profe sigue con todo abierto: entra por Protester (#c=) y este navegador lo recuerda
      (lm_mag_profe). Como el Blues. Deshacer: volver a «: null» al final de la línea de abajo. */
   var profe = false; try { profe = localStorage.getItem('lm_mag_profe') === 'true'; } catch (e) {}
+  /* (6-nov-2026) y si este navegador ya entró alguna vez como Protester (lm_vol_cuenta, la del seleccionador de voluntarios) y no
+     tiene cuenta de alumno guardada, también es el profe (como La cabaña, Atonalidad y 4 Sabores). Deshacer: borrar la línea de abajo. */
+  if (!profe && !st) { try { profe = UUID.test(localStorage.getItem('lm_vol_cuenta') || ''); } catch (e) {} }
   var ab = profe ? null : (st && Array.isArray(st.dias) && st.dias.length) ? st.dias.map(Number) : [1];   // null = todo abierto
   window.MagHitos = {
     activo: function () { return !!ab; },
