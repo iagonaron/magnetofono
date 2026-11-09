@@ -33,17 +33,17 @@ MAG.RUNS = {
   },
   "p_b1_02": {
    "f": "r/p_b1_02.mp4",
-   "b": 7504614,
+   "b": 7505139,
    "t": null,
    "fin": 27.7,
    "dur": 29.2,
    "f3": "r3/p_b1_02.mp4",
-   "b3": 4041254,
+   "b3": 4041779,
    "t3": null
   },
   "p_b1_03": {
    "f": "r/p_b1_03.mp4",
-   "b": 12330885,
+   "b": 12328900,
    "t": [
     "r/p_b1_03.mp4.p00",
     "r/p_b1_03.mp4.p01"
@@ -51,7 +51,7 @@ MAG.RUNS = {
    "fin": 29.7667,
    "dur": 29.7667,
    "f3": "r3/p_b1_03.mp4",
-   "b3": 6370256,
+   "b3": 6368271,
    "t3": null
   },
   "p_b1_04": {
@@ -365,4 +365,4 @@ MAG.RUNS = {
  }
 };
 MAG.RUNS30 = true;
-MAG.RUNS_V = '20261106c'; /* la versión de los vídeos: cámbiala cada vez que se rehagan (comun.js la pone en la URL para no usar trozos viejos de la caché). 6-nov: «b» y «c» (noche), la primera Odile otra vez (p_b1_00) */
+MAG.RUNS_V = '20261109a'; /* la versión de los vídeos: cámbiala cada vez que se rehagan (comun.js la pone en la URL para no usar trozos viejos de la caché). 6-nov: «b» y «c» (noche), la primera Odile otra vez (p_b1_00). 9-nov «a»: bobina 1, el golpe del disco al romperse (p_b1_02) y los golpes en la puerta de Herr Kessler (p_b1_03) */

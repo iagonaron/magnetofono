@@ -782,10 +782,12 @@
       ['En un cilindro de cera', 'En una cinta con polvo de hierro'],
       ['El surco se ve', 'Es invisible: no se ve nada'],
       ['Lo lee una aguja', 'Lo lee un cabezal'],
-      ['Suena lejano, como en una lata', 'Graves y agudos de verdad'],
+      /* (9-nov-2026, Iago en el aula: «sustituir… por lo de se puede borrar y volver a reutilizar») antes: ['Suena lejano, como en una lata', 'Graves y agudos de verdad'] */
+      ['Lo grabado no se puede borrar', 'Se puede borrar y volver a usar'],
       ['Unos dos minutos', 'Más de veinte minutos']
     ],
-    suma: [['SE BORRA', 'y la cinta se vuelve a usar'], ['SE OYE CIEN VECES', 'y casi no se gasta'],
+    /* (9-nov-2026) «SE BORRA» ya está en las tarjetas: aquí, en su sitio, lo que ha salido de ellas (antes: ['SE BORRA', 'y la cinta se vuelve a usar']) */
+    suma: [['GRAVES Y AGUDOS DE VERDAD', 'y casi sin ruido'], ['SE OYE CIEN VECES', 'y casi no se gasta'],
       ['VIAJA EN SU CAJA', 'sin miedo a que se rompa, como la cera'], ['SE COPIA DE CINTA A CINTA', 'sin volver a tocar nada']],
     orden: [7, 0, 9, 4, 2, 11, 1, 6, 10, 3, 8, 5],            // el mazo (par·2 + lado), barajado a mano para que no se adivine
     odile: { caja: [917, 0, 954, 1080] }
@@ -828,7 +830,7 @@
       tj.querySelector('.tj-txt').style.font = '400 27px/35px var(--maq)';
       const cols = [0, 1].map(l => {
         const c = ctx.el('div', { class: 'b1-col' }); c.style.left = (l ? 508 : 40) + 'px';
-        c.appendChild(MAG.el('div', { class: 'b1-col-t', text: l ? 'EL MAGNETÓFONO' : 'MI FONÓGRAFO' }));
+        c.appendChild(MAG.el('div', { class: 'b1-col-t', text: l ? 'MAGNETÓFONO' : 'FONÓGRAFO' }));   // (9-nov-2026, Iago: sin «mi» ni «el»)
         const huecos = TJ.pares.map(() => { const h = MAG.el('div', { class: 'b1-hueco' }); c.appendChild(h); return h; });
         return { el: c, huecos };
       });
