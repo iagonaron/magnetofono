@@ -207,6 +207,51 @@ window.LM_VOL_CONFIG = function () {
   marca(); setInterval(marca, 1500);
 })();
 </script>
+<script>/* (13-nov-2026, Iago · «Qué suma v2», C1) «cada capítulo cuenta al llegar al 75 %»: el Magnetófono le dice al latido cuánto lleva visto
+   de la bobina (data-lm-progreso, 0–1, en <html> junto a data-lm-ejercicio; el latido lo manda a la campana cada 5 s). Se mide por TIEMPO
+   REALMENTE REPRODUCIDO: cada segundo con el vídeo sonando (no en pausa, sin saltar, con la pestaña a la vista) suma 1 s a su tramo (tope = lo que dura);
+   cada estación (libreta/mapa/taller) vale 40 s y cuenta al pasar de ella; al «Fin de la bobina» llega a 1. Nunca baja (se guarda en este
+   navegador, lm_mag_vistos, para que «Continuar» no empiece de cero). Solo lee MAG.motor y MAG.GUION; no cambia nada más. Quitarlo: borrar este bloque. */
+(function () {
+  var EST_S = 40, V = {}, ult = '';
+  var listo = false;
+  function cargar() { if (listo) return true; if (!(window.MAG && MAG.lee)) return false; try { V = MAG.lee('vistos', {}) || {}; } catch (e) { V = {}; } listo = true; return true; }
+  function guardar() { try { MAG.guarda('vistos', V); } catch (e) {} }
+  function pesos(n) {
+    var b = window.MAG && MAG.GUION && MAG.GUION.bobinas && MAG.GUION.bobinas[n]; if (!b) return null;
+    var w = b.pasos.map(function (p) { return p.t === 'v' ? ((p.partes || []).reduce(function (a, x) { return a + (+x.dur || 0); }, 0) || +p.dur || 1) : EST_S; });
+    return { w: w, tot: w.reduce(function (a, x) { return a + x; }, 0), b: b };
+  }
+  function avance(n) {
+    var P = pesos(n); if (!P) return 0; var r = V[n] || { s: {}, f: 0 }, v = 0;
+    if (r.f) return 1;
+    P.b.pasos.forEach(function (p, i) { var s = +r.s[i] || 0; v += Math.min(s, P.w[i]); });
+    return Math.min(1, v / P.tot);
+  }
+  function tic() {
+    try {
+      var M = window.MAG && MAG.motor, h = document.documentElement; if (!M || !cargar()) return;
+      var n = +M.bobina;
+      if (!(n > 0) || M.modo === 'portada' || M.modo === 'cargando') { if (h.hasAttribute('data-lm-progreso')) h.removeAttribute('data-lm-progreso'); return; }
+      var P = pesos(n); if (!P) return;
+      if (!V[n]) V[n] = { s: {}, f: 0 };
+      var r = V[n], i = +M.paso, p = P.b.pasos[i], cambio = false;
+      if (M.modo === 'fin') { if (!r.f) { r.f = 1; cambio = true; } }
+      else {
+        /* las estaciones que quedan atrás ya se han hecho */
+        P.b.pasos.forEach(function (q, j) { if (j < i && q.t !== 'v' && !(r.s[j] >= P.w[j])) { r.s[j] = P.w[j]; cambio = true; } });
+        var el = (M.run && M.run.el) || M.vid, sona = el && !el.paused && !el.seeking && !el.ended && el.readyState > 2 && !document.hidden && !(M.run && (M.run.pausada || M.run.salto));
+        if (p && p.t === 'v' && M.modo === 'historia' && sona) { var s = +r.s[i] || 0; if (s < P.w[i]) { r.s[i] = Math.min(P.w[i], s + 1); cambio = true; } }
+      }
+      if (cambio) guardar();
+      var a = avance(n).toFixed(3);
+      if (h.getAttribute('data-lm-progreso') !== a) h.setAttribute('data-lm-progreso', a);
+    } catch (e) {}
+  }
+  setInterval(tic, 1000);
+  window.__magProgreso = avance;
+})();
+</script>
 <script src="https://ge.lmathome.es/piel/latido.js?v=1" defer></script><!-- el latido del trabajo por libre (la campana del Diario). Quitarlo: borrar esta línea -->
 </body>
 </html>
